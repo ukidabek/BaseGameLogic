@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.AI;
 
 using System;
 using System.Collections;
@@ -104,7 +105,7 @@ namespace BaseGameLogic
             MissingWarning(characterController, gameObject.name);
             #endif
 
-            characterNavMeshAgent = this.GetComponent<NavMeshAgent>();
+            characterNavMeshAgent = this.GetComponent<UnityEngine.AI.NavMeshAgent>();
             #if UNITY_EDITOR
             MissingWarning(characterNavMeshAgent, gameObject.name);
             #endif

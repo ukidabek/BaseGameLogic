@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 
+using System;
 using System.Collections;
 
 using BaseGameLogic.Inputs;
@@ -18,6 +19,8 @@ namespace BaseGameLogic
 			get;
 			private set;
 		}
+
+		public Action ObjectInitializationCallBack = null;
 
 		[SerializeField]
 		private GameStatusEnum _gameStatus = GameStatusEnum.Play;
@@ -82,6 +85,25 @@ namespace BaseGameLogic
 			}
 		}
 
+		protected virtual void CreateManagersInstance()
+		{
+			InputCollectorInstance = CreateInstance<InputCollector> (inputCollectorPrefab);
+			CharacterRegisterInstance = CreateInstance<CharacterRegister>(characterRegisterPrefab);
+			TimeManagerInstance = CreateInstance<TimeManager>(timeManagerPrefab);
+			EventManagerInstance = CreateInstance<EventManager> (eventManagerPrefab);
+
+			//			SaveLoadManagerInstance = CreateInstance<SaveLoadGameSystem> (saveLoadManagerPrefab);
+			//			LocalizationManagerInstance = CreateInstance<LocalizationManager> (localizationManagerPrefab);
+		}
+
+		protected virtual void InitalizeOtherObjects()
+		{
+			if (ObjectInitializationCallBack != null)
+			{
+				ObjectInitializationCallBack ();
+			}
+		}
+
 		protected T CreateInstance<T>(GameObject prefab) where T: MonoBehaviour
 		{
 			if (prefab == null) 
@@ -102,13 +124,13 @@ namespace BaseGameLogic
 		protected virtual void Awake()
 		{
 			CreateInstance ();
+			CreateManagersInstance ();
+		}
 
-			InputCollectorInstance = CreateInstance<InputCollector> (inputCollectorPrefab);
-			CharacterRegisterInstance = CreateInstance<CharacterRegister>(characterRegisterPrefab);
-			TimeManagerInstance = CreateInstance<TimeManager>(timeManagerPrefab);
-			EventManagerInstance = CreateInstance<EventManager> (eventManagerPrefab);
-//			SaveLoadManagerInstance = CreateInstance<SaveLoadGameSystem> (saveLoadManagerPrefab);
-//			LocalizationManagerInstance = CreateInstance<LocalizationManager> (localizationManagerPrefab);
+		protected virtual void Update()
+		{
+			this.enabled = false;
+			InitalizeOtherObjects ();
 		}
 
 		public void PauseGame()

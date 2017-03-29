@@ -14,6 +14,8 @@ namespace BaseGameLogic.Character
     /// </summary>
     public class BaseCharacterController : BaseStateObject
     {
+		public virtual bool IsPlayer { get { return false; } }
+
 		#region Managers references
 
 		protected CharacterRegister CharacterRegisterInstance

@@ -19,5 +19,14 @@ namespace BaseGameLogic.Inputs
 				_inputCollectorsDictionary.Add (i.ToString (), _inputCollectors [i]);
 			}
 		}
+
+		public InputCollector GetInputCollector(string id)
+		{
+			InputCollector _inputCollector = null;
+
+			_inputCollectorsDictionary.TryGetValue (id, out _inputCollector);
+
+			 return _inputCollector;
+		}
 	}
 }

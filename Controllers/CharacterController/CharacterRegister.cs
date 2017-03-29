@@ -9,6 +9,8 @@ namespace BaseGameLogic.Character
 	{
 		private Dictionary<string, BaseCharacterController> charactersDictionary = new Dictionary<string, BaseCharacterController>();
 
+		private List<BasePlayerCharacterController> _playersList = new List<BasePlayerCharacterController>();
+
 		public void RegisterCharacter(BaseCharacterController character)
 		{
 			bool containsValue = charactersDictionary.ContainsValue (character);
@@ -20,6 +22,13 @@ namespace BaseGameLogic.Character
 			{
 				string characterName = character.name;
 				charactersDictionary.Add (characterName, character);
+
+				if (character.IsPlayer) 
+				{
+					BasePlayerCharacterController player = character as BasePlayerCharacterController;
+					_playersList.Add (player);
+					_playersList.Sort ();
+				}
 			}
 		}
 
@@ -27,6 +36,13 @@ namespace BaseGameLogic.Character
 		{
 			string characterName = character.name;
 			bool valueRemoved =  charactersDictionary.Remove (characterName);
+
+			if (character.IsPlayer) 
+			{
+				BasePlayerCharacterController player = character as BasePlayerCharacterController;
+				int index = _playersList.IndexOf (player);
+				_playersList.RemoveAt (index);
+			}
 
 			if (!valueRemoved) 
 			{

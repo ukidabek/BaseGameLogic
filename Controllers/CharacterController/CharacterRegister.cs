@@ -3,7 +3,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace BaseGameLogic
+namespace BaseGameLogic.Character
 {
 	public class CharacterRegister : MonoBehaviour 
 	{

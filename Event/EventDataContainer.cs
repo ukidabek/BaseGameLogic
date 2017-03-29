@@ -36,7 +36,6 @@ namespace BaseGameLogic.Events
 		public EventData GetEventData(string eventDataID)
 		{
 			EventData data = null;
-			bool containsValue = false;
 
 			eventDataDictionary.TryGetValue (eventDataID, out data);
 

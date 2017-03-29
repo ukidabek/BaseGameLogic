@@ -7,12 +7,11 @@ using System.Collections.Generic;
 
 using BaseGameLogic.Inputs;
 
-namespace BaseGameLogic
+namespace BaseGameLogic.Character
 {
     /// <summary>
     /// Base character controller.
     /// </summary>
-//    [RequireComponent(typeof(InputCollector))]
     public class BaseCharacterController : BaseStateObject
     {
 		#region Managers references

@@ -5,8 +5,9 @@ using System.Collections;
 using BaseGameLogic.Inputs;
 using BaseGameLogic.TimeManagment;
 using BaseGameLogic.Events;
+using BaseGameLogic.Character;
 //using BaseGameLogic.SaveLoadSystem;
-using BaseGameLogic.Localization;
+//using BaseGameLogic.Localization;
 
 namespace BaseGameLogic
 {
@@ -61,13 +62,13 @@ namespace BaseGameLogic
 			protected set;
 		}
 
-		[SerializeField]
-		private GameObject localizationManagerPrefab = null;
-		public LocalizationManager LocalizationManagerInstance 
-		{
-			get;
-			protected set;
-		}
+//		[SerializeField]
+//		private GameObject localizationManagerPrefab = null;
+//		public LocalizationManager LocalizationManagerInstance 
+//		{
+//			get;
+//			protected set;
+//		}
 
 		protected virtual void CreateInstance()
 		{
@@ -107,7 +108,7 @@ namespace BaseGameLogic
 			TimeManagerInstance = CreateInstance<TimeManager>(timeManagerPrefab);
 			EventManagerInstance = CreateInstance<EventManager> (eventManagerPrefab);
 //			SaveLoadManagerInstance = CreateInstance<SaveLoadGameSystem> (saveLoadManagerPrefab);
-			LocalizationManagerInstance = CreateInstance<LocalizationManager> (localizationManagerPrefab);
+//			LocalizationManagerInstance = CreateInstance<LocalizationManager> (localizationManagerPrefab);
 		}
 
 		public void PauseGame()

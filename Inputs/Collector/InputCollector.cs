@@ -12,6 +12,7 @@ namespace BaseGameLogic.Inputs
 		[SerializeField]
         public InputSourceEnum currentInputSourceEnum = InputSourceEnum.Null;
 		public Action InputSourceInstanceChanged = null;
+
 		private BaseInputSource _currentInputSourceInstance = null;
 		public BaseInputSource CurrentInputSourceInstance 
 		{

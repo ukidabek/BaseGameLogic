@@ -100,11 +100,11 @@ namespace BaseGameLogic.Events
 					break;
 
 				case EventDataTypeEnum.GameObject:
-					data.GameObjectValue = (GameObject)EditorGUILayout.ObjectField (data.GameObjectValue, typeof(GameObject));
+					data.GameObjectValue = (GameObject)EditorGUILayout.ObjectField (data.GameObjectValue, typeof(GameObject), true);
 					break;
 
 				case EventDataTypeEnum.Transform:
-					data.TransfomValue = (Transform)EditorGUILayout.ObjectField (data.TransfomValue, typeof(Transform));
+					data.TransfomValue = (Transform)EditorGUILayout.ObjectField (data.TransfomValue, typeof(Transform), true);
 					break;
 				}
 			}

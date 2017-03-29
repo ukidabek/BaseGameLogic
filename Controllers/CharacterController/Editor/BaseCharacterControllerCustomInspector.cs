@@ -5,7 +5,7 @@ using UnityEditor.AnimatedValues;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace BaseGameLogic
+namespace BaseGameLogic.Character
 {
     [CustomEditor(typeof(BaseCharacterController), true)]
     public class BaseCharacterControllerCustomInspector : Editor 

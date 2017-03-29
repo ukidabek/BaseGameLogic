@@ -62,5 +62,13 @@ namespace BaseGameLogic.Character
 
 			return character;
 		}
+
+		public BasePlayerCharacterController GetPlayerCharacterInstance(int index)
+		{
+			if (index < 0 || index > _playersList.Count - 1)
+				return null;
+			
+			return _playersList [index];
+		}
 	}
 }

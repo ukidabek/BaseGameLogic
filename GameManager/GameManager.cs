@@ -7,71 +7,34 @@ using BaseGameLogic.Inputs;
 using BaseGameLogic.TimeManagment;
 using BaseGameLogic.Events;
 using BaseGameLogic.Character;
-//using BaseGameLogic.SaveLoadSystem;
-//using BaseGameLogic.Localization;
 
 namespace BaseGameLogic
 {
 	public class GameManager : MonoBehaviour 
 	{
-		public static GameManager Instance 
-		{
-			get;
-			private set;
-		}
+		public static GameManager Instance  { get; private set; }
 
 		public Action ObjectInitializationCallBack = null;
 
 		[SerializeField]
 		private GameStatusEnum _gameStatus = GameStatusEnum.Play;
-		public GameStatusEnum GameStatus {
-			get { return this._gameStatus; }
-		}
+		public GameStatusEnum GameStatus { get { return this._gameStatus; } }
+
 		[SerializeField]
 		private GameObject inputCollectorPrefab = null;
-		public InputCollector InputCollectorInstance {
-			get;
-			protected set;
-		}
+		public InputCollector InputCollectorInstance { get; protected set; }
 
 		[SerializeField]
 		private GameObject characterRegisterPrefab = null;
-		public CharacterRegister CharacterRegisterInstance 
-		{
-			get;
-			protected set;
-		}
+		public CharacterRegister CharacterRegisterInstance { get; protected set; }
 
 		[SerializeField]
 		private GameObject timeManagerPrefab = null;
-		public TimeManager TimeManagerInstance 
-		{
-			get;
-			protected set;
-		}
-
-//		[SerializeField]
-//		private GameObject saveLoadManagerPrefab = null;
-//		public SaveLoadGameSystem SaveLoadManagerInstance {
-//			get;
-//			protected set;
-//		}
+		public TimeManager TimeManagerInstance { get; protected set; }
 
 		[SerializeField]
 		private GameObject eventManagerPrefab = null;
-		public EventManager EventManagerInstance 
-		{
-			get;
-			protected set;
-		}
-
-//		[SerializeField]
-//		private GameObject localizationManagerPrefab = null;
-//		public LocalizationManager LocalizationManagerInstance 
-//		{
-//			get;
-//			protected set;
-//		}
+		public EventManager EventManagerInstance  { get; protected set; }
 
 		protected virtual void CreateInstance()
 		{
@@ -91,9 +54,6 @@ namespace BaseGameLogic
 			CharacterRegisterInstance = CreateInstance<CharacterRegister>(characterRegisterPrefab);
 			TimeManagerInstance = CreateInstance<TimeManager>(timeManagerPrefab);
 			EventManagerInstance = CreateInstance<EventManager> (eventManagerPrefab);
-
-			//			SaveLoadManagerInstance = CreateInstance<SaveLoadGameSystem> (saveLoadManagerPrefab);
-			//			LocalizationManagerInstance = CreateInstance<LocalizationManager> (localizationManagerPrefab);
 		}
 
 		protected virtual void InitalizeOtherObjects()

@@ -8,6 +8,13 @@ namespace BaseGameLogic.Inputs
 {
     public class InputCollector : MonoBehaviour 
     {
+		[SerializeField,Range(0,7)]
+		private int _playerNumber = 0;
+		public int PlayerNumber 
+		{
+    		get { return this._playerNumber; }
+    	}
+
         [Header("Debug display & options.")]
 		[SerializeField]
         public InputSourceEnum currentInputSourceEnum = InputSourceEnum.Null;
@@ -205,6 +212,9 @@ namespace BaseGameLogic.Inputs
 
 		private void HandleGamePause()
 		{
+			if (CurrentInputSourceInstance == null)
+				return; 
+			
 			bool enablePause = CurrentInputSourceInstance.PauseButtonDown;
 			bool gameManagerExist = GameManager.Instance != null;
 			bool gameIsPlaing = GameManager.Instance.GameStatus == GameStatusEnum.Play;

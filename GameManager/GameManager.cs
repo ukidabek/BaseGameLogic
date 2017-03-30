@@ -21,8 +21,8 @@ namespace BaseGameLogic
 		public GameStatusEnum GameStatus { get { return this._gameStatus; } }
 
 		[SerializeField]
-		private GameObject inputCollectorPrefab = null;
-		public InputCollector InputCollectorInstance { get; protected set; }
+		private GameObject inputCollectorManagerPrefab = null;
+		public InputCollectorManager InputCollectorManager { get; protected set; }
 
 		[SerializeField]
 		private GameObject characterRegisterPrefab = null;
@@ -50,7 +50,7 @@ namespace BaseGameLogic
 
 		protected virtual void CreateManagersInstance()
 		{
-			InputCollectorInstance = CreateInstance<InputCollector> (inputCollectorPrefab);
+			InputCollectorManager = CreateInstance<InputCollectorManager> (inputCollectorManagerPrefab);
 			CharacterRegisterInstance = CreateInstance<CharacterRegister>(characterRegisterPrefab);
 			TimeManagerInstance = CreateInstance<TimeManager>(timeManagerPrefab);
 			EventManagerInstance = CreateInstance<EventManager> (eventManagerPrefab);

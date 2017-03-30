@@ -14,7 +14,13 @@ namespace BaseGameLogic.Inputs
 		}
 
 		[SerializeField]
-		public InputCollector owner = null;
+		private InputCollector _owner = null;
+		public InputCollector Owner 
+		{ 
+			get { return _owner; } 
+			set { _owner = value; } 
+		}
+
 
 		protected List<PhysicalInput> physicalInputs = new List<PhysicalInput> ();
 		public List<PhysicalInput> PhysicalInputs 
@@ -71,12 +77,11 @@ namespace BaseGameLogic.Inputs
 
 		protected virtual void Start()
 		{
-			InputCollector inputCollestor = GameManager.Instance.InputCollectorInstance;
-			if (!inputCollestor.InputSources.Contains (this)) 
+			if (!Owner.InputSources.Contains (this)) 
 			{
 				if (this != null) 
 				{
-					inputCollestor.InputSources.Add (this);
+					Owner.InputSources.Add (this);
 				} 
 			}
 		}
@@ -126,7 +131,7 @@ namespace BaseGameLogic.Inputs
 
 			BaseInputSource newSource = InputCollector.inputSourcesContainerObject.AddComponent<T> ();
 			InputCollector.InputSources.Add (newSource);
-			newSource.owner = InputCollector;
+			newSource.Owner = InputCollector;
 
 			return newSource;
 		}

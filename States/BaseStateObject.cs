@@ -117,26 +117,27 @@ namespace BaseGameLogic
         /// The object animator.
         /// </summary>
         protected Animator objectAnimator = null;
-        public Animator ObjectAnimator {
+        public Animator ObjectAnimator 
+		{
             get { return this.objectAnimator; } 
         }
 			
-        /// <summary>
-        /// The input collector.
-        /// Contains data on inputs.
-        /// </summary>
-        public InputCollector InputCollector 
-        {
-            get 
-			{ 
-				if (GameManagerInstance == null) 
-				{
-					return null;
-				}
-
-				return this.GameManagerInstance.InputCollectorInstance; 
-			} 
-        }
+//        /// <summary>
+//        /// The input collector.
+//        /// Contains data on inputs.
+//        /// </summary>
+//        public InputCollector InputCollector 
+//        {
+//            get 
+//			{ 
+//				if (GameManagerInstance == null) 
+//				{
+//					return null;
+//				}
+//
+//				return this.GameManagerInstance.InputCollectorManager; 
+//			} 
+//        }
 
 		/// <summary>
 		/// The animation handling data.
@@ -222,9 +223,9 @@ namespace BaseGameLogic
 
         protected virtual void Awake() 
         {
-            #if UNITY_EDITOR            
-			MissingWarning(InputCollector, gameObject.name);
-            #endif
+//            #if UNITY_EDITOR            
+//			MissingWarning(InputCollector, gameObject.name);
+//            #endif
 
             this.objectAnimator = gameObject.GetComponent<Animator>();
             #if UNITY_EDITOR

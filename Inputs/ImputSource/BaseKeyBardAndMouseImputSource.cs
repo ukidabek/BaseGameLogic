@@ -32,14 +32,14 @@ namespace BaseGameLogic.Inputs
         }
 
         [SerializeField]
-        private ButtonInput _left= new ButtonInput();
+        private ButtonInput _left = new ButtonInput();
         public ButtonInput Left
         {
             get { return this._left; }
         }
 
         [SerializeField]
-        private ButtonInput _right= new ButtonInput();
+        private ButtonInput _right = new ButtonInput();
         public ButtonInput Right
         {
             get { return this._right; }

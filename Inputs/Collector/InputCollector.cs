@@ -236,6 +236,11 @@ namespace BaseGameLogic.Inputs
 
 		protected virtual void Awake()
 		{
+			for (int i = 0; i < InputSources.Count; i++) 
+			{
+				InputSources [i].Owner = this;
+			}
+
 			// Furthermore we make sure that we don't destroy between scenes (this is optional)
             if (inputSources.Count > 0)
             {

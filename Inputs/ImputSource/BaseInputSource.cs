@@ -51,6 +51,7 @@ namespace BaseGameLogic.Inputs
 		public float xLookAxisSensitivity = 3f;
 		[SerializeField, Tooltip("Sensitivity of y look axis.")]
 		public float yLookAxisSensitivity = 3f;
+
 		public virtual Vector3 LookVector 
 		{
 			get { return Vector3.zero; }
@@ -142,6 +143,7 @@ namespace BaseGameLogic.Inputs
 				if (source is T)
 					return true;
 			}
+
 			return false;
 		}
 

@@ -13,7 +13,7 @@ namespace BaseGameLogic
     /// <summary>
     /// Base game object.
     /// </summary>
-    public class BaseStateObject : MonoBehaviour, IEventClient// BaseGameLogic.SaveLoadSystem.SaveStructure
+    public class BaseStateObject : MonoBehaviour, IEventClient
     {   
         #if UNITY_EDITOR
 
@@ -122,22 +122,22 @@ namespace BaseGameLogic
             get { return this.objectAnimator; } 
         }
 			
-//        /// <summary>
-//        /// The input collector.
-//        /// Contains data on inputs.
-//        /// </summary>
-//        public InputCollector InputCollector 
-//        {
-//            get 
-//			{ 
-//				if (GameManagerInstance == null) 
-//				{
-//					return null;
-//				}
-//
-//				return this.GameManagerInstance.InputCollectorManager; 
-//			} 
-//        }
+        /// <summary>
+        /// The input collector.
+        /// Contains data on inputs.
+        /// </summary>
+		public InputCollectorManager InputCollectorManager
+        {
+            get 
+			{ 
+				if (GameManagerInstance == null) 
+				{
+					return null;
+				}
+
+				return this.GameManagerInstance.InputCollectorManager; 
+			} 
+        }
 
 		/// <summary>
 		/// The animation handling data.
@@ -223,9 +223,9 @@ namespace BaseGameLogic
 
         protected virtual void Awake() 
         {
-//            #if UNITY_EDITOR            
-//			MissingWarning(InputCollector, gameObject.name);
-//            #endif
+            #if UNITY_EDITOR            
+			MissingWarning(InputCollectorManager, gameObject.name);
+            #endif
 
             this.objectAnimator = gameObject.GetComponent<Animator>();
             #if UNITY_EDITOR
@@ -416,37 +416,20 @@ namespace BaseGameLogic
 			UnregisterAllEvents ();
 		}
 
-        public void RegisterAllEvents()
-        {
-        }
+        public void RegisterAllEvents() {}
 
-        public void UnregisterAllEvents()
-        {
-        }
+        public void UnregisterAllEvents() {}
 
-        public virtual void OnCollisionEnter(Collision collision)
-        {
-        }
+        public virtual void OnCollisionEnter(Collision collision) {}
 
-		public virtual void OnCollisionStay(Collision collision)
-		{
-		}
+		public virtual void OnCollisionStay(Collision collision) {}
 
-		public virtual void OnCollisionExit(Collision collision) 
-        {
-        }
+		public virtual void OnCollisionExit(Collision collision) {}
 
-        public virtual void OnTriggerEnter(Collider collision)
-        {
-        }
+        public virtual void OnTriggerEnter(Collider collision) {}
 
-		public virtual void OnTriggernStay(Collider collision)
-		{
-		}
+		public virtual void OnTriggernStay(Collider collision) {}
 
-        public virtual void OnTriggerExit(Collider collision) 
-        {
-        }
-
+        public virtual void OnTriggerExit(Collider collision)  {}
     }
 }

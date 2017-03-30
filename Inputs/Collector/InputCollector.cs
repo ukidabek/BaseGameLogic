@@ -102,7 +102,6 @@ namespace BaseGameLogic.Inputs
 				{
 					ButtonState = buttonInput.State;
 				}
-
 			}
 
 			return ButtonState;
@@ -128,6 +127,7 @@ namespace BaseGameLogic.Inputs
 		public AnalogInput GetAxisImput (string AxisName)
 		{
 			AnalogInput Axis = GetPhysicalInput<AnalogInput> (AxisName)[0];
+
 			return Axis;
 		}
 
@@ -147,7 +147,8 @@ namespace BaseGameLogic.Inputs
 			
 		public bool IsPadConneted ()
 		{
-			if (Input.GetJoystickNames().Length == 0 || Input.GetJoystickNames()[0] == "")
+			if (Input.GetJoystickNames().Length == 0 || 
+				Input.GetJoystickNames()[0] == "")
 			{
 				return false;
 			}
@@ -187,7 +188,7 @@ namespace BaseGameLogic.Inputs
 					}
 				}
 			}
-	    }
+		}
 
 		public void CheckInpunts ()
 		{
@@ -203,7 +204,10 @@ namespace BaseGameLogic.Inputs
 						ButtonInput tmpInputContainer = input as ButtonInput;
 						if (tmpInputContainer.keyCode == KeyCode.None) 
 						{
-							Debug.LogErrorFormat ("Input is not assigned to KeyCode!: Input Name {0} {1}", source.GetType() ,input.InputName);
+							Debug.LogErrorFormat (
+								"Input is not assigned to KeyCode!: Input Name {0} {1}", 
+								source.GetType(),
+								input.InputName);
 						}
 					}
 				}

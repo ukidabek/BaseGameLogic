@@ -21,7 +21,6 @@ namespace BaseGameLogic.Inputs
 			set { _owner = value; } 
 		}
 
-
 		protected List<PhysicalInput> physicalInputs = new List<PhysicalInput> ();
 		public List<PhysicalInput> PhysicalInputs 
 		{

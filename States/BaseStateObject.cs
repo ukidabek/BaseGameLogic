@@ -371,7 +371,10 @@ namespace BaseGameLogic.States
                 CurrentState.Enter();
 
                 #if UNITY_EDITOR
-                currentStateTypes.Insert(0, newState.GetType().ToString());
+				string type = newState.GetType().ToString();
+				string [] nameSegments = type.Split('.');
+				string stateName = nameSegments[nameSegments.Length -1];
+				currentStateTypes.Insert(0, stateName);
                 #endif    
             }
         }

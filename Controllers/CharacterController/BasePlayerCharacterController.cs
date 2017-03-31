@@ -31,6 +31,10 @@ namespace BaseGameLogic.Character
 			}
 		}
 
+		/// <summary>
+		/// The input collector.
+		/// Contains data on inputs.
+		/// </summary>
 		protected InputCollectorManager InputCollectorManagerInstance
 		{
 			get { return GameManagerInstance.InputCollectorManager; }

@@ -8,7 +8,7 @@ using BaseGameLogic.Inputs;
 using BaseGameLogic.Audio;
 using BaseGameLogic.Events;
 
-namespace BaseGameLogic
+namespace BaseGameLogic.States
 {
     /// <summary>
     /// Base game object.
@@ -121,23 +121,6 @@ namespace BaseGameLogic
 		{
             get { return this.objectAnimator; } 
         }
-			
-        /// <summary>
-        /// The input collector.
-        /// Contains data on inputs.
-        /// </summary>
-		public InputCollectorManager InputCollectorManager
-        {
-            get 
-			{ 
-				if (GameManagerInstance == null) 
-				{
-					return null;
-				}
-
-				return this.GameManagerInstance.InputCollectorManager; 
-			} 
-        }
 
 		/// <summary>
 		/// The animation handling data.
@@ -223,10 +206,6 @@ namespace BaseGameLogic
 
         protected virtual void Awake() 
         {
-            #if UNITY_EDITOR            
-			MissingWarning(InputCollectorManager, gameObject.name);
-            #endif
-
             this.objectAnimator = gameObject.GetComponent<Animator>();
             #if UNITY_EDITOR
             MissingWarning(objectAnimator, gameObject.name);

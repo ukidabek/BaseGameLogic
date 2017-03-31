@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using BaseGameLogic.Inputs;
 using BaseGameLogic.Audio;
 
-namespace BaseGameLogic
+namespace BaseGameLogic.States
 {
     /// <summary>
     /// Base state.

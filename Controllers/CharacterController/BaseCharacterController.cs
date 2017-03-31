@@ -5,6 +5,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+using BaseGameLogic.States;
+
 namespace BaseGameLogic.Character
 {
     /// <summary>

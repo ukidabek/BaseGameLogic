@@ -3,7 +3,7 @@ using System.Collections;
 
 using BaseGameLogic.Audio;
 
-namespace BaseGameLogic
+namespace BaseGameLogic.States
 {
     /// <summary>
     /// Base state creator.

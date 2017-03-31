@@ -2,7 +2,7 @@
 
 using System.Collections;
 
-namespace BaseGameLogic
+namespace BaseGameLogic.States
 {
     /// <summary>
     /// Base state mode.

@@ -274,7 +274,15 @@ namespace BaseGameLogic
         {
             EventClientStart();
             EnterDefaultState();
+
+			GameManagerInstance.ObjectInitializationCallBack -= InitializeObject;
+			GameManagerInstance.ObjectInitializationCallBack += InitializeObject;
         }
+
+		/// <summary>
+		/// This method is called by GameManager in firstupdata of this object.
+		/// </summary>
+		protected virtual void InitializeObject() {}
 
 		protected bool ExecutModesFunction(StateModeUpdate update)
         {
@@ -403,15 +411,17 @@ namespace BaseGameLogic
 		{
 			EventClientOnDestroy ();
 			string name = this.gameObject.name;
-			Debug.LogFormat ("{0} was destroyed", name); 
+			Debug.LogFormat ("{0} was destroyed", name);
+
+			GameManagerInstance.ObjectInitializationCallBack -= InitializeObject;
 		}
 
-        public virtual void EventClientStart ()
+		public virtual void EventClientStart ()
 		{
 			RegisterAllEvents ();
 		}
 
-        public virtual void EventClientOnDestroy ()
+		public virtual void EventClientOnDestroy ()
 		{
 			UnregisterAllEvents ();
 		}
@@ -430,6 +440,6 @@ namespace BaseGameLogic
 
 		public virtual void OnTriggernStay(Collider collision) {}
 
-        public virtual void OnTriggerExit(Collider collision)  {}
+        public virtual void OnTriggerExit(Collider collision) {}
     }
 }

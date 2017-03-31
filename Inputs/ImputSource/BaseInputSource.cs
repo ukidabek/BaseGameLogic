@@ -46,6 +46,11 @@ namespace BaseGameLogic.Inputs
 			get { return Vector3.zero; }
 		}
 
+		public virtual Vector3 TriggersVector
+		{
+			get { return Vector3.zero; }
+		}
+
 		[Header("Look axis sensitivity settings")]
 		[SerializeField, Tooltip("Sensitivity of x look axis.")]
 		public float xLookAxisSensitivity = 3f;

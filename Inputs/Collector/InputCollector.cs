@@ -177,8 +177,9 @@ namespace BaseGameLogic.Inputs
 
 		public void CollectInputs()
 	    {
-	    	foreach (BaseInputSource source in inputSources)
+			for (int i = 0; i < inputSources.Count; i++) 
 			{
+				BaseInputSource source = inputSources[i];
 				if (source != null) 
 				{
 					source.GatherInputs ();

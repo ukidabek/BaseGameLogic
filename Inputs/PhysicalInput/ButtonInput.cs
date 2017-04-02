@@ -31,9 +31,7 @@ namespace BaseGameLogic.Inputs
 
         public ButtonStateEnum State
         {
-			get {
-                return buttonState;
-            }
+			get { return buttonState; }
 			set { buttonState = value;}
         }
 
@@ -86,18 +84,22 @@ namespace BaseGameLogic.Inputs
 			WasPressed = IsPressed;
 			IsPressed = Input.GetKey(keyCode);
 
-			if (!IsPressed && !WasPressed) {
+			if (!IsPressed && !WasPressed)
+			{
 				buttonState = ButtonStateEnum.Released;
 				return;
-			} else if (IsPressed && !WasPressed)
+			} 
+			else if (IsPressed && !WasPressed)
 			{
 				buttonState = ButtonStateEnum.Down;
 				return;
-			} else if (IsPressed && WasPressed)
+			} 
+			else if (IsPressed && WasPressed)
 			{
 				buttonState = ButtonStateEnum.Held;
 				return;
-			} else if (!IsPressed && WasPressed)
+			} 
+			else if (!IsPressed && WasPressed)
 			{
 				buttonState = ButtonStateEnum.Up;
 				return;

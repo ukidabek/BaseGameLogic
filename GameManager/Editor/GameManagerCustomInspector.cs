@@ -3,6 +3,8 @@ using UnityEditor;
 
 using System.Collections;
 
+using BaseGameLogic.Management;
+
 namespace BaseGameLogic
 {
 	[CustomEditor(typeof(GameManager), true)]

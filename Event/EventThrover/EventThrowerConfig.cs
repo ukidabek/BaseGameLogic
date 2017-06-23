@@ -4,6 +4,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+using BaseGameLogic.Management;
+
 namespace BaseGameLogic.Events
 {
 	[CreateAssetMenu(menuName = "Events/EventThrowerConfig", fileName = "EventThrowerConfig.asset")]

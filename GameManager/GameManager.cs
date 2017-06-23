@@ -8,7 +8,7 @@ using BaseGameLogic.TimeManagment;
 using BaseGameLogic.Events;
 using BaseGameLogic.Character;
 
-namespace BaseGameLogic
+namespace BaseGameLogic.Management
 {
 	public class GameManager : MonoBehaviour 
 	{

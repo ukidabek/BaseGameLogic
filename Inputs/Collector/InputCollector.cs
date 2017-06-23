@@ -4,6 +4,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+using BaseGameLogic.Management;
+
 namespace BaseGameLogic.Inputs
 {
     public class InputCollector : MonoBehaviour 

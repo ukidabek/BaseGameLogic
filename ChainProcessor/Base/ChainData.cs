@@ -1,4 +1,7 @@
 ﻿using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 using System;
 using System.Collections;
@@ -8,10 +11,12 @@ using BaseGameLogic.Management;
 
 namespace BaseGameLogic.ChainProcessing
 {
-	[Serializable]
-	public abstract class ChainLink
+	public abstract class ChainData 
 	{
-		public abstract ChainLink [] Inputs { get;}
-		public abstract ChainLink [] Outputs { get;}
+		#if UNITY_EDITOR
+
+		public abstract void OnInspektorGui();
+
+		#endif
 	}
 }

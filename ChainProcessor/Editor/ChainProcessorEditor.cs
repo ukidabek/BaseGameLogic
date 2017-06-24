@@ -17,11 +17,5 @@ namespace BaseGameLogic.ChainProcessing
 			get { return this._processor; }
 			set { _processor = value; }
 		}
-
-//		public ChainProcessorEditor (ChainProcessor _processor)
-//		{
-//			this._processor = _processor;
-//		}
-		
 	}
 }

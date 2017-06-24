@@ -14,6 +14,8 @@ namespace BaseGameLogic.ChainProcessing
 	[Serializable]
 	public abstract class ChainLink
 	{
+		public ChainData OutData = null;
+
 		#if UNITY_EDITOR
 
 		private Rect _linkRect = new Rect ();
@@ -28,7 +30,7 @@ namespace BaseGameLogic.ChainProcessing
 		public abstract ChainLink [] Inputs { get; }
 		public abstract ChainLink [] Outputs { get; }
 
-		public abstract void Prosess(ChainData data);
+		public abstract void Prosess();
 
 		#if UNITY_EDITOR
 

@@ -19,9 +19,9 @@ namespace BaseGameLogic.ChainProcessing
 			get { return new ChainLink[]{_output}; }
 		}
 
-		public override void Prosess (ChainData data)
+		public override void Prosess ()
 		{
-			_output.Prosess (InData);
+			_output.Prosess ();
 		}
 	}
 }

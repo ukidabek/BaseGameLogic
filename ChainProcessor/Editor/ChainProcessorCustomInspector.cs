@@ -26,7 +26,7 @@ namespace BaseGameLogic.ChainProcessing
 			if (GUILayout.Button ("Open editor")) 
 			{
 				ChainProcessorEditor window = EditorWindow.CreateInstance<ChainProcessorEditor> ();
-				window.Processor = _processor;
+				window.Initialize (_processor);
 				window.Show ();
 			}
 		}

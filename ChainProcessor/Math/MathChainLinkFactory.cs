@@ -5,7 +5,10 @@ using System.Collections.Generic;
 
 using BaseGameLogic.ChainProcessing;
 
-public class MathBaseChainLinkFactory : BaseChainLinkFactory
+[CreateAssetMenu(
+	fileName = "MathChainLinkFactory", 
+	menuName = "BaseGameLogic/ChainLinkFactories/Math")]
+public class MathChainLinkFactory : BaseChainLinkFactory
 {
 	private const string ADDITION = "Addition";
 	private const string SUBTRACTION = "Subtraction";
@@ -24,20 +27,28 @@ public class MathBaseChainLinkFactory : BaseChainLinkFactory
 		get { return _chainLinkTypes;}
 	}
 
-	public override ChainLink FabricateChainLink (string type)
+	public override ChainLink FabricateChainLink (Order order)
 	{
-		switch (type) 
+		ChainLink link = null;
+		switch (order.Type) 
 		{
 		case ADDITION:
-			return null;
+			link = order.LinkContainerObject.AddComponent<AdditionChanLink>(); 
+			break;
 		case SUBTRACTION:
-			return null;
+			break;
 		case MULTIPLICATION:
-			return null;
+			break;
 		case DIVISION:
-			return null;
+			break;
 		}
 
-		return null;
+		Rect newRect = link.LinkRect;
+		newRect.position = order.Position;
+		Vector2 size = new Vector2 (100, 100);
+		newRect.size = size;
+		link.LinkRect = newRect;
+
+		return link;
 	}
 }

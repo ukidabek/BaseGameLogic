@@ -11,6 +11,6 @@ namespace BaseGameLogic.ChainProcessing
 	{
 		public abstract string [] ChainLinkTypes { get; }
 
-		public abstract ChainLink FabricateChainLink(string type);
+		public abstract ChainLink FabricateChainLink(Order order);
 	}
 }

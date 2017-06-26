@@ -9,6 +9,9 @@ namespace BaseGameLogic.ChainProcessing
 {
 	public class ChainInput : ChainLink 
 	{
+		private const string Link_Name = "ChainInput";
+		public override string Name { get { return Link_Name; } }
+
 		public ChainData InData = null;
 
 		public override ChainLink[] Inputs  { get { return null;} }
@@ -18,6 +21,8 @@ namespace BaseGameLogic.ChainProcessing
 		{
 			get { return new ChainLink[]{_output}; }
 		}
+
+		public ChainInput (Vector2 position) : base (position) {}
 
 		public override void Prosess ()
 		{

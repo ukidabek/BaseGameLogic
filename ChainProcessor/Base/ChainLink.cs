@@ -12,13 +12,15 @@ using BaseGameLogic.Management;
 namespace BaseGameLogic.ChainProcessing
 {
 	[Serializable]
-	public abstract class ChainLink
+	public abstract class ChainLink : MonoBehaviour
 	{
+		public abstract string Name { get; }
+
 		public ChainData OutData = null;
 
 		#if UNITY_EDITOR
-
-		private Rect _linkRect = new Rect ();
+		[SerializeField]
+		protected Rect _linkRect = new Rect ();
 		public Rect LinkRect 
 		{
 			get { return this._linkRect; }
@@ -40,5 +42,12 @@ namespace BaseGameLogic.ChainProcessing
 		}
 
 		#endif
+
+		public ChainLink (Vector2 position)
+		{
+			this._linkRect.x = position.x;
+			this._linkRect.y = position.y;
+		}
+		
 	}
 }

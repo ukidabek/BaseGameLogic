@@ -30,7 +30,12 @@ namespace BaseGameLogic.ChainProcessing
 		#endif
 
 		public abstract ChainLink [] Inputs { get; }
-		public abstract ChainLink [] Outputs { get; }
+		[SerializeField]
+		public List<ChainLink> _outputs = new List<ChainLink>();
+		public List<ChainLink> Outputs 
+		{ 
+			get { return _outputs; } 
+		}
 
 		public abstract void Prosess();
 

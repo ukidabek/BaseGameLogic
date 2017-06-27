@@ -11,10 +11,15 @@ namespace BaseGameLogic.ChainProcessing
 {
 	public class ChainProcessorEditor : EditorWindow
 	{
-		Rect contextRect = new Rect(10, 10, 100, 100);
+		private ChainProcessorEditorModeEnum _mode = ChainProcessorEditorModeEnum.Normal;
 
-		GenericMenu menu = new GenericMenu();
-		private List<Order> _ordersList = new List<Order>();
+		private Event _currentEvent = null;
+		private Vector2 _currentMousePositon = Vector2.zero;
+
+		private GenericMenu _edytorContextMenu = new GenericMenu();
+		private GenericMenu _nodeContextMenu = new GenericMenu();
+
+		private List<Order> _factoryOrdersList = new List<Order>();
 
 		private ChainProcessor _processor = null;
 		public ChainProcessor Processor 
@@ -28,24 +33,16 @@ namespace BaseGameLogic.ChainProcessing
 			get { return _processor.LinksFactory; }
 		}
 
-		void Callback(object obj)
+		private List<ChainLink> Links
 		{
-			if (obj is Order) 
-			{
-				Order order = obj as Order;
-				ChainLink link = Factory.FabricateChainLink (order);
-				if (link != null) 
-				{
-					_processor.LinkList.Add (link);
-				}
-
-			}
+			get { return _processor.LinkList; }
 		}
 
-		public void Initialize (ChainProcessor _processor)
-		{
-			this._processor = _processor;
+		private ChainLink _linkA = null;
+		private ChainLink _linkB = null;
 
+		private void GenerateEditorContextMenu()
+		{
 			GameObject linkContainerObject = _processor.LinkContainerObject;
 
 			string[] linksTypes = _processor.LinksFactory.ChainLinkTypes;
@@ -55,54 +52,162 @@ namespace BaseGameLogic.ChainProcessing
 				string guiContentText = string.Format ("Create/{0}", type);
 
 				Order newOrder = new Order (type, linkContainerObject);
-				_ordersList.Add (newOrder);
+				_factoryOrdersList.Add (newOrder);
 				GUIContent newGuiContent = new GUIContent (guiContentText);
-				menu.AddItem (newGuiContent, false, Callback, newOrder);
+				_edytorContextMenu.AddItem (newGuiContent, false, CreateNode, newOrder);
+			}
+		}
+
+		private void GenerateNodeContextMenu()
+		{
+			string guiContentText = "Connect";
+			GUIContent newGuiContent = new GUIContent (guiContentText);
+			_nodeContextMenu.AddItem (newGuiContent, false, ConnectNode, null);
+		}
+
+		public void Initialize (ChainProcessor _processor)
+		{
+			this._processor = _processor;
+			this.wantsMouseMove = true;
+
+			GenerateEditorContextMenu ();
+			GenerateNodeContextMenu ();
+		}
+
+		private void NormalModeOperations()
+		{
+			if (_currentEvent.type == EventType.MouseDown &&
+				_currentEvent.button == 1)
+			{
+				_currentMousePositon = _currentEvent.mousePosition;
+				_linkA = FindLink (_currentMousePositon);
+
+				if (_linkA != null)
+				{
+					_nodeContextMenu.ShowAsContext ();
+				}
+				else 
+				{
+					_edytorContextMenu.ShowAsContext ();
+				}
+
+				_currentEvent.Use ();
+			}
+		}
+
+		private ChainLink FindLink(Vector2 position)
+		{
+			bool nodeClicked = false;
+			for (int i = 0; i < Links.Count; i++) 
+			{
+				nodeClicked = Links [i].LinkRect.Contains (position);
+				if (nodeClicked) 
+				{
+					return Links [i];
+				}
 			}
 
+			return null;
 		}
-		
+
+
+		private void ConnectModeOperations()
+		{
+			if (_currentEvent.type == EventType.MouseMove) 
+			{
+				_currentMousePositon = _currentEvent.mousePosition;
+				_currentEvent.Use ();
+			}
+
+			if (_currentEvent.type == EventType.MouseDown &&
+			    _currentEvent.button == 0) 
+			{
+				_currentMousePositon = _currentEvent.mousePosition;
+				_linkB = FindLink (_currentMousePositon);
+				_currentEvent.Use ();
+
+				if (_linkA != null && _linkB != null) 
+				{
+					_linkA.Outputs.Add (_linkB);
+					_linkA = _linkB = null;
+
+					_mode = ChainProcessorEditorModeEnum.Normal;
+					EditorUtility.SetDirty (_processor.gameObject);
+					return;
+				}
+			}
+
+			Color oldColor = Handles.color;
+			Handles.color = Color.black;
+			Handles.DrawLine (_linkA.LinkRect.position, _currentMousePositon);
+			Handles.color = oldColor;
+		}
+
+		private void ConnectNode(object obj)
+		{
+			_mode = ChainProcessorEditorModeEnum.Connect;
+		}
+
+		private void CreateNode(object obj)
+		{
+			if (obj is Order) 
+			{
+				Order order = obj as Order;
+				order.Position = _currentMousePositon;
+
+				ChainLink link = Factory.FabricateChainLink (order);
+				if (link != null) 
+				{
+					if (link is ChainInput) 
+					{
+						_processor.Inputs.Add (link as ChainInput);
+					}
+
+					if (link is ChainOutput) 
+					{
+						_processor.Outputs.Add (link as ChainOutput);
+					}
+					_processor.LinkList.Add (link);
+				}
+
+			}
+		}
+
+		private void  DrawNodes()
+		{
+			BeginWindows();
+			{
+				for (int i = 0; i < Links.Count; i++) 
+				{
+					Links [i].LinkRect = GUI.Window (
+						i,
+						Links [i].LinkRect,
+						Links [i].DrawNodeWindow,
+						Links [i].Name);
+				}
+			}
+			EndWindows();
+		}
 
 		private void OnGUI()
 		{
 			if (_processor == null)
+		
 				return;
-			List<ChainLink> _links = _processor.LinkList;
+			_currentEvent = Event.current;
 
-			BeginWindows();
+			switch (_mode) 
 			{
-				for (int i = 0; i < _links.Count; i++) 
-				{
-					_links [i].LinkRect = GUI.Window (
-						i,
-						_links [i].LinkRect,
-						_links [i].DrawNodeWindow,
-						_links [i].Name);
-				}
+			case ChainProcessorEditorModeEnum.Normal:
+				NormalModeOperations ();
+				break;
+
+			case ChainProcessorEditorModeEnum.Connect:
+				ConnectModeOperations ();
+				break;
 			}
-			EndWindows();
 
-			Event currentEvent = Event.current;
-			if (currentEvent.type == EventType.ContextClick)
-			{
-				Vector2 mousePositon = currentEvent.mousePosition;
-
-				for (int i = 0; i < _ordersList.Count; i++) 
-				{
-					_ordersList [i].Position = mousePositon;
-				}
-//				if (contextRect.Contains(mousePos))
-//				{
-					// Now create the menu, add items and show it
-
-//				menu.AddItem(new GUIContent("MenuItem1"), false, Callback, "item 1");
-//				menu.AddItem(new GUIContent("MenuItem2"), false, Callback, "item 2");
-//				menu.AddSeparator("");
-//				menu.AddItem(new GUIContent("SubMenu/MenuItem3"), false, Callback, "item 3");
-				menu.ShowAsContext();
-				currentEvent.Use();
-//				}
-			}
+			DrawNodes ();
 		}
 	}
 }

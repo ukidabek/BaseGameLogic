@@ -16,6 +16,8 @@ public class MathChainLinkFactory : BaseChainLinkFactory
 	private const string DIVISION = "Division";
 
 	private string [] _chainLinkTypes = new string[] { 
+		INPUT,
+		OUTPUT,
 		ADDITION, 
 		SUBTRACTION, 
 		MULTIPLICATION, 
@@ -24,12 +26,15 @@ public class MathChainLinkFactory : BaseChainLinkFactory
 
 	public override string[] ChainLinkTypes 
 	{
-		get { return _chainLinkTypes;}
+		get { return this._chainLinkTypes; }
 	}
 
 	public override ChainLink FabricateChainLink (Order order)
 	{
-		ChainLink link = null;
+		ChainLink link = base.FabricateChainLink(order);
+		if (link != null)
+			return link;
+		
 		switch (order.Type) 
 		{
 		case ADDITION:
@@ -43,12 +48,15 @@ public class MathChainLinkFactory : BaseChainLinkFactory
 			break;
 		}
 
-		Rect newRect = link.LinkRect;
-		newRect.position = order.Position;
-		Vector2 size = new Vector2 (100, 100);
-		newRect.size = size;
-		link.LinkRect = newRect;
+		if (link != null) 
+		{			
+			Rect newRect = link.LinkRect;
+			newRect.position = order.Position;
+			Vector2 size = new Vector2 (100, 100);
+			newRect.size = size;
 
+			link.LinkRect = newRect;
+		}
 		return link;
 	}
 }

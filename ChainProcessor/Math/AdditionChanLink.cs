@@ -11,17 +11,13 @@ public class AdditionChanLink : ChainLink
 	private const string Link_Name = "Addition";
 	public override string Name { get { return Link_Name; } }
 
-	private ChainLink inputA = null;
-	private ChainLink inputB = null;
-
+	[SerializeField]
+	private ChainLink _inputA = null;
+	[SerializeField]
+	private ChainLink _inputB = null;
 	public override ChainLink[] Inputs 
 	{
-		get { return new ChainLink [] { inputA, inputB }; }
-	}
-
-	public override ChainLink[] Outputs 
-	{
-		get { throw new System.NotImplementedException (); }
+		get { return new ChainLink [] { _inputA, _inputB }; }
 	}
 
 	public AdditionChanLink (Vector2 position) : base (position) 
@@ -32,10 +28,10 @@ public class AdditionChanLink : ChainLink
 
 	public override void Prosess ()
 	{
-		if (inputA != null || inputB != null) 
+		if (_inputA != null || _inputB != null) 
 		{
-			if(inputA != null && inputB != null &&
-				inputA.OutData != null && inputB.OutData != null)
+			if(_inputA != null && _inputB != null &&
+				_inputA.OutData != null && _inputB.OutData != null)
 			{
 			}
 		}

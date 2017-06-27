@@ -6,15 +6,13 @@ using BaseGameLogic.Management;
 
 namespace BaseGameLogic.ChainProcessing
 {
-	public class ChainOutput : ChainLink 
+	public class ChainOutput : IOChainLink 
 	{
 		private const string Link_Name = "ChainOutput";
 		public override string Name { get { return Link_Name; } }
 
 		private ChainLink _input = null; 
 		public override ChainLink[] Inputs { get { return new ChainLink[]{_input}; }}
-
-		public override ChainLink[] Outputs { get { return null;} }
 
 		public ChainOutput (Vector2 position) : base (position) {}
 

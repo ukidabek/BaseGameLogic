@@ -18,5 +18,17 @@ namespace BaseGameLogic.ChainProcessing
 		public abstract void OnInspektorGui();
 
 		#endif
+
+		protected abstract ChainData Add (ChainData data);
+		public static ChainData operator + (ChainData data1, ChainData data2)
+		{
+			return data1.Add (data2);
+		}
+
+		protected abstract ChainData Subtract (ChainData data);
+		public static ChainData operator - (ChainData data1, ChainData data2)
+		{
+			return data1.Subtract (data2);
+		}
 	}
 }

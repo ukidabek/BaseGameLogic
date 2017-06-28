@@ -13,6 +13,20 @@ namespace BaseGameLogic.ChainProcessing
 {
 	public abstract class IOChainLink : ChainLink 
 	{
+		[SerializeField]
+		protected string ioName = string.Empty;
+		public string IOName 
+		{
+			get { return this.ioName; }
+			set { ioName = value; }
+		}
+
 		public IOChainLink (Vector2 position) : base (position) {}
+
+		public override void DrawNodeWindow (int id)
+		{
+			ioName = EditorGUILayout.TextField (ioName);
+			base.DrawNodeWindow (id);
+		}
 	}
 }

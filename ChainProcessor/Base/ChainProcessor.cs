@@ -60,5 +60,12 @@ namespace BaseGameLogic.ChainProcessing
 		{
 			get { return this._outputs; }
 		}
+
+		public void Process()
+		{
+			for (int i = 0; i < _inputs.Count; i++) {
+				_inputs [i].Prosess ();
+			}
+		}
 	}
 }

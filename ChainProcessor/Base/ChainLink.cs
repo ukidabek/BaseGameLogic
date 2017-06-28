@@ -19,6 +19,7 @@ namespace BaseGameLogic.ChainProcessing
 		public ChainData OutData = null;
 
 		#if UNITY_EDITOR
+
 		[SerializeField]
 		protected Rect _linkRect = new Rect ();
 		public Rect LinkRect 
@@ -26,15 +27,59 @@ namespace BaseGameLogic.ChainProcessing
 			get { return this._linkRect; }
 			set { _linkRect = value; }
 		}
+			
+		public Vector2 OutputHook()
+		{
+				Vector2 hook = new Vector2 (
+					               _linkRect.position.x + _linkRect.size.x,
+					               _linkRect.position.y + (_linkRect.size.y / 2));
+			
+				return hook;
+		}
+
+		public Vector2 GetInputHook(int index)
+		{
+			float deltaHeight = _linkRect.size.y / (InputsCount * 2);
+
+			Vector2 hook = new Vector2 (
+				_linkRect.position.x,
+				_linkRect.position.y + (deltaHeight + (deltaHeight * index * 2)));
+
+			return hook;
+		}
 
 		#endif
 
-		public abstract ChainLink [] Inputs { get; }
+		protected abstract int InputsCount { get ; }
+
 		[SerializeField]
-		public List<ChainLink> _outputs = new List<ChainLink>();
+		protected ChainLink[] _inputs = null; 
+		public ChainLink [] Inputs 
+		{
+			get 
+			{ 
+				if (_inputs == null) 
+				{
+					_inputs = new ChainLink [InputsCount];
+				}
+
+				return _inputs; 
+			}
+		}
+
+
+		[SerializeField]
+		public List<ChainLink> _outputs = null;
 		public List<ChainLink> Outputs 
 		{ 
-			get { return _outputs; } 
+			get 
+			{
+				if (_outputs == null) 
+				{
+					_outputs = new List<ChainLink>();
+				}
+				return _outputs; 
+			} 
 		}
 
 		public abstract void Prosess();

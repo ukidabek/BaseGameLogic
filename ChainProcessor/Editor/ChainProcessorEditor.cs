@@ -110,6 +110,19 @@ namespace BaseGameLogic.ChainProcessing
 			return null;
 		}
 
+		public void xD(object obj)
+		{
+			int index = (int)obj;
+
+			_linkA.Outputs.Add (_linkB);
+
+			_linkB.Inputs [index] = _linkA;
+			_linkA = _linkB = null;
+
+			_mode = ChainProcessorEditorModeEnum.Normal;
+			EditorUtility.SetDirty (_processor.gameObject);
+
+		}
 
 		private void ConnectModeOperations()
 		{
@@ -128,18 +141,27 @@ namespace BaseGameLogic.ChainProcessing
 
 				if (_linkA != null && _linkB != null) 
 				{
-					_linkA.Outputs.Add (_linkB);
-					_linkA = _linkB = null;
+					GenericMenu _test = new GenericMenu();
+					for (int i = 0; i < _linkB.Inputs.Length; i++) 
+					{
+						GUIContent newGUIContent = new GUIContent(i.ToString());
+						_test.AddItem (newGUIContent, false, xD, i);
+					}
+					 
+					_test.ShowAsContext ();
 
-					_mode = ChainProcessorEditorModeEnum.Normal;
-					EditorUtility.SetDirty (_processor.gameObject);
 					return;
 				}
 			}
 
+			DrawLine (_linkA.OutputHook(), _currentMousePositon);
+		}
+
+		private void DrawLine (Vector2 start, Vector2 end)
+		{
 			Color oldColor = Handles.color;
 			Handles.color = Color.black;
-			Handles.DrawLine (_linkA.LinkRect.position, _currentMousePositon);
+			Handles.DrawLine (start, end);
 			Handles.color = oldColor;
 		}
 
@@ -184,7 +206,21 @@ namespace BaseGameLogic.ChainProcessing
 						Links [i].LinkRect,
 						Links [i].DrawNodeWindow,
 						Links [i].Name);
+
+					if (Links [i].Inputs != null) 
+					{
+						for (int j = 0; j < Links [i].Inputs.Length; j++) 
+						{
+							if (Links [i].Inputs [j] != null) 
+							{
+								Vector2 start = Links [i].GetInputHook (j);
+								Vector2 end = Links [i].Inputs [j].OutputHook ();
+								DrawLine (start, end);
+							}
+						}
+					}
 				}
+
 			}
 			EndWindows();
 		}

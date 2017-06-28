@@ -14,13 +14,18 @@ namespace BaseGameLogic.ChainProcessing
 
 		public ChainData InData = null;
 
-		public override ChainLink[] Inputs  { get { return null;} }
-
+		protected override int InputsCount { get { return 0;} }
 
 		public ChainInput (Vector2 position) : base (position) {}
 
 		public override void Prosess ()
 		{
+			OutData = InData;
+			for (int i = 0; i < _outputs.Count; i++) 
+			{
+//				_outputs [i].OutData = InData;
+				_outputs [i].Prosess ();
+			}
 		}
 	}
 }

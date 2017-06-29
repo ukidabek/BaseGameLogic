@@ -11,6 +11,9 @@ namespace BaseGameLogic.ChainProcessing
 {
 	public class ChainProcessorEditor : EditorWindow
 	{
+		private const int Left_Mouse_Button = 0;
+		private const int Right_Mouse_Button = 1;
+
 		private ChainProcessorEditorModeEnum _mode = ChainProcessorEditorModeEnum.Normal;
 
 		private Event _currentEvent = null;
@@ -62,7 +65,11 @@ namespace BaseGameLogic.ChainProcessing
 		{
 			string guiContentText = "Connect";
 			GUIContent newGuiContent = new GUIContent (guiContentText);
-			_nodeContextMenu.AddItem (newGuiContent, false, ConnectNode, null);
+			_nodeContextMenu.AddItem (newGuiContent, false, SwithToConnectMode, null);
+
+			guiContentText = "Delete";
+			newGuiContent = new GUIContent (guiContentText);
+			_nodeContextMenu.AddItem (newGuiContent, false, DeleteNode, null);
 		}
 
 		public void Initialize (ChainProcessor _processor)
@@ -77,7 +84,7 @@ namespace BaseGameLogic.ChainProcessing
 		private void NormalModeOperations()
 		{
 			if (_currentEvent.type == EventType.MouseDown &&
-				_currentEvent.button == 1)
+				_currentEvent.button == Right_Mouse_Button)
 			{
 				_currentMousePositon = _currentEvent.mousePosition;
 				_linkA = FindLink (_currentMousePositon);
@@ -93,6 +100,57 @@ namespace BaseGameLogic.ChainProcessing
 
 				_currentEvent.Use ();
 			}
+
+			if (_currentEvent.type == EventType.MouseDown &&
+				_currentEvent.button == Left_Mouse_Button) 
+			{
+				_currentMousePositon = _currentEvent.mousePosition;
+				_linkA = FindLink (_currentMousePositon);
+			}
+			if (_currentEvent.type == EventType.KeyDown &&
+				_currentEvent.keyCode == KeyCode.Delete) 
+			{
+				if (_linkA != null)
+				{
+					DeleteNode ();
+				}
+			}
+		}
+
+		private void DeleteNode(object obj = null)
+		{
+			ChainLink link = _linkA;
+			if (link == null)
+				return;
+			
+			int index =_processor.LinkList.IndexOf (link);
+			if (index > 0) 
+			{
+				_processor.LinkList.RemoveAt (index);
+			}
+			if (link is ChainOutput) 
+			{
+				ChainOutput output = link as ChainOutput;
+				index = _processor.Outputs.IndexOf (output);
+
+				if (index > 0) 
+				{
+					_processor.Outputs.RemoveAt (index);
+				}
+			}
+
+			if (link is ChainInput) 
+			{
+				ChainInput input = link as ChainInput;
+				index = _processor.Inputs.IndexOf (input);
+
+				if (index > 0) 
+				{
+					_processor.Inputs.RemoveAt (index);
+				}
+			}
+
+			Repaint ();
 		}
 
 		private ChainLink FindLink(Vector2 position)
@@ -110,18 +168,62 @@ namespace BaseGameLogic.ChainProcessing
 			return null;
 		}
 
-		public void xD(object obj)
+		private void FindLinkByHook (Vector2 position, int hookType, out ChainLink link, out int index)
+		{
+			link = null;
+			index = -1;
+
+			bool nodeClicked = false;
+			for (int i = 0; i < Links.Count; i++) 
+			{
+				Rect[] input = null;
+				switch (hookType) 
+				{
+				case 0:
+					input = Links [i].GetInputHooksRects ();
+					break;
+				}
+
+				if (input == null) 
+				{
+					continue;
+				}
+
+				for (int j = 0; j < input.Length; j++) 
+				{					
+					nodeClicked = input[j].Contains (position);
+					if (nodeClicked) 
+					{
+						index = j;
+						link= Links [i];
+						break;
+					}
+				}
+
+				if (nodeClicked) 
+				{
+					break;
+				}
+			}
+		}
+
+		public void ResetToNormalNode()
+		{
+			_linkA = _linkB = null;
+		
+			_mode = ChainProcessorEditorModeEnum.Normal;
+			EditorUtility.SetDirty (_processor.gameObject);
+		}
+
+		public void ConnectNodes(object obj)
 		{
 			int index = (int)obj;
 
 			_linkA.Outputs.Add (_linkB);
 
 			_linkB.Inputs [index] = _linkA;
-			_linkA = _linkB = null;
 
-			_mode = ChainProcessorEditorModeEnum.Normal;
-			EditorUtility.SetDirty (_processor.gameObject);
-
+			ResetToNormalNode ();
 		}
 
 		private void ConnectModeOperations()
@@ -136,25 +238,35 @@ namespace BaseGameLogic.ChainProcessing
 			    _currentEvent.button == 0) 
 			{
 				_currentMousePositon = _currentEvent.mousePosition;
-				_linkB = FindLink (_currentMousePositon);
+				int index = 0;
+				FindLinkByHook (
+					_currentMousePositon,
+					0,
+					out _linkB,
+					out index);
+				
 				_currentEvent.Use ();
 
-				if (_linkA != null && _linkB != null) 
+				if (_linkA != null && _linkB != null && index > -1) 
 				{
-					GenericMenu _test = new GenericMenu();
-					for (int i = 0; i < _linkB.Inputs.Length; i++) 
-					{
-						GUIContent newGUIContent = new GUIContent(i.ToString());
-						_test.AddItem (newGUIContent, false, xD, i);
-					}
-					 
-					_test.ShowAsContext ();
-
+					ConnectNodes (index);
 					return;
 				}
 			}
 
-			DrawLine (_linkA.OutputHook(), _currentMousePositon);
+			if ((_currentEvent.type == EventType.MouseDown &&
+				_currentEvent.button == 1) ||
+				(_currentEvent.type == EventType.KeyDown && 
+				_currentEvent.keyCode == KeyCode.Escape)) 
+			{
+				ResetToNormalNode ();
+				_currentEvent.Use ();
+			}
+
+			if (_linkA != null) 
+			{
+				DrawLine (_linkA.OutputHook (), _currentMousePositon);
+			}
 		}
 
 		private void DrawLine (Vector2 start, Vector2 end)
@@ -165,7 +277,7 @@ namespace BaseGameLogic.ChainProcessing
 			Handles.color = oldColor;
 		}
 
-		private void ConnectNode(object obj)
+		private void SwithToConnectMode(object obj)
 		{
 			_mode = ChainProcessorEditorModeEnum.Connect;
 		}
@@ -191,7 +303,6 @@ namespace BaseGameLogic.ChainProcessing
 					}
 					_processor.LinkList.Add (link);
 				}
-
 			}
 		}
 
@@ -201,6 +312,9 @@ namespace BaseGameLogic.ChainProcessing
 			{
 				for (int i = 0; i < Links.Count; i++) 
 				{
+					Links [i].DD ();
+					Links [i].XD ();
+
 					Links [i].LinkRect = GUI.Window (
 						i,
 						Links [i].LinkRect,
@@ -220,7 +334,6 @@ namespace BaseGameLogic.ChainProcessing
 						}
 					}
 				}
-
 			}
 			EndWindows();
 		}

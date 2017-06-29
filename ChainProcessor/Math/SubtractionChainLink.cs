@@ -21,13 +21,6 @@ public class SubtractionChainLink : ChainLink
 
 	public override void Prosess ()
 	{
-		//		if (Inputs[0] != null || Inputs[1]!= null) 
-		//		{
-		//			if(_inputA != null && _inputB != null &&
-		//				_inputA.OutData != null && _inputB.OutData != null)
-		//			{
-		//			}
-		//		}
 		ChainData a = Inputs [0].OutData;
 		ChainData b = Inputs [1].OutData;
 

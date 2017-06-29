@@ -30,11 +30,26 @@ namespace BaseGameLogic.ChainProcessing
 			
 		public Vector2 OutputHook()
 		{
-				Vector2 hook = new Vector2 (
-					               _linkRect.position.x + _linkRect.size.x,
-					               _linkRect.position.y + (_linkRect.size.y / 2));
-			
-				return hook;
+			Vector2 hook = new Vector2 (
+				               _linkRect.position.x + _linkRect.size.x,
+				               _linkRect.position.y + (_linkRect.size.y / 2));
+		
+			return hook;
+		}
+
+		public Rect [] GetOutputHookRects()
+		{
+			Rect[] rects = new Rect[1];
+			Vector2 size = new Vector2 (10, 10);
+			Vector2 inputHook = OutputHook ();
+
+			rects [0] = new Rect (
+				new Vector2 (
+					inputHook.x - (size.x / 2),
+					inputHook.y - (size.y / 2)),
+				size);
+
+			return rects;
 		}
 
 		public Vector2 GetInputHook(int index)
@@ -46,6 +61,54 @@ namespace BaseGameLogic.ChainProcessing
 				_linkRect.position.y + (deltaHeight + (deltaHeight * index * 2)));
 
 			return hook;
+		}
+
+		public Rect [] GetInputHooksRects()
+		{
+			if (InputsCount == 0)
+				return null;
+			
+			Rect[] rects = new Rect[InputsCount];
+
+			Vector2 size = new Vector2 (10, 10);
+
+			for (int i = 0; i < InputsCount; i++)
+			{
+				Vector2 inputHook = GetInputHook (i);
+				rects [i] = new Rect (
+					new Vector2 (
+						inputHook.x - (size.x / 2),
+						inputHook.y - (size.y / 2)),
+					size);
+			}
+
+			return rects;
+		}
+
+		public void DD()
+		{
+			Rect[] x = GetInputHooksRects ();
+			if (x != null) 
+			{
+				for (int i = 0; i < x.Length; i++)
+				{
+					EditorGUI.DrawRect (x [i], Color.green);
+				}
+			}
+		}
+
+		public void XD()
+		{
+			Rect[] x = GetOutputHookRects ();
+			if (x != null) 
+			{
+				EditorGUI.DrawRect (x [0], Color.green);
+			}
+		}
+
+		public virtual void DrawNodeWindow(int id) 
+		{
+			GUI.DragWindow();
 		}
 
 		#endif
@@ -83,15 +146,6 @@ namespace BaseGameLogic.ChainProcessing
 		}
 
 		public abstract void Prosess();
-
-		#if UNITY_EDITOR
-
-		public virtual void DrawNodeWindow(int id) 
-		{
-			GUI.DragWindow();
-		}
-
-		#endif
 
 		public ChainLink (Vector2 position)
 		{

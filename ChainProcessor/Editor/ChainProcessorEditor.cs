@@ -106,7 +106,22 @@ namespace BaseGameLogic.ChainProcessing
 			{
 				_currentMousePositon = _currentEvent.mousePosition;
 				_linkA = FindLink (_currentMousePositon);
+
+				ChainLink link = null;
+				int index = 0;
+				FindLinkByHook (
+					_currentMousePositon,
+					1,
+					out link,
+					out index);
+
+				if (link != null) 
+				{
+					_linkA = link;
+					SwithToConnectMode ();
+				}
 			}
+
 			if (_currentEvent.type == EventType.KeyDown &&
 				_currentEvent.keyCode == KeyCode.Delete) 
 			{
@@ -128,6 +143,7 @@ namespace BaseGameLogic.ChainProcessing
 			{
 				_processor.LinkList.RemoveAt (index);
 			}
+
 			if (link is ChainOutput) 
 			{
 				ChainOutput output = link as ChainOutput;
@@ -176,22 +192,25 @@ namespace BaseGameLogic.ChainProcessing
 			bool nodeClicked = false;
 			for (int i = 0; i < Links.Count; i++) 
 			{
-				Rect[] input = null;
+				Rect[] rects = null;
 				switch (hookType) 
 				{
 				case 0:
-					input = Links [i].GetInputHooksRects ();
+					rects = Links [i].GetInputHooksRects ();
+					break;
+				case 1:
+					rects = Links [i].GetOutputHookRects ();
 					break;
 				}
 
-				if (input == null) 
+				if (rects == null) 
 				{
 					continue;
 				}
 
-				for (int j = 0; j < input.Length; j++) 
+				for (int j = 0; j < rects.Length; j++) 
 				{					
-					nodeClicked = input[j].Contains (position);
+					nodeClicked = rects[j].Contains (position);
 					if (nodeClicked) 
 					{
 						index = j;
@@ -277,7 +296,7 @@ namespace BaseGameLogic.ChainProcessing
 			Handles.color = oldColor;
 		}
 
-		private void SwithToConnectMode(object obj)
+		private void SwithToConnectMode(object obj = null)
 		{
 			_mode = ChainProcessorEditorModeEnum.Connect;
 		}

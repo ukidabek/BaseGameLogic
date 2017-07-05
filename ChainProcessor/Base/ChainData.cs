@@ -30,5 +30,12 @@ namespace BaseGameLogic.ChainProcessing
 		{
 			return data1.Subtract (data2);
 		}
+
+		protected abstract ChainData Multiply(ChainData data);
+		public static ChainData operator * (ChainData data1, ChainData data2)
+		{
+			return data1.Multiply (data2);
+		}
+
 	}
 }

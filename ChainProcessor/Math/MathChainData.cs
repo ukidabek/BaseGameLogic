@@ -34,6 +34,13 @@ public class MathChainData : ChainData
 		float a = this.Data - mathData.Data;
 
 		return new MathChainData (a);
+	}
 
+	protected override ChainData Multiply (ChainData data)
+	{
+		MathChainData mathData = data as MathChainData;
+		float a = this.Data * mathData.Data;
+
+		return new MathChainData (a);
 	}
 }

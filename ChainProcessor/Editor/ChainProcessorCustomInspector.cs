@@ -23,12 +23,15 @@ namespace BaseGameLogic.ChainProcessing
 		{
 			base.OnInspectorGUI ();
 
+
+			GUI.enabled = _processor.LinksFactory != null;
 			if (GUILayout.Button ("Open editor")) 
 			{
 				ChainProcessorEditor window = EditorWindow.CreateInstance<ChainProcessorEditor> ();
 				window.Initialize (_processor);
 				window.Show ();
 			}
+			GUI.enabled = true;
 
 			if (GUILayout.Button ("Open editor")) 
 			{

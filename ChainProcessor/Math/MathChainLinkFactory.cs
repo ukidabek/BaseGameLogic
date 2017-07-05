@@ -47,6 +47,7 @@ public class MathChainLinkFactory : BaseChainLinkFactory
 			link = order.LinkContainerObject.AddComponent<MultiplicationChainLink>(); 
 			break;
 		case DIVISION:
+			link = order.LinkContainerObject.AddComponent<DivisionChainLink>(); 
 			break;
 		}
 

@@ -43,4 +43,12 @@ public class MathChainData : ChainData
 
 		return new MathChainData (a);
 	}
+
+	protected override ChainData Divide (ChainData data)
+	{
+		MathChainData mathData = data as MathChainData;
+		float a = this.Data / mathData.Data;
+
+		return new MathChainData (a);
+	}
 }

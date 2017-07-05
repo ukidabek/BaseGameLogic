@@ -37,5 +37,10 @@ namespace BaseGameLogic.ChainProcessing
 			return data1.Multiply (data2);
 		}
 
+		protected abstract ChainData Divide(ChainData data);
+		public static ChainData operator / (ChainData data1, ChainData data2)
+		{
+			return data1.Divide (data2);
+		}
 	}
 }

@@ -312,8 +312,8 @@ namespace BaseGameLogic.ChainProcessing
 			{
 				for (int i = 0; i < Links.Count; i++) 
 				{
-					Links [i].DD ();
-					Links [i].XD ();
+					Links [i].DrawInputHooks ();
+					Links [i].DrawGetOutputHook ();
 
 					Links [i].LinkRect = GUI.Window (
 						i,

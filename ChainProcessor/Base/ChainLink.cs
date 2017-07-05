@@ -85,7 +85,7 @@ namespace BaseGameLogic.ChainProcessing
 			return rects;
 		}
 
-		public void DD()
+		public void DrawInputHooks()
 		{
 			Rect[] x = GetInputHooksRects ();
 			if (x != null) 
@@ -97,7 +97,7 @@ namespace BaseGameLogic.ChainProcessing
 			}
 		}
 
-		public void XD()
+		public void DrawGetOutputHook()
 		{
 			Rect[] x = GetOutputHookRects ();
 			if (x != null) 

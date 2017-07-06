@@ -10,14 +10,10 @@ public class SubtractionChainLink : ChainLink
 {
 	private const string Link_Name = "Subtraction";
 	public override string Name { get { return Link_Name; } }
-
+	public override Vector2 Size { get { return new Vector2 (100f, 100f); } }
 	protected override int InputsCount { get { return 2;} }
 
-	public SubtractionChainLink (Vector2 position) : base (position) 
-	{
-		Vector2 size = new Vector2 (100, 100);
-		_linkRect.size = size;
-	}
+	public SubtractionChainLink (Vector2 position) : base (position) {}
 
 	public override void Prosess ()
 	{

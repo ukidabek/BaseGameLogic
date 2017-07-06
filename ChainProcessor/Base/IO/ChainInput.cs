@@ -11,7 +11,7 @@ namespace BaseGameLogic.ChainProcessing
 	{
 		private const string Link_Name = "ChainInput";
 		public override string Name { get { return Link_Name; } }
-
+		public override Vector2 Size { get { return new Vector2 (100f, 100f); } }
 		public ChainData InData = null;
 
 		protected override int InputsCount { get { return 0;} }

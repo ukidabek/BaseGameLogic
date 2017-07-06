@@ -10,24 +10,13 @@ public class AdditionChanLink : ChainLink
 {
 	private const string Link_Name = "Addition";
 	public override string Name { get { return Link_Name; } }
-
+	public override Vector2 Size { get { return new Vector2 (100f, 100f); } }
 	protected override int InputsCount { get { return 2;} }
 
-	public AdditionChanLink (Vector2 position) : base (position) 
-	{
-		Vector2 size = new Vector2 (100, 100);
-		_linkRect.size = size;
-	}
+	public AdditionChanLink (Vector2 position) : base (position) {}
 
 	public override void Prosess ()
 	{
-//		if (Inputs[0] != null || Inputs[1]!= null) 
-//		{
-//			if(_inputA != null && _inputB != null &&
-//				_inputA.OutData != null && _inputB.OutData != null)
-//			{
-//			}
-//		}
 		ChainData a = Inputs [0].OutData;
 		ChainData b = Inputs [1].OutData;
 

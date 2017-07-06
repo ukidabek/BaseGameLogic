@@ -16,7 +16,9 @@ namespace BaseGameLogic.ChainProcessing
 	{
 		public abstract string Name { get; }
 
-		public ChainData OutData = null;
+		public virtual ChainData OutData { get; set;}
+
+		public abstract Vector2 Size { get; }
 
 		#if UNITY_EDITOR
 
@@ -111,6 +113,37 @@ namespace BaseGameLogic.ChainProcessing
 			GUI.DragWindow();
 		}
 
+		public virtual bool CheackConnectingOutputType(Type type, int inputIdex)
+		{
+			ChainLink link = null;
+			Type _type = GetType (link);
+			return type == _type;
+		}
+
+		protected Type GetType<T>(T obj) 
+		{
+			Type type;
+			if (obj == null) 
+			{
+				type = typeof(T);
+			} 
+			else 
+			{
+				type = obj.GetType ();
+			}
+
+			return type;
+		}
+
+		public virtual Type OutputType
+		{
+			get 
+			{
+				ChainLink link = null;
+				return GetType (link);
+			}
+		}
+
 		#endif
 
 		protected abstract int InputsCount { get ; }
@@ -149,8 +182,8 @@ namespace BaseGameLogic.ChainProcessing
 
 		public ChainLink (Vector2 position)
 		{
-			this._linkRect.x = position.x;
-			this._linkRect.y = position.y;
+			this._linkRect.position = position;
+			this._linkRect.size = Size;
 		}
 		
 	}

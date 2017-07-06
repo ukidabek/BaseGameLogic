@@ -10,7 +10,7 @@ namespace BaseGameLogic.ChainProcessing
 	{
 		private const string Link_Name = "ChainOutput";
 		public override string Name { get { return Link_Name; } }
-
+		public override Vector2 Size { get { return new Vector2 (100f, 100f); } }
 		protected override int InputsCount { get { return 1; } }
 
 		public ChainOutput (Vector2 position) : base (position) {}

@@ -14,16 +14,27 @@ namespace BaseGameLogic.ChainProcessing
 
 		public abstract string[] ChainLinkTypes { get; }
 
+		protected virtual ChainLink GetChainInput(Order order)
+		{
+			return order.LinkContainerObject.AddComponent<ChainInput>(); 
+		}
+
+		protected virtual ChainLink GetChainOutput(Order order)
+		{
+			return order.LinkContainerObject.AddComponent<ChainOutput>(); 
+		}
+
 		public virtual ChainLink FabricateChainLink(Order order)
 		{
 			ChainLink link = null;
 			switch (order.Type) 
 			{
 			case INPUT:
-				link = order.LinkContainerObject.AddComponent<ChainInput>(); 
+				link = GetChainInput (order);
 				break;
+
 			case OUTPUT:
-				link = order.LinkContainerObject.AddComponent<ChainOutput>(); 
+				link = GetChainOutput (order);
 				break;
 			}
 

@@ -10,14 +10,10 @@ public class DivisionChainLink : ChainLink
 {
 	private const string Link_Name = "Division";
 	public override string Name { get { return Link_Name; } }
-
+	public override Vector2 Size { get { return new Vector2 (100f, 100f); } }
 	protected override int InputsCount { get { return 2;} }
 
-	public DivisionChainLink (Vector2 position) : base (position) 
-	{
-		Vector2 size = new Vector2 (100, 100);
-		_linkRect.size = size;
-	}
+	public DivisionChainLink (Vector2 position) : base (position) {}
 
 	public override void Prosess ()
 	{

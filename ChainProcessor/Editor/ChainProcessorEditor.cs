@@ -44,6 +44,8 @@ namespace BaseGameLogic.ChainProcessing
 		private ChainLink _linkA = null;
 		private ChainLink _linkB = null;
 
+		#region Context menu generation 
+
 		private void GenerateEditorContextMenu()
 		{
 			GameObject linkContainerObject = _processor.LinkContainerObject;
@@ -81,6 +83,24 @@ namespace BaseGameLogic.ChainProcessing
 			GenerateNodeContextMenu ();
 		}
 
+		#endregion
+
+		#region Mode Operations
+
+		/// <summary>
+		/// Resets to normal node.
+		/// </summary>
+		public void ResetToNormalNode()
+		{
+			_linkA = _linkB = null;
+
+			_mode = ChainProcessorEditorModeEnum.Normal;
+			EditorUtility.SetDirty (_processor.gameObject);
+		}
+
+		/// <summary>
+		/// Normals the mode operations.
+		/// </summary>
 		private void NormalModeOperations()
 		{
 			if (_currentEvent.type == EventType.MouseDown &&
@@ -132,43 +152,70 @@ namespace BaseGameLogic.ChainProcessing
 			}
 		}
 
-		private void DeleteNode(object obj = null)
+		/// <summary>
+		/// Swiths to connect mode.
+		/// </summary>
+		/// <param name="obj">Object.</param>
+		private void SwithToConnectMode(object obj = null)
 		{
-			ChainLink link = _linkA;
-			if (link == null)
-				return;
-			
-			int index =_processor.LinkList.IndexOf (link);
-			if (index > 0) 
-			{
-				_processor.LinkList.RemoveAt (index);
-			}
-
-			if (link is ChainOutput) 
-			{
-				ChainOutput output = link as ChainOutput;
-				index = _processor.Outputs.IndexOf (output);
-
-				if (index > 0) 
-				{
-					_processor.Outputs.RemoveAt (index);
-				}
-			}
-
-			if (link is ChainInput) 
-			{
-				ChainInput input = link as ChainInput;
-				index = _processor.Inputs.IndexOf (input);
-
-				if (index > 0) 
-				{
-					_processor.Inputs.RemoveAt (index);
-				}
-			}
-
-			Repaint ();
+			_mode = ChainProcessorEditorModeEnum.Connect;
 		}
 
+		/// <summary>
+		/// Connects the mode operations.
+		/// </summary>
+		private void ConnectModeOperations()
+		{
+			if (_currentEvent.type == EventType.MouseMove) 
+			{
+				_currentMousePositon = _currentEvent.mousePosition;
+				_currentEvent.Use ();
+			}
+
+			if (_currentEvent.type == EventType.MouseDown &&
+				_currentEvent.button == 0) 
+			{
+				_currentMousePositon = _currentEvent.mousePosition;
+				int index = 0;
+				FindLinkByHook (
+					_currentMousePositon,
+					0,
+					out _linkB,
+					out index);
+
+				_currentEvent.Use ();
+
+				if (_linkA != null && _linkB != null && index > -1) 
+				{
+					ConnectNodes (index);
+					return;
+				}
+			}
+
+			if ((_currentEvent.type == EventType.MouseDown &&
+				_currentEvent.button == 1) ||
+				(_currentEvent.type == EventType.KeyDown && 
+					_currentEvent.keyCode == KeyCode.Escape)) 
+			{
+				ResetToNormalNode ();
+				_currentEvent.Use ();
+			}
+
+			if (_linkA != null) 
+			{
+				DrawLine (_linkA.OutputHook (), _currentMousePositon);
+			}
+		}
+
+		#endregion
+
+		#region Nodes managnet
+
+		/// <summary>
+		/// Finds the link by his position.
+		/// </summary>
+		/// <returns>The link if found null if not.</returns>
+		/// <param name="position">Position to cheack.</param>
 		private ChainLink FindLink(Vector2 position)
 		{
 			bool nodeClicked = false;
@@ -184,6 +231,13 @@ namespace BaseGameLogic.ChainProcessing
 			return null;
 		}
 
+		/// <summary>
+		/// Finds the link by hook.
+		/// </summary>
+		/// <param name="position">Position to cheack.</param>
+		/// <param name="hookType">Hook type input (0) or output (1).</param>
+		/// <param name="link">Variable for link if found.</param>
+		/// <param name="index">Variable for index of that node.</param>
 		private void FindLinkByHook (Vector2 position, int hookType, out ChainLink link, out int index)
 		{
 			link = null;
@@ -226,81 +280,71 @@ namespace BaseGameLogic.ChainProcessing
 			}
 		}
 
-		public void ResetToNormalNode()
+		/// <summary>
+		/// Deletes the node.
+		/// </summary>
+		/// <param name="obj">Link object.</param>
+		private void DeleteNode(object obj = null)
 		{
-			_linkA = _linkB = null;
-		
-			_mode = ChainProcessorEditorModeEnum.Normal;
-			EditorUtility.SetDirty (_processor.gameObject);
+			ChainLink link = _linkA;
+			if (link == null)
+				return;
+
+			int index =_processor.LinkList.IndexOf (link);
+			if (index >= 0) 
+			{
+				_processor.LinkList.RemoveAt (index);
+			}
+
+			if (link is ChainOutput) 
+			{
+				ChainOutput output = link as ChainOutput;
+				index = _processor.Outputs.IndexOf (output);
+
+				if (index >= 0) 
+				{
+					_processor.Outputs.RemoveAt (index);
+				}
+			}
+
+			if (link is ChainInput) 
+			{
+				ChainInput input = link as ChainInput;
+				index = _processor.Inputs.IndexOf (input);
+
+				if (index >= 0) 
+				{
+					_processor.Inputs.RemoveAt (index);
+				}
+			}
+
+			DestroyImmediate (link);
+			Repaint ();
 		}
 
+		/// <summary>
+		/// Connects the nodes.
+		/// </summary>
+		/// <param name="obj">Node input index.</param>
 		public void ConnectNodes(object obj)
 		{
 			int index = (int)obj;
 
-			_linkA.Outputs.Add (_linkB);
+			Type type = _linkA.OutputType;
+			if (_linkB.CheackConnectingOutputType (type, index)) 
+			{
+				_linkA.Outputs.Add (_linkB);
 
-			_linkB.Inputs [index] = _linkA;
+				_linkB.Inputs [index] = _linkA;
+			}
 
 			ResetToNormalNode ();
 		}
 
-		private void ConnectModeOperations()
-		{
-			if (_currentEvent.type == EventType.MouseMove) 
-			{
-				_currentMousePositon = _currentEvent.mousePosition;
-				_currentEvent.Use ();
-			}
-
-			if (_currentEvent.type == EventType.MouseDown &&
-			    _currentEvent.button == 0) 
-			{
-				_currentMousePositon = _currentEvent.mousePosition;
-				int index = 0;
-				FindLinkByHook (
-					_currentMousePositon,
-					0,
-					out _linkB,
-					out index);
-				
-				_currentEvent.Use ();
-
-				if (_linkA != null && _linkB != null && index > -1) 
-				{
-					ConnectNodes (index);
-					return;
-				}
-			}
-
-			if ((_currentEvent.type == EventType.MouseDown &&
-				_currentEvent.button == 1) ||
-				(_currentEvent.type == EventType.KeyDown && 
-				_currentEvent.keyCode == KeyCode.Escape)) 
-			{
-				ResetToNormalNode ();
-				_currentEvent.Use ();
-			}
-
-			if (_linkA != null) 
-			{
-				DrawLine (_linkA.OutputHook (), _currentMousePositon);
-			}
-		}
-
-		private void DrawLine (Vector2 start, Vector2 end)
-		{
-			Color oldColor = Handles.color;
-			Handles.color = Color.black;
-			Handles.DrawLine (start, end);
-			Handles.color = oldColor;
-		}
-
-		private void SwithToConnectMode(object obj = null)
-		{
-			_mode = ChainProcessorEditorModeEnum.Connect;
-		}
-
+		/// <summary>
+		/// Creates the node.
+		/// </summary>
+		/// <param name="obj">Order object.</param>
 		private void CreateNode(object obj)
 		{
 			if (obj is Order) 
@@ -325,6 +369,16 @@ namespace BaseGameLogic.ChainProcessing
 			}
 		}
 
+		#endregion
+			
+		private void DrawLine (Vector2 start, Vector2 end)
+		{
+			Color oldColor = Handles.color;
+			Handles.color = Color.black;
+			Handles.DrawLine (start, end);
+			Handles.color = oldColor;
+		}
+			
 		private void  DrawNodes()
 		{
 			BeginWindows();

@@ -20,7 +20,7 @@ namespace BaseGameLogic.ChainProcessing
 
 		public override void Prosess ()
 		{
-			OutData = InData;
+			Data = InData;
 			for (int i = 0; i < _outputs.Count; i++) 
 			{
 //				_outputs [i].OutData = InData;

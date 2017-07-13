@@ -1,4 +1,7 @@
 ﻿using UnityEngine; 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 using System.Collections;
 using System.Collections.Generic;
@@ -14,11 +17,12 @@ public class MathChainData : ChainData
 		this.Data = data;
 	}
 	
-
-	public override void OnInspektorGui ()
+	#if UNITY_EDITOR
+	public override void DrawDataOnInspektorGUI ()
 	{
-//		throw new System.NotImplementedException ();
+		Data = EditorGUILayout.FloatField (Data);
 	}
+	#endif
 
 	protected override ChainData Add (ChainData data)
 	{

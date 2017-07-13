@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -11,7 +12,7 @@ namespace BaseGameLogic.ChainProcessing
 	{
 		private const string Link_Container_Object_Name = "LinkContainerObject";
 
-		[SerializeField]
+		[SerializeField, HideInInspector]
 		private GameObject _linkContainerObject = null;
 		public GameObject LinkContainerObject 
 		{
@@ -38,23 +39,25 @@ namespace BaseGameLogic.ChainProcessing
 		private BaseChainLinkFactory _linksFactory = null;
 		public BaseChainLinkFactory LinksFactory { get { return this._linksFactory; } }
 
+		public Action Reprint = null;
+
 		#endif
 
-		[SerializeField]
+		[SerializeField, HideInInspector]
 		private List<ChainLink> _linkList = new List<ChainLink>();
 		public List<ChainLink> LinkList 
 		{
 			get { return this._linkList; }
 		}
 
-		[SerializeField]
+		[SerializeField, HideInInspector]
 		private List<ChainInput> _inputs = new List<ChainInput>();
 		public List<ChainInput> Inputs 
 		{
 			get { return this._inputs; }
 		}
 
-		[SerializeField]
+		[SerializeField, HideInInspector]
 		private List<ChainOutput> _outputs = new List<ChainOutput>();
 		public List<ChainOutput> Outputs 
 		{
@@ -63,7 +66,15 @@ namespace BaseGameLogic.ChainProcessing
 
 		public void Process()
 		{
-			for (int i = 0; i < _inputs.Count; i++) {
+			#if UNITY_EDITOR
+			if(Reprint != null)
+			{
+				Reprint();
+			}
+			#endif
+
+			for (int i = 0; i < _inputs.Count; i++) 
+			{
 				_inputs [i].Prosess ();
 			}
 		}

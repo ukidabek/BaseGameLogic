@@ -51,6 +51,7 @@ public class MathChainLinkFactory : BaseChainLinkFactory
 			break;
 		}
 
+		#if UNITY_EDITOR
 		if (link != null) 
 		{			
 			Rect newRect = link.LinkRect;
@@ -60,6 +61,8 @@ public class MathChainLinkFactory : BaseChainLinkFactory
 
 			link.LinkRect = newRect;
 		}
+		#endif
+
 		return link;
 	}
 }

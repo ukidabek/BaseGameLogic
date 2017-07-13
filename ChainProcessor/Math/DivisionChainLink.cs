@@ -17,12 +17,12 @@ public class DivisionChainLink : ChainLink
 
 	public override void Prosess ()
 	{
-		ChainData a = Inputs [0].OutData;
-		ChainData b = Inputs [1].OutData;
+		ChainData a = Inputs [0].Data;
+		ChainData b = Inputs [1].Data;
 
 		if (a != null && b != null) 
 		{
-			OutData = a / b;
+			Data = a / b;
 
 			for (int i = 0; i < _outputs.Count; i++) 
 			{

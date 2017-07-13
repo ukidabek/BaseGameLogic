@@ -14,14 +14,7 @@ namespace BaseGameLogic.ChainProcessing
 	[Serializable]
 	public abstract class ChainLink : MonoBehaviour
 	{
-		public abstract string Name { get; }
-
-		public virtual ChainData OutData { get; set;}
-
-		public abstract Vector2 Size { get; }
-
 		#if UNITY_EDITOR
-
 		[SerializeField]
 		protected Rect _linkRect = new Rect ();
 		public Rect LinkRect 
@@ -29,13 +22,63 @@ namespace BaseGameLogic.ChainProcessing
 			get { return this._linkRect; }
 			set { _linkRect = value; }
 		}
-			
-		public Vector2 OutputHook()
+		#endif
+
+		public abstract string Name { get; }
+
+		public virtual ChainData Data { get; set;}
+
+		public abstract Vector2 Size { get; }
+
+		public ChainLink (Vector2 position)
+		{
+			#if UNITY_EDITOR
+			this._linkRect.position = position;
+			this._linkRect.size = Size;
+			#endif
+		}
+
+		protected abstract int InputsCount { get ; }
+
+		[SerializeField]
+		protected ChainLink[] _inputs = null; 
+		public ChainLink [] Inputs 
+		{
+			get 
+			{ 
+				if (_inputs == null) 
+				{
+					_inputs = new ChainLink [InputsCount];
+				}
+
+				return _inputs; 
+			}
+		}
+
+
+		[SerializeField]
+		public List<ChainLink> _outputs = null;
+		public List<ChainLink> Outputs 
+		{ 
+			get 
+			{
+				if (_outputs == null) 
+				{
+					_outputs = new List<ChainLink>();
+				}
+				return _outputs; 
+			} 
+		}
+
+		public abstract void Prosess();
+
+		#if UNITY_EDITOR
+		public virtual Vector2 OutputHook()
 		{
 			Vector2 hook = new Vector2 (
-				               _linkRect.position.x + _linkRect.size.x,
-				               _linkRect.position.y + (_linkRect.size.y / 2));
-		
+				_linkRect.position.x + _linkRect.size.x,
+				_linkRect.position.y + (_linkRect.size.y / 2));
+
 			return hook;
 		}
 
@@ -69,7 +112,7 @@ namespace BaseGameLogic.ChainProcessing
 		{
 			if (InputsCount == 0)
 				return null;
-			
+
 			Rect[] rects = new Rect[InputsCount];
 
 			Vector2 size = new Vector2 (10, 10);
@@ -99,7 +142,7 @@ namespace BaseGameLogic.ChainProcessing
 			}
 		}
 
-		public void DrawGetOutputHook()
+		public virtual void DrawOutputHook()
 		{
 			Rect[] x = GetOutputHookRects ();
 			if (x != null) 
@@ -110,6 +153,11 @@ namespace BaseGameLogic.ChainProcessing
 
 		public virtual void DrawNodeWindow(int id) 
 		{
+			if (Data != null) 
+			{
+				Data.DrawDataOnInspektorGUI ();
+			}
+
 			GUI.DragWindow();
 		}
 
@@ -146,45 +194,5 @@ namespace BaseGameLogic.ChainProcessing
 
 		#endif
 
-		protected abstract int InputsCount { get ; }
-
-		[SerializeField]
-		protected ChainLink[] _inputs = null; 
-		public ChainLink [] Inputs 
-		{
-			get 
-			{ 
-				if (_inputs == null) 
-				{
-					_inputs = new ChainLink [InputsCount];
-				}
-
-				return _inputs; 
-			}
-		}
-
-
-		[SerializeField]
-		public List<ChainLink> _outputs = null;
-		public List<ChainLink> Outputs 
-		{ 
-			get 
-			{
-				if (_outputs == null) 
-				{
-					_outputs = new List<ChainLink>();
-				}
-				return _outputs; 
-			} 
-		}
-
-		public abstract void Prosess();
-
-		public ChainLink (Vector2 position)
-		{
-			this._linkRect.position = position;
-			this._linkRect.size = Size;
-		}
-		
 	}
 }

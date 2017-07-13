@@ -77,10 +77,17 @@ namespace BaseGameLogic.ChainProcessing
 		public void Initialize (ChainProcessor _processor)
 		{
 			this._processor = _processor;
+			this._processor.Reprint -= Repaint;
+			this._processor.Reprint += Repaint;
 			this.wantsMouseMove = true;
 
 			GenerateEditorContextMenu ();
 			GenerateNodeContextMenu ();
+		}
+
+		void OnDisable() 
+		{
+			this._processor.Reprint -= Repaint;
 		}
 
 		#endregion
@@ -291,6 +298,28 @@ namespace BaseGameLogic.ChainProcessing
 				return;
 
 			int index =_processor.LinkList.IndexOf (link);
+
+			for (int i = 0; i < _processor.LinkList.Count; i++) 
+			{
+				if (i != index) 
+				{
+					ChainLink _link = _processor.LinkList [i];
+
+					for (int j = 0; j < _link.Inputs.Length; j++) 
+					{
+						if(_link.Inputs[j] == link)
+						{
+							_link.Inputs[j] = null;
+						}
+					}
+
+					for (int j = 0; j < _link.Outputs.Count; j++) 
+					{
+						_link.Outputs.RemoveAt (j);
+					}
+				}
+			}
+
 			if (index >= 0) 
 			{
 				_processor.LinkList.RemoveAt (index);
@@ -386,7 +415,7 @@ namespace BaseGameLogic.ChainProcessing
 				for (int i = 0; i < Links.Count; i++) 
 				{
 					Links [i].DrawInputHooks ();
-					Links [i].DrawGetOutputHook ();
+					Links [i].DrawOutputHook ();
 
 					Links [i].LinkRect = GUI.Window (
 						i,

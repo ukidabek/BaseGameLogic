@@ -23,10 +23,25 @@ namespace BaseGameLogic.ChainProcessing
 
 		public IOChainLink (Vector2 position) : base (position) {}
 
+		#if UNITY_EDITOR
 		public override void DrawNodeWindow (int id)
 		{
 			ioName = EditorGUILayout.TextField (ioName);
 			base.DrawNodeWindow (id);
 		}
+
+		public virtual void DrawIOInspectorGUI()
+		{
+			EditorGUILayout.BeginHorizontal ();
+			{
+				ioName = EditorGUILayout.TextField (ioName);
+				if (Data != null) 
+				{
+					Data.DrawDataOnInspektorGUI ();
+				}
+			}
+			EditorGUILayout.EndHorizontal ();
+		}
+		#endif
 	}
 }

@@ -17,12 +17,48 @@ namespace BaseGameLogic.ChainProcessing
 		private void OnEnable()
 		{
 			_processor = target as ChainProcessor;
+			_processor.Reprint -= this.Repaint;
+			_processor.Reprint += this.Repaint;
+		}
+
+		private void Awake()
+		{
+			OnEnable ();
+		}
+
+		private void OnDisable()
+		{
+			_processor.Reprint -= this.Repaint;
 		}
 
 		public override void OnInspectorGUI ()
 		{
 			base.OnInspectorGUI ();
 
+			EditorGUILayout.BeginHorizontal ();
+			{
+				EditorGUILayout.BeginVertical ();
+				{
+					EditorGUILayout.LabelField ("Inputs: ");
+					for (int i = 0; i < _processor.Inputs.Count; i++) 
+					{
+						_processor.Inputs [i].DrawIOInspectorGUI ();
+					}
+				}
+				EditorGUILayout.EndVertical ();
+
+				EditorGUILayout.BeginVertical ();
+				{
+					EditorGUILayout.LabelField ("Outputs: ");
+					for (int i = 0; i < _processor.Outputs.Count; i++) 
+					{
+						_processor.Outputs [i].DrawIOInspectorGUI ();
+					}
+				}
+				EditorGUILayout.EndVertical ();
+
+			}
+			EditorGUILayout.EndHorizontal ();
 
 			GUI.enabled = _processor.LinksFactory != null;
 			if (GUILayout.Button ("Open editor")) 
@@ -33,8 +69,8 @@ namespace BaseGameLogic.ChainProcessing
 			}
 			GUI.enabled = true;
 
-			if (GUILayout.Button ("Open editor")) 
-			{
+//			if (GUILayout.Button ("Open editor")) 
+//			{
 //				string xx = string.Empty;
 //
 //				for (int i = 0; i < _processor.LinkList.Count; i++) 
@@ -70,10 +106,10 @@ namespace BaseGameLogic.ChainProcessing
 //				Type t = Type.GetType ("BaseGameLogic.ChainProcessing.ChainLink");
 //
 //				_processor.LinkList [3].CheackOutputType (t, 0);
-				ChainData aaa = new MathChainData(5f);
+//				ChainData aaa = new MathChainData(5f);
 //				Type a = GetType (aaa);
-				_processor.LinkList [3].CheackConnectingOutputType (aaa.GetType(), 0);
-			}
+//				_processor.LinkList [3].CheackConnectingOutputType (aaa.GetType(), 0);
+//			}
 		}
 	}
 }

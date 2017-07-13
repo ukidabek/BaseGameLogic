@@ -15,7 +15,7 @@ namespace BaseGameLogic.ChainProcessing
 	{
 		#if UNITY_EDITOR
 
-		public abstract void OnInspektorGui();
+		public abstract void DrawDataOnInspektorGUI();
 
 		#endif
 

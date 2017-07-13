@@ -17,7 +17,17 @@ namespace BaseGameLogic.ChainProcessing
 
 		public override void Prosess ()
 		{
-			OutData = Inputs[0].OutData;
+			Data = Inputs[0].Data;
 		}
+
+
+		#if UNITY_EDITOR
+		public override Vector2 OutputHook ()
+		{
+			return Vector3.zero;
+		}
+
+		public override void DrawOutputHook () {}
+		#endif
 	}
 }

@@ -35,30 +35,27 @@ namespace BaseGameLogic.ChainProcessing
 		{
 			base.OnInspectorGUI ();
 
-			EditorGUILayout.BeginHorizontal ();
+			EditorGUILayout.BeginVertical ();
 			{
-				EditorGUILayout.BeginVertical ();
+				EditorGUILayout.LabelField ("Inputs: ");
+				for (int i = 0; i < _processor.Inputs.Count; i++) 
 				{
-					EditorGUILayout.LabelField ("Inputs: ");
-					for (int i = 0; i < _processor.Inputs.Count; i++) 
-					{
-						_processor.Inputs [i].DrawIOInspectorGUI ();
-					}
+					_processor.Inputs [i].DrawIOInspectorGUI ();
 				}
-				EditorGUILayout.EndVertical ();
-
-				EditorGUILayout.BeginVertical ();
-				{
-					EditorGUILayout.LabelField ("Outputs: ");
-					for (int i = 0; i < _processor.Outputs.Count; i++) 
-					{
-						_processor.Outputs [i].DrawIOInspectorGUI ();
-					}
-				}
-				EditorGUILayout.EndVertical ();
-
 			}
-			EditorGUILayout.EndHorizontal ();
+			EditorGUILayout.EndVertical ();
+
+			EditorGUILayout.Space ();
+
+			EditorGUILayout.BeginVertical ();
+			{
+				EditorGUILayout.LabelField ("Outputs: ");
+				for (int i = 0; i < _processor.Outputs.Count; i++) 
+				{
+					_processor.Outputs [i].DrawIOInspectorGUI ();
+				}
+			}
+			EditorGUILayout.EndVertical ();
 
 			GUI.enabled = _processor.LinksFactory != null;
 			if (GUILayout.Button ("Open editor")) 
@@ -68,48 +65,6 @@ namespace BaseGameLogic.ChainProcessing
 				window.Show ();
 			}
 			GUI.enabled = true;
-
-//			if (GUILayout.Button ("Open editor")) 
-//			{
-//				string xx = string.Empty;
-//
-//				for (int i = 0; i < _processor.LinkList.Count; i++) 
-//				{
-//					string a = _processor.LinkList [i].Name + "|";
-//
-//					for (int j = 0; j < _processor.LinkList [i].Inputs.Length; j++) 
-//					{
-//						if (_processor.LinkList [i].Inputs [j] == null)
-//							continue;
-//						int z = _processor.LinkList.IndexOf (_processor.LinkList [i].Inputs [j]);
-//						a += z.ToString ();
-//
-//						if (j < _processor.LinkList [i].Inputs.Length - 1)
-//							a += ",";
-//					}
-//
-//					a += "|";
-//
-//					for (int j = 0; j < _processor.LinkList [i].Outputs.Count; j++) 
-//					{						
-//						int z = _processor.LinkList.IndexOf (_processor.LinkList [i].Outputs [j]);
-//						a += z.ToString ();
-//
-//						if (j < _processor.LinkList [i].Outputs.Count - 1)
-//							a += ",";
-//					}
-//					a += ";";
-//					xx += a;
-//				}
-//				Debug.Log (xx);
-//				_processor.LinkList [3].OutData;
-//				Type t = Type.GetType ("BaseGameLogic.ChainProcessing.ChainLink");
-//
-//				_processor.LinkList [3].CheackOutputType (t, 0);
-//				ChainData aaa = new MathChainData(5f);
-//				Type a = GetType (aaa);
-//				_processor.LinkList [3].CheackConnectingOutputType (aaa.GetType(), 0);
-//			}
 		}
 	}
 }

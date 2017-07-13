@@ -34,6 +34,7 @@ namespace BaseGameLogic.ChainProcessing
 		{
 			EditorGUILayout.BeginHorizontal ();
 			{
+				EditorGUILayout.LabelField ("Name: ", GUILayout.Width (40));
 				ioName = EditorGUILayout.TextField (ioName);
 				if (Data != null) 
 				{

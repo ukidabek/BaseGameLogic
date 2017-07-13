@@ -34,13 +34,11 @@ namespace BaseGameLogic.ChainProcessing
 		}
 
 		#if UNITY_EDITOR
-
 		[SerializeField, Space(10)]
 		private BaseChainLinkFactory _linksFactory = null;
 		public BaseChainLinkFactory LinksFactory { get { return this._linksFactory; } }
 
 		public Action Reprint = null;
-
 		#endif
 
 		[SerializeField, HideInInspector]

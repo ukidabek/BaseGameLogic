@@ -191,8 +191,6 @@ namespace BaseGameLogic.ChainProcessing
 				return GetType (link);
 			}
 		}
-
 		#endif
-
 	}
 }

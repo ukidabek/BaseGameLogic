@@ -37,6 +37,7 @@ namespace BaseGameLogic.ChainProcessing
 				link = GetChainOutput (order);
 				break;
 			}
+
 			#if UNITY_EDITOR
 			if (link != null) 
 			{
@@ -47,6 +48,7 @@ namespace BaseGameLogic.ChainProcessing
 				link.LinkRect = newRect;
 			}
 			#endif
+
 			return link;
 		}
 	}

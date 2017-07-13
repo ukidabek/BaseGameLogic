@@ -22,10 +22,7 @@ namespace BaseGameLogic.ChainProcessing
 
 
 		#if UNITY_EDITOR
-		public override Vector2 OutputHook ()
-		{
-			return Vector3.zero;
-		}
+		public override Vector2 OutputHook () { return Vector3.zero; }
 
 		public override void DrawOutputHook () {}
 		#endif

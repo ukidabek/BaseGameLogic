@@ -66,95 +66,7 @@ namespace BaseGameLogic.Inputs
 		{ 
             get { return this.inputSources; } 
         }
-
-        /// <summary>
-        /// Return InputSource by it's type. 
-        /// </summary>
-        /// <typeparam name="T">Type of InputSource</typeparam>
-        /// <returns>InputSource of type T. </returns>
-        public T GetInputSources<T>() where T :BaseInputSource
-        {
-            foreach (BaseInputSource inputSource in this.inputSources)
-            {
-                if (inputSource is T)
-                {
-                    return inputSource as T;
-                }
-            }
-
-            return null;
-        }
-
-		public List<T> GetPhysicalInput<T>(string name) where T:PhysicalInput
-		{
-			List<T> inputsList = new List<T>();
-			foreach (BaseInputSource soure in inputSources)
-			{
-				if (soure != null) 
-				{
-					if (soure.GetPhysicalInput<T>(name) as T != null)
-					{
-						inputsList.Add(soure.GetPhysicalInput<T>(name) as T );
-					}
-				}
-			}
-
-			return inputsList;
-		}
 			
-		public ButtonStateEnum GetKeyState (string ButtonName)
-		{
-			List<ButtonInput> TmpButton = new List<ButtonInput>(); //only for init
-
-			ButtonStateEnum ButtonState = ButtonStateEnum.Released;
-
-			List<ButtonInput> KeyList = GetPhysicalInput<ButtonInput> (ButtonName);
-
-			for (int i = 0; i < KeyList.Count; i++) 
-			{
-				ButtonInput buttonInput = KeyList [i];
-				if (buttonInput.InputName == ButtonName) 
-				{
-					TmpButton.Add(buttonInput);
-				}
-			}
-
-			for (int i = 0; i < TmpButton.Count; i++) 
-			{
-				ButtonInput buttonInput = TmpButton [i];
-				if (buttonInput.State != ButtonStateEnum.Released)
-				{
-					ButtonState = buttonInput.State;
-				}
-			}
-
-			return ButtonState;
-		}
-
-		public Vector2 ReadAxisFromImput (string AxisName)
-		{
-			AnalogInput TmpAnalog = null; //only for init
-
-			List<AnalogInput> KeyList = GetPhysicalInput<AnalogInput> (AxisName);
-			for (int i = 0; i < KeyList.Count; i++) 
-			{
-				AnalogInput analogInput = KeyList [i];
-				if (analogInput.InputName == AxisName ) 
-				{
-					TmpAnalog = analogInput;
-				}
-			}
-
-			return TmpAnalog.Axis;
-		}
-
-		public AnalogInput GetAxisImput (string AxisName)
-		{
-			AnalogInput Axis = GetPhysicalInput<AnalogInput> (AxisName)[0];
-
-			return Axis;
-		}
-
         /// <summary>
         /// Returns true if GamePad if connected.
         /// </summary>
@@ -199,7 +111,7 @@ namespace BaseGameLogic.Inputs
 				BaseInputSource source = inputSources[i];
 				if (source != null) 
 				{
-					source.GatherInputs ();
+					source.ReadInputs ();
 					if (source.PositiveReading)
 					{
 						SelectCurrentInputSourceInstance (source);

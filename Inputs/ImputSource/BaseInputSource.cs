@@ -6,6 +6,10 @@ using System.Collections.Generic;
 
 namespace BaseGameLogic.Inputs
 {
+    /// <summary>
+    /// Base Input source class. Classes with will extend that class will be used for handling
+    /// a input device like kay board, game pad or mouse.
+    /// </summary>
 	public class BaseInputSource : MonoBehaviour
 	{
 		public virtual string InputSourceType 
@@ -14,19 +18,32 @@ namespace BaseGameLogic.Inputs
 		}
 
 		[SerializeField]
+        [Tooltip("The reference to input collector that collect input from this source.")]
 		private InputCollector _owner = null;
+        /// <summary>
+        /// The reference to input collector that collect input from this source.
+        /// </summary>
 		public InputCollector Owner 
 		{ 
 			get { return _owner; } 
 			set { _owner = value; } 
 		}
 
+        /// <summary>
+        /// List of all PhysicalInputs  (buttons, analog values, ect.) that will be checked when this InputSource is collecting it’s inputs.
+        /// </summary>
 		protected List<PhysicalInput> physicalInputs = new List<PhysicalInput> ();
-		public List<PhysicalInput> PhysicalInputs 
+        /// <summary>
+        /// List of all PhysicalInputs  (buttons, analog values, ect.) that will be checked when this InputSource is collecting it’s inputs.
+        /// </summary>
+        public List<PhysicalInput> PhysicalInputs 
 		{
 			get { return physicalInputs; }
 		}
 
+        /// <summary>
+        /// Return true if only one PhysicalInput is positive. For example button is pleased or analog value is greater then 0 or less.
+        /// </summary>
 		public bool PositiveReading 
 		{
 			get 
@@ -41,30 +58,47 @@ namespace BaseGameLogic.Inputs
 			} 
 		}
 
+        /// <summary>
+        /// Vector used for controlling player motion (WASD, left analog on game pad).
+        /// </summary>
 		public virtual Vector3 MovementVector 
 		{
 			get { return Vector3.zero; }
 		}
 
+        /// <summary>
+        /// Vector containing a analog valeuse (greater then 0 or less) reader from game pad triggers.
+        /// </summary>
 		public virtual Vector3 TriggersVector
 		{
 			get { return Vector3.zero; }
 		}
 
 		[Header("Look axis sensitivity settings")]
-		[SerializeField, Tooltip("Sensitivity of x look axis.")]
+		[SerializeField]
+        [Tooltip("Sensitivity of x look axis.")]
 		public float xLookAxisSensitivity = 3f;
-		[SerializeField, Tooltip("Sensitivity of y look axis.")]
+		[SerializeField]
+        [Tooltip("Sensitivity of y look axis.")]
 		public float yLookAxisSensitivity = 3f;
 
-		public virtual Vector3 LookVector 
+        /// <summary>
+        /// Vector used for controlling camera motion (mouse, right analog on game pad).
+        /// </summary>
+        public virtual Vector3 LookVector 
 		{
 			get { return Vector3.zero; }
 		}
 
+        [SerializeField]
+        private ButtonInput _pauseButton = new ButtonInput();
+
+        /// <summary>
+        /// Is true if the pause button for this InputSource is pressed. 
+        /// </summary>
 		public virtual bool PauseButtonDown
 		{
-			get { return false; }
+			get { return _pauseButton.Pressed; }
 		}
 
 		protected virtual void Awake ()
@@ -73,11 +107,14 @@ namespace BaseGameLogic.Inputs
 			{
 				Debug.LogError ("No input detected. Add input source and set inputs");
 			}
-				
-			foreach (PhysicalInput input in physicalInputs) 
-			{
-				input.SetOwner (this);
-			}
+
+            physicalInputs.Add(_pauseButton);
+
+            for (int i = 0; i < physicalInputs.Count; i++)
+            {
+                PhysicalInput input = physicalInputs[i];
+                input.SetOwner(this);
+            }
 		}
 
 		protected virtual void Start()
@@ -90,15 +127,25 @@ namespace BaseGameLogic.Inputs
 				} 
 			}
 		}
-			
-		public virtual void GatherInputs ()
+
+        /// <summary>
+        /// Rad all PhysicalInputs in InputSource.
+        /// </summary>
+        public virtual void ReadInputs ()
 		{
-			foreach (PhysicalInput input in physicalInputs) 
-			{
-				input.Read ();
-			}
+            for (int i = 0; i < physicalInputs.Count; i++)
+            {
+                PhysicalInput input = physicalInputs[i];
+                input.Read();
+            }
 		}
 
+        /// <summary>
+        /// Return the PhysicalInput of type T by it’s name.
+        /// </summary>
+        /// <typeparam name="T">Type extending PhysicalInput.</typeparam>
+        /// <param name="name">Name of input</param>
+        /// <returns>PhysicalInput</returns>
 		public T GetPhysicalInput<T> (string name) where T:PhysicalInput
 		{
 			T _input = null;

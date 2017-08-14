@@ -10,19 +10,36 @@ namespace BaseGameLogic.Inputs
 {
     public class InputCollector : MonoBehaviour 
     {
-		[SerializeField,Range(0,7)]
+        private const string Input_KeyCode_Error_Message = "Input is not assigned to KeyCode!: Input Name {0} {1}";
+        private const string No_Input_Sources_Error_Message = "No input sources! Add input sources!";
+
+		[SerializeField]
+        [Range(0,7)]
+        [Tooltip("Number of player that InputCollector will be assigned do.")]
 		private int _playerNumber = 0;
-		public int PlayerNumber 
+        /// <summary>
+        /// If more the one local play is used to bound InputCollector to PlayerController by player number.
+        /// </summary>
+        public int PlayerNumber 
 		{
     		get { return this._playerNumber; }
     	}
 
         [Header("Debug display & options.")]
-		[SerializeField]
-        public InputSourceEnum currentInputSourceEnum = InputSourceEnum.Null;
-		public Action InputSourceInstanceChanged = null;
+        [SerializeField]
+        [Tooltip("Current input type name. ")]
+        public string currentInputSourceType = string.Empty;
+        /// <summary>
+        /// Current input type name. 
+        /// </summary>
+        public string CurrentInputSourceType {  get { return currentInputSourceType; } }
+
+        public Action InputSourceInstanceChanged = null;
 
 		private BaseInputSource _currentInputSourceInstance = null;
+        /// <summary>
+        /// Current InputSource instance.
+        /// </summary>
 		public BaseInputSource CurrentInputSourceInstance 
 		{
 			get { return _currentInputSourceInstance; }
@@ -39,17 +56,22 @@ namespace BaseGameLogic.Inputs
 			}
 		}
 
-		[SerializeField]
-        public GameObject inputSourcesContainerObject = null;
-
 		[Header("Input sources managment.")]
         [SerializeField]
         private List<BaseInputSource> inputSources = new List<BaseInputSource>();
+        /// <summary>
+        /// List of InputSources from which InputCollector will collect input.
+        /// </summary>
         public List<BaseInputSource> InputSources 
 		{ 
             get { return this.inputSources; } 
         }
 
+        /// <summary>
+        /// Return InputSource by it's type. 
+        /// </summary>
+        /// <typeparam name="T">Type of InputSource</typeparam>
+        /// <returns>InputSource of type T. </returns>
         public T GetInputSources<T>() where T :BaseInputSource
         {
             foreach (BaseInputSource inputSource in this.inputSources)
@@ -133,20 +155,10 @@ namespace BaseGameLogic.Inputs
 			return Axis;
 		}
 
-		public BaseInputSource GetCurrentSource ()
-		{
-			for (int i = 0; i < inputSources.Count; i++) 
-			{
-				BaseInputSource inputSource = inputSources[i];
-				if (inputSource.InputSourceType == currentInputSourceEnum) 
-				{
-					return inputSource;
-				}
-			}
-
-			return null;
-		}
-			
+        /// <summary>
+        /// Returns true if GamePad if connected.
+        /// </summary>
+        /// <returns></returns>
 		public bool IsPadConneted ()
 		{
 			if (Input.GetJoystickNames().Length == 0 || 
@@ -171,12 +183,15 @@ namespace BaseGameLogic.Inputs
 				return false;
 			}
 
-			currentInputSourceEnum = source.InputSourceType;
+			currentInputSourceType = source.InputSourceType;
 			CurrentInputSourceInstance = source;
 
 			return true;
 		}
 
+        /// <summary>
+        /// Collecting inputs.
+        /// </summary>
 		public void CollectInputs()
 	    {
 			for (int i = 0; i < inputSources.Count; i++) 
@@ -193,6 +208,9 @@ namespace BaseGameLogic.Inputs
 			}
 		}
 
+        /// <summary>
+        /// Check the correctness of the input configuration.
+        /// </summary>
 		public void CheckInpunts ()
 		{
 			for (int i = 0; i < InputSources.Count; i++) 
@@ -208,7 +226,7 @@ namespace BaseGameLogic.Inputs
 						if (tmpInputContainer.keyCode == KeyCode.None) 
 						{
 							Debug.LogErrorFormat (
-								"Input is not assigned to KeyCode!: Input Name {0} {1}", 
+								Input_KeyCode_Error_Message, 
 								source.GetType(),
 								input.InputName);
 						}
@@ -217,6 +235,9 @@ namespace BaseGameLogic.Inputs
 			}
 		}
 
+        /// <summary>
+        /// Enable or disable game pause by player input.
+        /// </summary>
 		private void HandleGamePause()
 		{
 			if (CurrentInputSourceInstance == null)
@@ -244,7 +265,6 @@ namespace BaseGameLogic.Inputs
 				InputSources [i].Owner = this;
 			}
 
-			// Furthermore we make sure that we don't destroy between scenes (this is optional)
             if (inputSources.Count > 0)
             {
                 SelectCurrentInputSourceInstance(InputSources[0]);
@@ -252,7 +272,7 @@ namespace BaseGameLogic.Inputs
             else
             {
                 // Exeption! 
-                Debug.LogError("No input sources! Add input sources!");
+                Debug.LogError(No_Input_Sources_Error_Message);
             }
 		}
 			

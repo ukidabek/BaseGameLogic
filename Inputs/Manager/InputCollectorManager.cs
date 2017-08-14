@@ -7,26 +7,45 @@ namespace BaseGameLogic.Inputs
 {
 	public class InputCollectorManager : MonoBehaviour 
 	{
-		[SerializeField]
-		private List<InputCollector> _inputCollectors = new List<InputCollector>();
+        [SerializeField]
+        [Tooltip("List of input collectors active in game.")]
+        private InputCollector [] _inputCollectors = null;
 
+        /// <summary>
+        /// 
+        /// </summary>
 		private Dictionary<int, InputCollector> _inputCollectorsDictionary = new Dictionary<int, InputCollector>();
 
 		public void Awake()
 		{
-			for (int i = 0; i < _inputCollectors.Count; i++) 
+            // Collecting InputCollector instances. 
+            _inputCollectors = GetComponentsInChildren<InputCollector>();
+
+            // Creating dictionary from collected InputCollectors.
+            for (int i = 0; i < _inputCollectors.Length; i++) 
 			{
-				_inputCollectorsDictionary.Add (
-					_inputCollectors [i].PlayerNumber, 
-					_inputCollectors [i]);
+				_inputCollectorsDictionary.Add ( _inputCollectors [i].PlayerNumber, _inputCollectors [i]);
 			}
 		}
 
-		public InputCollector GetInputCollector(int id)
+        /// <summary>
+        /// Returns InputCollector by it's PlayerNumber. 
+        /// If there are only one InputCollector instance method will return that one.
+        /// </summary>
+        /// <param name="playerNumber">PlayerNumber</param>
+        /// <returns>InputCollector instance.</returns>
+		public InputCollector GetInputCollector(int playerNumber = 0)
 		{
 			InputCollector _inputCollector = null;
 
-			_inputCollectorsDictionary.TryGetValue (id, out _inputCollector);
+            if(_inputCollectorsDictionary.Count == 1)
+            {
+                _inputCollectorsDictionary.TryGetValue(0, out _inputCollector);
+            }
+            else
+            {
+                _inputCollectorsDictionary.TryGetValue (playerNumber, out _inputCollector);
+            }
 
 			 return _inputCollector;
 		}

@@ -8,7 +8,7 @@ namespace BaseGameLogic.Inputs
 {
 	public class BaseInputSource : MonoBehaviour
 	{
-		public virtual InputSourceEnum InputSourceType 
+		public virtual string InputSourceType 
 		{
 			get { throw new NotImplementedException (); }
 		}
@@ -115,43 +115,6 @@ namespace BaseGameLogic.Inputs
 				throw new NoPhysicalInputException(name, typeof(T));
 
 			return _input;
-		}
-	                           
-		#if UNITY_EDITOR
-
-		public static BaseInputSource CreateInputSource<T> ( InputCollector InputCollector) where T :BaseInputSource
-		{
-			if (InputCollector.inputSourcesContainerObject == null) 
-			{
-				InputCollector.inputSourcesContainerObject = new GameObject ();
-				InputCollector.inputSourcesContainerObject.name = "InputSourcesContainerObject";
-				InputCollector.inputSourcesContainerObject.transform.SetParent (InputCollector.transform);
-			}
-
-			if (BaseInputSource.HaveSource<T> (InputCollector))
-			{
-				Debug.LogError ("This controller already has a KeyboardAndMouseInputSource");
-				return null;
-			}
-
-			BaseInputSource newSource = InputCollector.inputSourcesContainerObject.AddComponent<T> ();
-			InputCollector.InputSources.Add (newSource);
-			newSource.Owner = InputCollector;
-
-			return newSource;
-		}
-
-		public static bool HaveSource<T> (InputCollector InputCollector) where T:BaseInputSource
-		{
-			foreach (BaseInputSource source in InputCollector.InputSources)
-			{
-				if (source is T)
-					return true;
-			}
-
-			return false;
-		}
-
-		#endif
+		}	                           
 	}
 }

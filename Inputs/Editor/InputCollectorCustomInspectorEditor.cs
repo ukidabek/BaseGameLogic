@@ -9,7 +9,6 @@ namespace BaseGameLogic.Inputs
     public class InputCollectorCustomInspectorEditor : Editor 
     {
 		protected InputCollector inputCollector = null;
-		protected InputSourceEnum inputSourceEnum = InputSourceEnum.KeyboardAndMouse;
 
         private void OnEnable()
         {
@@ -64,22 +63,22 @@ namespace BaseGameLogic.Inputs
         }
 			
 
-		protected virtual void CreateInputSource(InputSourceEnum inputSourceEnum) 
-        {
-            if (inputCollector == null)
-            {
-                GameObject inputSourcesContainerObject = new GameObject();
-                inputCollector.inputSourcesContainerObject = inputSourcesContainerObject;
-                inputSourcesContainerObject.transform.SetParent(inputCollector.transform);
-                inputSourcesContainerObject.transform.localPosition = Vector3.zero;
-            }
+		//protected virtual void CreateInputSource(InputSourceEnum inputSourceEnum) 
+  //      {
+  //          if (inputCollector == null)
+  //          {
+  //              GameObject inputSourcesContainerObject = new GameObject();
+  //              inputCollector.inputSourcesContainerObject = inputSourcesContainerObject;
+  //              inputSourcesContainerObject.transform.SetParent(inputCollector.transform);
+  //              inputSourcesContainerObject.transform.localPosition = Vector3.zero;
+  //          }
 
-            switch (inputSourceEnum)
-            {
-                case InputSourceEnum.KeyboardAndMouse:
+  //          switch (inputSourceEnum)
+  //          {
+  //              case InputSourceEnum.KeyboardAndMouse:
                     
-                    break;
-            }
-        }
+  //                  break;
+  //          }
+  //      }
     }
 }

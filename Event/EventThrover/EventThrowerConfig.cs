@@ -21,7 +21,12 @@ namespace BaseGameLogic.Events
 	[Serializable]
 	public class EventToThrow
 	{
-	    [SerializeField]
+        private EventManager EventManagerInstance
+        {
+            get { return EventManager.Instance; }
+        }
+
+        [SerializeField]
 	    public string name = string.Empty;
 
 	    [SerializeField] 
@@ -29,8 +34,10 @@ namespace BaseGameLogic.Events
 	   	
 	    public void Throw()
 	    {
-			EventManager eventManagerInstance = GameManager.Instance.EventManagerInstance;
-			eventManagerInstance.FireEvent (name, null);
+            if (EventManagerInstance != null)
+            {
+                EventManagerInstance.FireEvent(name, null);
+            }
 	    }
 	}
 }

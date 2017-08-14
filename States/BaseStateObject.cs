@@ -69,21 +69,20 @@ namespace BaseGameLogic.States
         {
             get
             {
-                return GameManager.Instance.EventManagerInstance;
+                return EventManager.Instance;
             }
         }
 
-		protected virtual bool EventCanBeRegistred
+        protected virtual bool EventCanBeRegistred
 		{
-			get { return EventManagerInstance != null; }
+			get { return EventManager.EventCanBeRegistred; }
 		}
 
 		protected bool IsGamePaused
 		{
 			get 
 			{
-				return GameManagerInstance != null && 
-					GameManagerInstance.GameStatus == GameStatusEnum.Pause;
+				return GameManagerInstance != null && GameManagerInstance.GameStatus == GameStatusEnum.Pause;
 			}
 		}
 

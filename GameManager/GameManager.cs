@@ -32,9 +32,8 @@ namespace BaseGameLogic.Management
 		private GameObject timeManagerPrefab = null;
 		public TimeManager TimeManagerInstance { get; protected set; }
 
-		[SerializeField]
-		private GameObject eventManagerPrefab = null;
-		public EventManager EventManagerInstance  { get; protected set; }
+        [Obsolete("EventManager is now separate singleton. Use directly singleton reference.")]
+        public EventManager EventManagerInstance { get { return EventManager.Instance; } }
 
 		protected virtual void CreateInstance()
 		{
@@ -53,7 +52,6 @@ namespace BaseGameLogic.Management
 			InputCollectorManager = CreateInstance<InputCollectorManager> (inputCollectorManagerPrefab);
 			CharacterRegisterInstance = CreateInstance<CharacterRegister>(characterRegisterPrefab);
 			TimeManagerInstance = CreateInstance<TimeManager>(timeManagerPrefab);
-			EventManagerInstance = CreateInstance<EventManager> (eventManagerPrefab);
 		}
 
 		protected virtual void InitalizeOtherObjects()

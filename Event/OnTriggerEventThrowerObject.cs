@@ -11,7 +11,7 @@ namespace BaseGameLogic.Events
 	{
 		public EventManager EventManagerInstance 
 		{
-			get { return GameManager.Instance.EventManagerInstance; }
+			get { return EventManager.Instance; }
 		}
 
 		private Collider objectCollider = null;

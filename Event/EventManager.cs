@@ -13,6 +13,8 @@ namespace BaseGameLogic.Events
 	/// </summary>
 	public class EventManager : MonoBehaviour 
 	{
+        private const string Anather_Instance_Error = "There is another EventManager instance. Please delete it!";
+
 		#if UNITY_EDITOR
 
 		[SerializeField]
@@ -20,22 +22,40 @@ namespace BaseGameLogic.Events
 
 		#endif
 
-		/// <summary>
-		/// The dictionary of event.
-		/// </summary>
-		private Dictionary<string, Action<IEventClient>> _eventDictionary = new Dictionary<string, Action<IEventClient>>();
-		public Dictionary<string, Action<IEventClient>> EventDictionary {
+        public static EventManager Instance { get; private set; }
+
+        public static bool EventCanBeRegistred { get { return Instance != null; } }
+
+        /// <summary>
+        /// The dictionary of event.
+        /// </summary>
+        private Dictionary<string, Action<object>> _eventDictionary = new Dictionary<string, Action<object>>();
+		public Dictionary<string, Action<object>> EventDictionary
+        {
 			get{ return _eventDictionary; }
 		}
 
+        private void Awake()
+        {
+            if(Instance == null)
+            {
+                Instance = this;
+                DontDestroyOnLoad(this.gameObject);
+            }
+            else
+            {
+                Debug.LogError(Anather_Instance_Error);
+            }
+        }
 
-		/// <summary>
-		/// Creates null event of ID.
-		/// </summary>
-		/// <param name="eventID">Event ID.</param>
-		public void CreateEvent(string eventID)
+
+        /// <summary>
+        /// Creates null event of ID.
+        /// </summary>
+        /// <param name="eventID">Event ID.</param>
+        public void CreateEvent(string eventID)
 		{
-			Action<IEventClient> eventAction = null;
+			Action<object> eventAction = null;
 			bool containValue = false;
 
 			containValue = _eventDictionary.TryGetValue (eventID, out eventAction);
@@ -57,7 +77,7 @@ namespace BaseGameLogic.Events
 		/// <param name="eventID">Event ID.</param>
 		public void RemoveEvent(string eventID)
 		{
-			Action<IEventClient> eventAction = null;
+			Action<object> eventAction = null;
 			bool containValue = false;
 
 			containValue = _eventDictionary.TryGetValue (eventID, out eventAction);
@@ -72,7 +92,7 @@ namespace BaseGameLogic.Events
 		/// Registers event of ID.
 		/// </summary>
 		/// <param name="eventID">Event ID.</param>
-		public void RegisterEventAction(string eventID, Action<IEventClient> action)
+		public void RegisterEventAction(string eventID, Action<object> action)
 		{
 			bool containValue = false;
 
@@ -109,9 +129,9 @@ namespace BaseGameLogic.Events
 		/// Unregisters the event.
 		/// </summary>
 		/// <param name="eventID">Event ID.</param>
-		public void UnregisterEventAction(string eventID, Action<IEventClient> action = null)
+		public void UnregisterEventAction(string eventID, Action<object> action = null)
 		{
-			Action<IEventClient> eventAction = null;
+			Action<object> eventAction = null;
 			bool containValue = false;
 
 			containValue = _eventDictionary.TryGetValue (eventID, out eventAction);
@@ -134,16 +154,16 @@ namespace BaseGameLogic.Events
 		/// Fires event of ID.
 		/// </summary>
 		/// <param name="eventID">Event ID.</param>
-		/// <param name="eventClient">Reference to EventClient object.</param>
-		public void FireEvent(string eventID, IEventClient eventClient)
+		/// <param name="eventData">Reference to EventClient object.</param>
+		public void FireEvent(string eventID, object eventData)
 		{
-			Action<IEventClient> eventAction = null;
+			Action<object> eventAction = null;
 			bool containValue = false;
 
 			containValue = _eventDictionary.TryGetValue (eventID, out eventAction);
 			if (containValue && eventAction != null) 
 			{
-				eventAction (eventClient);
+				eventAction (eventData);
 			}
 		}
 	}

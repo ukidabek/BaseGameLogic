@@ -128,7 +128,6 @@ namespace BaseGameLogic.Character
 		{
 			BaseCharacterController character = null;
 			bool containsValue = _charactersDictionary.TryGetValue (characterName, out character);
-
 			if (!containsValue) 
 			{
 				//	exeption

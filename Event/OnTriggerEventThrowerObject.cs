@@ -7,7 +7,7 @@ using BaseGameLogic.Management;
 
 namespace BaseGameLogic.Events
 {
-	public class OnTriggerEventThrowerObject : MonoBehaviour, IEventClient 
+	public class OnTriggerEventThrowerObject : MonoBehaviour
 	{
 		public EventManager EventManagerInstance 
 		{
@@ -39,14 +39,6 @@ namespace BaseGameLogic.Events
 		{
 			get { return this._eventDataContainerOnExit; }
 		}
-
-		public void EventClientStart () {}
-
-		public void EventClientOnDestroy () {}
-
-		public void RegisterAllEvents () {}
-
-		public void UnregisterAllEvents () {}
 
 		private void Awake()
 		{

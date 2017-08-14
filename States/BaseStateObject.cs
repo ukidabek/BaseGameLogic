@@ -14,7 +14,7 @@ namespace BaseGameLogic.States
     /// <summary>
     /// Base game object.
     /// </summary>
-    public class BaseStateObject : MonoBehaviour, IEventClient
+    public class BaseStateObject : MonoBehaviour
     {   
         #if UNITY_EDITOR
 
@@ -45,6 +45,9 @@ namespace BaseGameLogic.States
         [SerializeField]
         protected Stack<BaseState> states = new Stack<BaseState>();
 
+        /// <summary>
+        /// Reference to current state of the object.
+        /// </summary>
         public BaseState CurrentState
         {
             get 
@@ -67,10 +70,7 @@ namespace BaseGameLogic.States
 
         public EventManager EventManagerInstance
         {
-            get
-            {
-                return EventManager.Instance;
-            }
+            get { return EventManager.Instance; }
         }
 
         protected virtual bool EventCanBeRegistred
@@ -78,12 +78,12 @@ namespace BaseGameLogic.States
 			get { return EventManager.EventCanBeRegistred; }
 		}
 
+        /// <summary>
+        /// Enable or disable execiution of stateobject updates methods.
+        /// </summary>
 		protected bool IsGamePaused
 		{
-			get 
-			{
-				return GameManagerInstance != null && GameManagerInstance.GameStatus == GameStatusEnum.Pause;
-			}
+			get { return GameManagerInstance != null && GameManagerInstance.GameStatus == GameStatusEnum.Pause; }
 		}
 
 		#endregion
@@ -204,31 +204,8 @@ namespace BaseGameLogic.States
 
         #endif
 
-        protected virtual void Awake() 
-        {
-            this.objectAnimator = gameObject.GetComponent<Animator>();
-            #if UNITY_EDITOR
-            MissingWarning(objectAnimator, gameObject.name);
-            #endif
-
-            this.animationEventsBroadcaster = this.gameObject.GetComponent<AnimationEventsBroadcaster>();
-            #if UNITY_EDITOR
-            MissingWarning(animationEventsBroadcaster, gameObject.name);
-            #endif
-
-            this.soundEffectManager = this.gameObject.GetComponent<SoundEffectManager>();
-            #if UNITY_EDITOR
-            MissingWarning(soundEffectManager, gameObject.name);
-            #endif
-
-            this.objectRigidbody = this.gameObject.GetComponent<Rigidbody>();
-            #if UNITY_EDITOR
-            MissingWarning(objectRigidbody, gameObject.name);
-            #endif
-        }
-
 		/// <summary>
-		/// Enters the default state.
+		/// Enters the default state of the object.
 		/// </summary>
         protected virtual void EnterDefaultState()
         {
@@ -251,8 +228,7 @@ namespace BaseGameLogic.States
 
         protected virtual void Start () 
         {
-            EventClientStart();
-            EnterDefaultState();
+            RegisterAllEvents();
 
 			GameManagerInstance.ObjectInitializationCallBack -= InitializeObject;
 			GameManagerInstance.ObjectInitializationCallBack += InitializeObject;
@@ -261,9 +237,12 @@ namespace BaseGameLogic.States
 		/// <summary>
 		/// This method is called by GameManager in firstupdata of this object.
 		/// </summary>
-		protected virtual void InitializeObject() {}
+		protected virtual void InitializeObject()
+        {
+            EnterDefaultState();
+        }
 
-		protected bool ExecutModesFunction(StateModeUpdate update)
+        protected bool ExecutModesFunction(StateModeUpdate update)
         {
             bool additive = true;
             if (CurrentState == null)
@@ -295,6 +274,40 @@ namespace BaseGameLogic.States
 			return additive;
 		}
 
+        #region MonoBehaviour methods
+
+        protected virtual void Awake()
+        {
+            this.objectAnimator = gameObject.GetComponent<Animator>();
+            #if UNITY_EDITOR
+            MissingWarning(objectAnimator, gameObject.name);
+            #endif
+
+            this.animationEventsBroadcaster = this.gameObject.GetComponent<AnimationEventsBroadcaster>();
+            #if UNITY_EDITOR
+            MissingWarning(animationEventsBroadcaster, gameObject.name);
+            #endif
+
+            this.soundEffectManager = this.gameObject.GetComponent<SoundEffectManager>();
+            #if UNITY_EDITOR
+            MissingWarning(soundEffectManager, gameObject.name);
+            #endif
+
+            this.objectRigidbody = this.gameObject.GetComponent<Rigidbody>();
+            #if UNITY_EDITOR
+            MissingWarning(objectRigidbody, gameObject.name);
+            #endif
+        }
+
+        protected virtual void OnDestroy()
+        {
+            UnregisterAllEvents();
+            string name = this.gameObject.name;
+            Debug.LogFormat("{0} was destroyed", name);
+
+            GameManagerInstance.ObjectInitializationCallBack -= InitializeObject;
+        }
+
         protected virtual void Update ()
         {
 			if (IsGamePaused)
@@ -325,6 +338,26 @@ namespace BaseGameLogic.States
                 CurrentState.OnFixedUpdate();
         }
 
+        public virtual void OnCollisionEnter(Collision collision) {}
+
+        public virtual void OnCollisionStay(Collision collision) {}
+
+        public virtual void OnCollisionExit(Collision collision) {}
+
+        public virtual void OnTriggerEnter(Collider collision) {}
+
+        public virtual void OnTriggerStay(Collider collision) {}
+
+        public virtual void OnTriggerExit(Collider collision) {}
+
+
+        #endregion
+
+        /// <summary>
+        /// Return a StateCreator added to BaseStateObject by it's name.
+        /// </summary>
+        /// <param name="stateName">Name of StateCreator.</param>
+        /// <returns></returns>
         public BaseStateCreator GetStateCreator(string stateName)
         {
             foreach (BaseStateCreator creator in stateCreators)
@@ -341,6 +374,11 @@ namespace BaseGameLogic.States
             return null;
         }
 
+        /// <summary>
+        /// Return a StateModeCreator added to BaseStateObject by it's name.
+        /// </summary>
+        /// <param name="stateModeName">Name of StateModeCreator </param>
+        /// <returns></returns>
         public BaseStateModeCreator GetBaseStateModeCreator(string stateModeName)
         {
             foreach (BaseStateModeCreator creator in stateModesCreators)
@@ -357,7 +395,10 @@ namespace BaseGameLogic.States
             return null;
         }
 
-
+        /// <summary>
+        /// Enter a new state. 
+        /// </summary>
+        /// <param name="newState"> New state instance.</param>
         public void EnterState(BaseState newState)
         {
             if (newState.EnterConditions())
@@ -379,6 +420,9 @@ namespace BaseGameLogic.States
             }
         }
 
+        /// <summary>
+        /// Exits current state. 
+        /// </summary>
         public void ExitState()
         {
             states.Pop().Exit();
@@ -389,39 +433,9 @@ namespace BaseGameLogic.States
             #endif    
         }
 
-		protected virtual void OnDestroy() 
-		{
-			EventClientOnDestroy ();
-			string name = this.gameObject.name;
-			Debug.LogFormat ("{0} was destroyed", name);
+        public virtual void RegisterAllEvents() {}
 
-			GameManagerInstance.ObjectInitializationCallBack -= InitializeObject;
-		}
+        public virtual void UnregisterAllEvents() {}
 
-		public virtual void EventClientStart ()
-		{
-			RegisterAllEvents ();
-		}
-
-		public virtual void EventClientOnDestroy ()
-		{
-			UnregisterAllEvents ();
-		}
-
-        public void RegisterAllEvents() {}
-
-        public void UnregisterAllEvents() {}
-
-        public virtual void OnCollisionEnter(Collision collision) {}
-
-		public virtual void OnCollisionStay(Collision collision) {}
-
-		public virtual void OnCollisionExit(Collision collision) {}
-
-        public virtual void OnTriggerEnter(Collider collision) {}
-
-		public virtual void OnTriggernStay(Collider collision) {}
-
-        public virtual void OnTriggerExit(Collider collision) {}
     }
 }

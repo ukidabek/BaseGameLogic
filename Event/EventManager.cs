@@ -22,8 +22,14 @@ namespace BaseGameLogic.Events
 
 		#endif
 
+        /// <summary>
+        /// EventManager instance. 
+        /// </summary>
         public static EventManager Instance { get; private set; }
 
+        /// <summary>
+        /// EventManager existence check 
+        /// </summary>
         public static bool EventCanBeRegistred { get { return Instance != null; } }
 
         /// <summary>

@@ -17,8 +17,11 @@ namespace BaseGameLogic.Events
 
 		#if UNITY_EDITOR
 
+        /// <summary>
+        /// Enable or disable log of EventManager.
+        /// </summary>
 		[SerializeField]
-		private bool showLogData = true;
+		private bool showLogData = false;
 
 		#endif
 

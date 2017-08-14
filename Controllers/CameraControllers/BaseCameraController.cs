@@ -8,10 +8,10 @@ namespace BaseGameLogic
     public class BaseCameraController : BaseStateObject 
     {
         protected Camera controlledCamera = null;
-		public Camera ControlledCamera {
+		public Camera ControlledCamera
+        {
 			get{ return controlledCamera; }
 		}
-
 
         [SerializeField]
         public Transform target = null;

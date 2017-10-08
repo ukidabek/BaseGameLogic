@@ -76,8 +76,8 @@ namespace BaseGameLogic.Character
         /// </summary>
 		[Header("Character settings & managment.")]
 		[SerializeField, Tooltip("Slot for CharacterSettings instance.")]
-        protected CharacterSettings settings = null;
-        public CharacterSettings Settings 
+        protected BaseCharacterSettings settings = null;
+        public BaseCharacterSettings Settings 
         {
             get { return this.settings; }
             set { settings = value; }

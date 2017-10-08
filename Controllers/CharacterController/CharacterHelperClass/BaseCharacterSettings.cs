@@ -2,13 +2,13 @@
 
 using System.Collections;
 
-namespace BaseGameLogic
+namespace BaseGameLogic.Character
 {
     /// <summary>
     /// Character settings base class.
     /// Derived classes contains settings set.
     /// </summary>
-    public abstract class CharacterSettings : ScriptableObject
+    public abstract class BaseCharacterSettings : ScriptableObject
     {
     }
 }

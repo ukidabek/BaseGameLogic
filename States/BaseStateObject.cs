@@ -278,22 +278,22 @@ namespace BaseGameLogic.States
 
         protected virtual void Awake()
         {
-            this.objectAnimator = gameObject.GetComponent<Animator>();
+            this.objectAnimator = gameObject.DeepGetComponent<Animator>();
             #if UNITY_EDITOR
             MissingWarning(objectAnimator, gameObject.name);
             #endif
 
-            this.animationEventsBroadcaster = this.gameObject.GetComponent<AnimationEventsBroadcaster>();
+            this.animationEventsBroadcaster = this.gameObject.DeepGetComponent<AnimationEventsBroadcaster>();
             #if UNITY_EDITOR
             MissingWarning(animationEventsBroadcaster, gameObject.name);
             #endif
 
-            this.soundEffectManager = this.gameObject.GetComponent<SoundEffectManager>();
+            this.soundEffectManager = this.gameObject.DeepGetComponent<SoundEffectManager>();
             #if UNITY_EDITOR
             MissingWarning(soundEffectManager, gameObject.name);
             #endif
 
-            this.objectRigidbody = this.gameObject.GetComponent<Rigidbody>();
+            this.objectRigidbody = this.gameObject.DeepGetComponent<Rigidbody>();
             #if UNITY_EDITOR
             MissingWarning(objectRigidbody, gameObject.name);
             #endif

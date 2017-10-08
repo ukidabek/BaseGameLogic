@@ -57,8 +57,8 @@ namespace BaseGameLogic.Character
 
             for (int i = 0; i < scriptableObjects.Count; i++)
             {
-                ScriptableObject so = scriptableObjects[i];
-                string[] stringsInType = so.GetType().ToString().Split('.');
+                ScriptableObject scriptableObject = scriptableObjects[i];
+                string[] stringsInType = scriptableObject.GetType().ToString().Split('.');
                 showEditor[i] = EditorGUILayout.Foldout(showEditor[i], stringsInType[1]);
                 if (editors[i] != null && showEditor[i])
                 {

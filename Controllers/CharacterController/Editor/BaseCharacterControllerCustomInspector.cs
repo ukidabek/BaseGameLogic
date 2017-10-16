@@ -5,18 +5,16 @@ using UnityEditor.AnimatedValues;
 using System.Collections;
 using System.Collections.Generic;
 
-using BaseGameLogic.States;
-
 namespace BaseGameLogic.Character
 {
     [CustomEditor(typeof(BaseCharacterController), true)]
-    public class BaseCharacterControllerCustomInspector : BaseStateObjectCustomInspector
+    public class BaseCharacterControllerCustomInspector : Editor 
     {
         private BaseCharacterController baseCharacterController = null;
         private Editor characterSettingsEditor;
         private Editor characterEquipmentEditor;
         protected List<ScriptableObject> scriptableObjects = new List<ScriptableObject>();
-        private bool[] showEditors = null;
+        private bool[] showEditor = null;
         private Editor[] editors = null;
 
         protected void AddScriptableObject(ScriptableObject scriptableObject)
@@ -33,7 +31,7 @@ namespace BaseGameLogic.Character
             tmp = baseCharacterController.Settings as ScriptableObject;
             AddScriptableObject(tmp);
 
-            showEditors = new bool[scriptableObjects.Count];
+            showEditor = new bool[scriptableObjects.Count];
             editors = new Editor[scriptableObjects.Count];
 
             for (int i = 0; i < scriptableObjects.Count; i++)
@@ -42,18 +40,15 @@ namespace BaseGameLogic.Character
             }
         }
 
-        protected override void OnEnable()
+        public void OnEnable()
         {
-            base.OnEnable();
             Initialize();
         }
 
         public override void OnInspectorGUI()
         {
             EditorGUI.BeginChangeCheck();
-            {
-                base.OnInspectorGUI();
-            }
+            base.OnInspectorGUI();
             if (EditorGUI.EndChangeCheck())
             {
                 EditorUtility.SetDirty(target);
@@ -64,9 +59,8 @@ namespace BaseGameLogic.Character
             {
                 ScriptableObject scriptableObject = scriptableObjects[i];
                 string[] stringsInType = scriptableObject.GetType().ToString().Split('.');
-                showEditors[i] = EditorGUILayout.Foldout(showEditors[i], stringsInType[stringsInType.Length - 1]);
-
-                if (editors[i] != null && showEditors[i])
+                showEditor[i] = EditorGUILayout.Foldout(showEditor[i], stringsInType[1]);
+                if (editors[i] != null && showEditor[i])
                 {
                     editors[i].OnInspectorGUI();
                 }                

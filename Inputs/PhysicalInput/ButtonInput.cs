@@ -7,6 +7,7 @@ namespace BaseGameLogic.Inputs
     [Serializable]
     public class ButtonInput : PhysicalInput
     {
+        
         private bool IsPressed = false;
         private bool WasPressed = false;
 
@@ -34,15 +35,12 @@ namespace BaseGameLogic.Inputs
 			set { buttonState = value;}
         }
 
-		public float AnalogTarget
-        {
+		public float AnalogTarget {
             get { return invert ? -1f : 1f; }
         }
 
-		public bool Pressed
-        {
-			get
-            {
+		public bool Pressed {
+			get{
 				ButtonStateEnum tmpButtonState = State;
 
 				return tmpButtonState == ButtonStateEnum.Down ||
@@ -56,8 +54,8 @@ namespace BaseGameLogic.Inputs
         private float anagloValue = 0f;
         public float AnagloValue
         {
-            get
-            {
+            get {
+
 				if (Pressed)
                 {
                     return anagloValue = Mathf.MoveTowards(
@@ -79,6 +77,7 @@ namespace BaseGameLogic.Inputs
 
         [SerializeField]
 		public KeyCode keyCode;
+
 
 		public override void Read ()
     	{

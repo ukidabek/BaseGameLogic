@@ -32,10 +32,20 @@ namespace BaseGameLogic.States
 		[Header("States managment.")]
         [SerializeField, Tooltip("Default state creator - object that create states.")]
         protected BaseStateCreator defaultStateCreator = null;
-
+#if UNITY_EDITOR
+        public BaseStateCreator DefaultStateCreator
+        {
+            get { return defaultStateCreator; }
+        }
+#endif
         [SerializeField, Tooltip("List of state creatorsof that this object can enter.")]
         protected List<BaseStateCreator> stateCreators = new List<BaseStateCreator>();
-
+#if UNITY_EDITOR
+        public List<BaseStateCreator> StateCreators
+        {
+            get { return stateCreators; }
+        }
+#endif
         [SerializeField, Tooltip("List of mode creators that can be applyed to object states.")]
         protected List<BaseStateModeCreator> stateModesCreators = new List<BaseStateModeCreator>();
 

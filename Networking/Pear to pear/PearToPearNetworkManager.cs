@@ -4,6 +4,8 @@ using UnityEngine.Networking.Types;
 
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 namespace BaseGameLogic.Networking.PearToPear
 {
@@ -48,8 +50,8 @@ namespace BaseGameLogic.Networking.PearToPear
 
         protected virtual void Update()
         {
-            if (_pearType == PearToPearNetworkManagerEnum.Pear)
-                return;
+            //if (_pearType == PearToPearNetworkManagerEnum.Pear)
+            //    return;
 
             int recHostId;
             int connectionId;
@@ -69,9 +71,24 @@ namespace BaseGameLogic.Networking.PearToPear
                     NetworkID networkID;
                     NodeID node;
                     NetworkTransport.GetConnectionInfo(hostID, connectionId, out adres, out port, out networkID, out node, out error);
+                    Debug.Log(adres);
                     Debug.Log(port);
+                    PearInfo info = new PearInfo(adres, port);
+                    PearToPearMessage message = new PearToPearMessage(PearToPearMessageID.NEW_PEAR);
+                    message.Data = info;
+                    BinaryFormatter bf = new BinaryFormatter();
+                    int size;
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        bf.Serialize(ms, message);
+                        size = ms.ToArray().Length;
+                        recBuffer = ms.ToArray();
+                    }
+                    int chid = channelDictionary[QosType.Reliable];
+                    NetworkTransport.Send(hostID, connectionId, chid, recBuffer, size, out error);
                     break;
                 case NetworkEventType.DataEvent:       //3
+                    Debug.Log(dataSize);
                     break;
                 case NetworkEventType.DisconnectEvent: //4
                     break;

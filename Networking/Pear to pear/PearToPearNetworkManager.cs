@@ -65,7 +65,9 @@ namespace BaseGameLogic.Networking.PearToPear
             {
                 case NetworkEventType.Nothing:         //1
                     break;
-                case NetworkEventType.ConnectEvent:    //2
+				case NetworkEventType.ConnectEvent:    //2
+					if (connectionIdTT == connectionId)
+						break;
                     int port;
                     string adres = string.Empty;
                     NetworkID networkID;
@@ -101,6 +103,7 @@ namespace BaseGameLogic.Networking.PearToPear
                         if(m.MessageID == PearToPearMessageID.NEW_PEAR)
                         {
                             PearInfo infoo = m.Data as PearInfo;
+							Debug.Log(infoo.IPAdres);
                             Debug.Log(infoo.Port);
                         }
                     }
@@ -110,12 +113,11 @@ namespace BaseGameLogic.Networking.PearToPear
                     break;
             }
         }
-
+		int connectionIdTT;
         public void Connect()
         {
-            int connectionId;
             byte error;
-            connectionId = NetworkTransport.Connect(hostID, "127.0.0.1", port, 0, out error);
+			connectionIdTT = NetworkTransport.Connect(hostID, "192.168.1.255", port, 0, out error);
         }
     }
 }

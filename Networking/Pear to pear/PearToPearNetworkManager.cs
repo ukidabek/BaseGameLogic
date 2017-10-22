@@ -95,6 +95,7 @@ namespace BaseGameLogic.Networking.PearToPear
                     using (MemoryStream ms = new MemoryStream())
                     {
                         ms.Write(recBuffer, 0, dataSize);
+                        ms.Seek(0, SeekOrigin.Begin);
                         PearToPearMessage m = bff.Deserialize(ms) as PearToPearMessage;
                         size = ms.ToArray().Length;
                         recBuffer = ms.ToArray();

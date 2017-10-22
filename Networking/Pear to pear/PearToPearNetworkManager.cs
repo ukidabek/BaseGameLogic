@@ -66,7 +66,7 @@ namespace BaseGameLogic.Networking.PearToPear
                 case NetworkEventType.Nothing:         //1
                     break;
                 case NetworkEventType.ConnectEvent:    //2
-                    int port;
+                    int port = 1234;
                     string adres = string.Empty;
                     NetworkID networkID;
                     NodeID node;

@@ -12,7 +12,7 @@ namespace BaseGameLogic.Character
     /// <summary>
     /// Base character controller.
     /// </summary>
-    public class BaseCharacterController : BaseStateObject
+    public abstract class BaseCharacterController : BaseStateObject
     {
 		public virtual bool IsPlayer { get { return false; } }
 

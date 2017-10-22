@@ -8,7 +8,7 @@ using BaseGameLogic.Management;
 
 namespace BaseGameLogic.Inputs
 {
-    public class InputCollector : MonoBehaviour 
+    public abstract class InputCollector : MonoBehaviour 
     {
         private const string Input_KeyCode_Error_Message = "Input is not assigned to KeyCode!: Input Name {0} {1}";
         private const string No_Input_Sources_Error_Message = "No input sources! Add input sources!";

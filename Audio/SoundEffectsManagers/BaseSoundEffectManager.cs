@@ -5,9 +5,9 @@ namespace BaseGameLogic.Audio
     /// <summary>
     /// Base sound effect manager.
     /// </summary>
-    public class BaseSoundEffectManager : MonoBehaviour 
+    public abstract class BaseSoundEffectManager : MonoBehaviour 
     {
-        protected const string audioSourceHostObjectName = "ObjectWithAudioSources";
+        protected const string AUDIO_SOURCE_HOST_OBJECT_NAME = "ObjectWithAudioSources";
 
         /// <summary>
         /// The reference to object with SoundSource attached to.
@@ -31,7 +31,7 @@ namespace BaseGameLogic.Audio
             if (objectWithSoundEffects == null)
             {
                 objectWithSoundEffects = new GameObject();
-                objectWithSoundEffects.name = audioSourceHostObjectName;
+                objectWithSoundEffects.name = AUDIO_SOURCE_HOST_OBJECT_NAME;
                 objectWithSoundEffects.transform.SetParent(this.transform);
                 objectWithSoundEffects.transform.localPosition = Vector3.zero;
             }

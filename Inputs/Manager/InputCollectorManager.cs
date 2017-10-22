@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace BaseGameLogic.Inputs
 {
-	public class InputCollectorManager : MonoBehaviour 
+	public abstract class InputCollectorManager : MonoBehaviour 
 	{
         [SerializeField]
         [Tooltip("List of input collectors active in game.")]

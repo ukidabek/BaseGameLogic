@@ -5,7 +5,7 @@ using BaseGameLogic.States;
 
 namespace BaseGameLogic
 {
-    public class BaseCameraController : BaseStateObject 
+    public abstract class BaseCameraController : BaseStateObject 
     {
         protected Camera controlledCamera = null;
 		public Camera ControlledCamera

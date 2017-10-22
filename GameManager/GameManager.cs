@@ -10,7 +10,7 @@ using BaseGameLogic.Character;
 
 namespace BaseGameLogic.Management
 {
-	public class GameManager : MonoBehaviour 
+	public abstract class GameManager : MonoBehaviour 
 	{
 		public static GameManager Instance  { get; private set; }
 

@@ -10,7 +10,7 @@ namespace BaseGameLogic.Inputs
     /// Base Input source class. Classes with will extend that class will be used for handling
     /// a input device like kay board, game pad or mouse.
     /// </summary>
-	public class BaseInputSource : MonoBehaviour
+	public abstract class BaseInputSource : MonoBehaviour
 	{
 		public virtual string InputSourceType 
 		{

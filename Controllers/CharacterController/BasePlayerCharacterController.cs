@@ -8,7 +8,7 @@ using BaseGameLogic.Inputs;
 
 namespace BaseGameLogic.Character
 {
-	public class BasePlayerCharacterController : BaseCharacterController, IComparable 
+	public abstract class BasePlayerCharacterController : BaseCharacterController, IComparable 
 	{
 		public override bool IsPlayer { get { return true; } }
 

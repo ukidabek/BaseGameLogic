@@ -68,7 +68,6 @@ namespace BaseGameLogic.Networking.PearToPear
 				case NetworkEventType.ConnectEvent:    //2
 					if (connectionIdTT == connectionId)
 						break;
-                    int port;
                     int port = 1234;
                     string adres = string.Empty;
                     NetworkID networkID;

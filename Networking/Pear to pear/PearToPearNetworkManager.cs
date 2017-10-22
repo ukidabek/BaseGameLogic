@@ -87,8 +87,24 @@ namespace BaseGameLogic.Networking.PearToPear
                     int chid = channelDictionary[QosType.Reliable];
                     NetworkTransport.Send(hostID, connectionId, chid, recBuffer, size, out error);
                     break;
+
                 case NetworkEventType.DataEvent:       //3
                     Debug.Log(dataSize);
+
+                    BinaryFormatter bff = new BinaryFormatter();
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        ms.Write(recBuffer, 0, dataSize);
+                        PearToPearMessage m = bff.Deserialize(ms) as PearToPearMessage;
+                        size = ms.ToArray().Length;
+                        recBuffer = ms.ToArray();
+
+                        if(m.MessageID == PearToPearMessageID.NEW_PEAR)
+                        {
+                            PearInfo infoo = m.Data as PearInfo;
+                        }
+                    }
+
                     break;
                 case NetworkEventType.DisconnectEvent: //4
                     break;

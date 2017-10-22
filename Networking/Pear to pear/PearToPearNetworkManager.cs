@@ -71,8 +71,6 @@ namespace BaseGameLogic.Networking.PearToPear
                     NetworkID networkID;
                     NodeID node;
                     NetworkTransport.GetConnectionInfo(hostID, connectionId, out adres, out port, out networkID, out node, out error);
-                    Debug.Log(adres);
-                    Debug.Log(port);
                     PearInfo info = new PearInfo(adres, port);
                     PearToPearMessage message = new PearToPearMessage(PearToPearMessageID.NEW_PEAR);
                     message.Data = info;
@@ -103,6 +101,7 @@ namespace BaseGameLogic.Networking.PearToPear
                         if(m.MessageID == PearToPearMessageID.NEW_PEAR)
                         {
                             PearInfo infoo = m.Data as PearInfo;
+                            Debug.Log(infoo.Port);
                         }
                     }
 

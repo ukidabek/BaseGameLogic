@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 
-namespace BaseGameLogic.Networking.PearToPear
+namespace BaseGameLogic.Networking.PeerToPeer
 {
     public abstract class PeerToPearNetworkManager : MonoBehaviour
     {
@@ -40,6 +40,9 @@ namespace BaseGameLogic.Networking.PearToPear
 
             int portToUse = _pearType == PeerToPeerNetworkManagerEnum.MasterPear ? port : 0;
             hostID = NetworkTransport.AddHost(topology, portToUse);
+
+            byte error = 0;
+            NetworkTransport.SetBroadcastCredentials(hostID, 1, 1, 1, out error);
         }
 
         protected void AddChanel(ref ConnectionConfig conectionConfig, QosType type)
@@ -74,7 +77,7 @@ namespace BaseGameLogic.Networking.PearToPear
                     NodeID node;
                     NetworkTransport.GetConnectionInfo(hostID, connectionId, out adres, out port, out networkID, out node, out error);
                     PeerInfo info = new PeerInfo(adres, port);
-                    PeerToPeerMessage message = new PeerToPeerMessage(PearToPearMessageID.NEW_PEAR);
+                    Message message = new Message(PearToPearMessageID.NEW_PEAR);
                     message.Data = info;
                     BinaryFormatter bf = new BinaryFormatter();
                     int size;
@@ -96,7 +99,7 @@ namespace BaseGameLogic.Networking.PearToPear
                     {
                         ms.Write(recBuffer, 0, dataSize);
                         ms.Seek(0, SeekOrigin.Begin);
-                        PeerToPeerMessage m = bff.Deserialize(ms) as PeerToPeerMessage;
+                        Message m = bff.Deserialize(ms) as Message;
                         size = ms.ToArray().Length;
                         recBuffer = ms.ToArray();
 
@@ -119,9 +122,13 @@ namespace BaseGameLogic.Networking.PearToPear
                     }
                     string adress = string.Empty;
                     int p = 0;
-                    NetworkTransport.GetBroadcastConnectionInfo(hostID, out adres, out p, out error);
-                    Debug.Log(adres + " " + p);
-
+                    NetworkTransport.GetBroadcastConnectionInfo(hostID, out adress, out p, out error);
+                    Debug.Log(adress + " " + p);
+                    char[] s = { ':'};
+                    adress = adress.Split(s)[3];
+                    connectionIdTT = NetworkTransport.Connect(hostID, adress, p, 0, out error);
+                    NetworkError er = (NetworkError)error;
+                    Debug.Log(er);
                     break;
             }
         }
@@ -129,8 +136,8 @@ namespace BaseGameLogic.Networking.PearToPear
         public void Connect()
         {
             byte error;
-			//connectionIdTT = NetworkTransport.Connect(hostID, "192.168.1.255", port, 0, out error);
-            NetworkTransport.StartBroadcastDiscovery(hostID, port, 0, 1, 1, null, 0, 3, out error);
+
+            NetworkTransport.StartBroadcastDiscovery(hostID, port, 1, 1, 1, null, 0, 3, out error);
         }
     }
 }

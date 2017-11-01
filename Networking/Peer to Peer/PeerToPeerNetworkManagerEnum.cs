@@ -1,4 +1,4 @@
-﻿namespace BaseGameLogic.Networking.PearToPear
+﻿namespace BaseGameLogic.Networking.PeerToPeer
 {
     public enum PeerToPeerNetworkManagerEnum
     {

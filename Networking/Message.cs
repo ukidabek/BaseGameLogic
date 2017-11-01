@@ -4,10 +4,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace BaseGameLogic.Networking.PearToPear
+namespace BaseGameLogic.Networking
 {
     [Serializable]
-    public class PeerToPeerMessage
+    public class Message
     {
         private int _messageID = -1;
         public int MessageID
@@ -17,9 +17,9 @@ namespace BaseGameLogic.Networking.PearToPear
 
         public object Data = null;
 
-        private PeerToPeerMessage() {}
+        private Message() {}
 
-        public PeerToPeerMessage(int messafgeID)
+        public Message(int messafgeID)
         {
             _messageID = messafgeID;
         }

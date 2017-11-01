@@ -4,7 +4,7 @@ using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace BaseGameLogic.Networking.PearToPear
+namespace BaseGameLogic.Networking.PeerToPeer
 {
     [CustomEditor(typeof(PeerToPearNetworkManager), true)]
     public class PeerToPeerNetworkManagerCustomInspector : Editor

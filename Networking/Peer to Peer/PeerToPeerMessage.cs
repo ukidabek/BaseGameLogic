@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace BaseGameLogic.Networking.PearToPear
 {
     [Serializable]
-    public class PearToPearMessage
+    public class PeerToPeerMessage
     {
         private int _messageID = -1;
         public int MessageID
@@ -17,9 +17,9 @@ namespace BaseGameLogic.Networking.PearToPear
 
         public object Data = null;
 
-        private PearToPearMessage() {}
+        private PeerToPeerMessage() {}
 
-        public PearToPearMessage(int messafgeID)
+        public PeerToPeerMessage(int messafgeID)
         {
             _messageID = messafgeID;
         }

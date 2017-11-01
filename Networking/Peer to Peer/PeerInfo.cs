@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace BaseGameLogic.Networking.PearToPear
 {
     [Serializable]
-    public class PearInfo
+    public class PeerInfo
     {
         private int _port = 0;
         public int Port
@@ -21,7 +21,7 @@ namespace BaseGameLogic.Networking.PearToPear
             get { return _ipAdres; }
         }
 
-        public PearInfo(string ipAdress, int port)
+        public PeerInfo(string ipAdress, int port)
         {
             char[] separators = { ':' };
             string[] ipAdresParts = ipAdress.Split(separators);

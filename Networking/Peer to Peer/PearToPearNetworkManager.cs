@@ -9,7 +9,7 @@ using System.IO;
 
 namespace BaseGameLogic.Networking.PearToPear
 {
-    public abstract class PearToPearNetworkManager : MonoBehaviour
+    public abstract class PeerToPearNetworkManager : MonoBehaviour
     {
         [SerializeField]
         private int port = 8888;
@@ -18,7 +18,7 @@ namespace BaseGameLogic.Networking.PearToPear
         protected int connectionsCount = 8;
         
         [SerializeField]
-        protected PearToPearNetworkManagerEnum _pearType = PearToPearNetworkManagerEnum.MasterPear;
+        protected PeerToPeerNetworkManagerEnum _pearType = PeerToPeerNetworkManagerEnum.MasterPear;
 
         [SerializeField]
         protected int hostID = 0;
@@ -38,7 +38,7 @@ namespace BaseGameLogic.Networking.PearToPear
             // Topology configuration
             HostTopology topology = new HostTopology(config, connectionsCount);
 
-            int portToUse = _pearType == PearToPearNetworkManagerEnum.MasterPear ? port : 0;
+            int portToUse = _pearType == PeerToPeerNetworkManagerEnum.MasterPear ? port : 0;
             hostID = NetworkTransport.AddHost(topology, portToUse);
         }
 
@@ -73,8 +73,8 @@ namespace BaseGameLogic.Networking.PearToPear
                     NetworkID networkID;
                     NodeID node;
                     NetworkTransport.GetConnectionInfo(hostID, connectionId, out adres, out port, out networkID, out node, out error);
-                    PearInfo info = new PearInfo(adres, port);
-                    PearToPearMessage message = new PearToPearMessage(PearToPearMessageID.NEW_PEAR);
+                    PeerInfo info = new PeerInfo(adres, port);
+                    PeerToPeerMessage message = new PeerToPeerMessage(PearToPearMessageID.NEW_PEAR);
                     message.Data = info;
                     BinaryFormatter bf = new BinaryFormatter();
                     int size;
@@ -96,13 +96,13 @@ namespace BaseGameLogic.Networking.PearToPear
                     {
                         ms.Write(recBuffer, 0, dataSize);
                         ms.Seek(0, SeekOrigin.Begin);
-                        PearToPearMessage m = bff.Deserialize(ms) as PearToPearMessage;
+                        PeerToPeerMessage m = bff.Deserialize(ms) as PeerToPeerMessage;
                         size = ms.ToArray().Length;
                         recBuffer = ms.ToArray();
 
                         if(m.MessageID == PearToPearMessageID.NEW_PEAR)
                         {
-                            PearInfo infoo = m.Data as PearInfo;
+                            PeerInfo infoo = m.Data as PeerInfo;
 							Debug.Log(infoo.IPAdres);
                             Debug.Log(infoo.Port);
                         }

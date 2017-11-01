@@ -6,14 +6,14 @@ using System.Collections.Generic;
 
 namespace BaseGameLogic.Networking.PearToPear
 {
-    [CustomEditor(typeof(PearToPearNetworkManager), true)]
-    public class PearToPearNetworkManagerCustomInspector : Editor
+    [CustomEditor(typeof(PeerToPearNetworkManager), true)]
+    public class PeerToPeerNetworkManagerCustomInspector : Editor
     {
-        private PearToPearNetworkManager manager = null;
+        private PeerToPearNetworkManager manager = null;
 
         private void OnEnable()
         {
-            manager = target as PearToPearNetworkManager;
+            manager = target as PeerToPearNetworkManager;
         }
 
         public override void OnInspectorGUI()

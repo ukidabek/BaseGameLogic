@@ -1,6 +1,6 @@
 ﻿namespace BaseGameLogic.Networking.PearToPear
 {
-    public enum PearToPearNetworkManagerEnum
+    public enum PeerToPeerNetworkManagerEnum
     {
         MasterPear,
         Pear

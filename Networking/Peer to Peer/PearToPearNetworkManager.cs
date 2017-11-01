@@ -12,37 +12,60 @@ namespace BaseGameLogic.Networking.PeerToPeer
     public abstract class PeerToPearNetworkManager : MonoBehaviour
     {
         [SerializeField]
-        private int port = 8888;
+        protected PeerToPearNetworkManagerSettings _settings = new PeerToPearNetworkManagerSettings();
 
         [SerializeField]
-        protected int connectionsCount = 8;
-        
-        [SerializeField]
-        protected PeerToPeerNetworkManagerEnum _pearType = PeerToPeerNetworkManagerEnum.MasterPear;
+        protected BroadcastCredentials _broadcastCredentials = new BroadcastCredentials();
 
         [SerializeField]
         protected int hostID = 0;
 
-        protected Dictionary<QosType, int> channelDictionary = new Dictionary<QosType, int>();
+        [SerializeField, Tooltip("List of connected peers. Do not setup!")]
+        protected List<PeerInfo> _connectedPeers = new List<PeerInfo>();
 
-        public void Awake()
+        protected int port = 0;
+        protected byte error = 0;
+        protected string adres = string.Empty;
+        protected PeerInfo newPear = null;
+
+        protected Dictionary<QosType, int> channelDictionary = new Dictionary<QosType, int>();
+        protected BinaryFormatter binaryFormatter = new BinaryFormatter();
+
+        protected virtual void Initialize()
         {
             // Transport layer initialization.
             NetworkTransport.Init();
 
-            // Conection configuration
+            // Conection configuration.
             ConnectionConfig config = new ConnectionConfig();
 
             AddChanel(ref config, QosType.Reliable);
 
-            // Topology configuration
-            HostTopology topology = new HostTopology(config, connectionsCount);
+            // Topology configuration.
+            HostTopology topology = new HostTopology(config, _settings.ConnectionsCount);
 
-            int portToUse = _pearType == PeerToPeerNetworkManagerEnum.MasterPear ? port : 0;
+            // Set get port settings. If master use value for settings if not use first free port.
+            int portToUse = _settings.PearType == PeerToPeerNetworkManagerEnum.MasterPear ? _settings.Port : 0;
             hostID = NetworkTransport.AddHost(topology, portToUse);
 
-            byte error = 0;
-            NetworkTransport.SetBroadcastCredentials(hostID, 1, 1, 1, out error);
+            // If master setup the broadcast settings, for incoming connection handling.
+            if (_settings.PearType == PeerToPeerNetworkManagerEnum.MasterPear)
+            {
+                NetworkTransport.SetBroadcastCredentials(
+                    hostID,
+                    _broadcastCredentials.Key,
+                    _broadcastCredentials.Version,
+                    _broadcastCredentials.Subcersion,
+                    out error);
+            }
+        }
+
+        public void Awake()
+        {
+            Initialize();
+            
+            // Make sure if connected pears list is empty
+            _connectedPeers.Clear();
         }
 
         protected void AddChanel(ref ConnectionConfig conectionConfig, QosType type)
@@ -53,9 +76,6 @@ namespace BaseGameLogic.Networking.PeerToPeer
 
         protected virtual void Update()
         {
-            //if (_pearType == PearToPearNetworkManagerEnum.Pear)
-            //    return;
-
             int recHostId;
             int connectionId;
             int channelId;
@@ -69,75 +89,36 @@ namespace BaseGameLogic.Networking.PeerToPeer
                 case NetworkEventType.Nothing:         //1
                     break;
 				case NetworkEventType.ConnectEvent:    //2
-					if (connectionIdTT == connectionId)
-						break;
-                    int port = 1234;
-                    string adres = string.Empty;
                     NetworkID networkID;
                     NodeID node;
                     NetworkTransport.GetConnectionInfo(hostID, connectionId, out adres, out port, out networkID, out node, out error);
-                    PeerInfo info = new PeerInfo(adres, port);
-                    Message message = new Message(PearToPearMessageID.NEW_PEAR);
-                    message.Data = info;
-                    BinaryFormatter bf = new BinaryFormatter();
-                    int size;
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        bf.Serialize(ms, message);
-                        size = ms.ToArray().Length;
-                        recBuffer = ms.ToArray();
-                    }
-                    int chid = channelDictionary[QosType.Reliable];
-                    NetworkTransport.Send(hostID, connectionId, chid, recBuffer, size, out error);
+                    newPear = new PeerInfo(adres, port);
+                    newPear.ConnectionID = connectionId;
                     break;
 
                 case NetworkEventType.DataEvent:       //3
-                    Debug.Log(dataSize);
-
-                    BinaryFormatter bff = new BinaryFormatter();
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        ms.Write(recBuffer, 0, dataSize);
-                        ms.Seek(0, SeekOrigin.Begin);
-                        Message m = bff.Deserialize(ms) as Message;
-                        size = ms.ToArray().Length;
-                        recBuffer = ms.ToArray();
-
-                        if(m.MessageID == PearToPearMessageID.NEW_PEAR)
-                        {
-                            PeerInfo infoo = m.Data as PeerInfo;
-							Debug.Log(infoo.IPAdres);
-                            Debug.Log(infoo.Port);
-                        }
-                    }
-
                     break;
+
                 case NetworkEventType.DisconnectEvent: //4
                     break;
 
                 case NetworkEventType.BroadcastEvent:
-                    if(_pearType == PeerToPeerNetworkManagerEnum.Pear)
-                    {
-                        break;
-                    }
-                    string adress = string.Empty;
-                    int p = 0;
-                    NetworkTransport.GetBroadcastConnectionInfo(hostID, out adress, out p, out error);
-                    Debug.Log(adress + " " + p);
-                    char[] s = { ':'};
-                    adress = adress.Split(s)[3];
-                    connectionIdTT = NetworkTransport.Connect(hostID, adress, p, 0, out error);
+                    NetworkTransport.GetBroadcastConnectionInfo(hostID, out adres, out port, out error);
+                    newPear = new PeerInfo(adres, port);
+                    newPear.ConnectionID = NetworkTransport.Connect(hostID, adres, port, 0, out error);
+                    _connectedPeers.Add(newPear);
                     NetworkError er = (NetworkError)error;
                     Debug.Log(er);
                     break;
             }
         }
+
 		int connectionIdTT;
         public void Connect()
         {
             byte error;
 
-            NetworkTransport.StartBroadcastDiscovery(hostID, port, 1, 1, 1, null, 0, 3, out error);
+            NetworkTransport.StartBroadcastDiscovery(hostID, _settings.Port, 1, 1, 1, null, 0, 3, out error);
         }
     }
 }

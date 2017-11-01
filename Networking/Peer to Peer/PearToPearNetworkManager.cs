@@ -111,13 +111,26 @@ namespace BaseGameLogic.Networking.PearToPear
                     break;
                 case NetworkEventType.DisconnectEvent: //4
                     break;
+
+                case NetworkEventType.BroadcastEvent:
+                    if(_pearType == PeerToPeerNetworkManagerEnum.Pear)
+                    {
+                        break;
+                    }
+                    string adress = string.Empty;
+                    int p = 0;
+                    NetworkTransport.GetBroadcastConnectionInfo(hostID, out adres, out p, out error);
+                    Debug.Log(adres + " " + p);
+
+                    break;
             }
         }
 		int connectionIdTT;
         public void Connect()
         {
             byte error;
-			connectionIdTT = NetworkTransport.Connect(hostID, "192.168.1.255", port, 0, out error);
+			//connectionIdTT = NetworkTransport.Connect(hostID, "192.168.1.255", port, 0, out error);
+            NetworkTransport.StartBroadcastDiscovery(hostID, port, 0, 1, 1, null, 0, 3, out error);
         }
     }
 }

@@ -38,6 +38,7 @@ namespace BaseGameLogic.Networking.PeerToPeer
 
         protected Dictionary<QosType, int> channelDictionary = new Dictionary<QosType, int>();
         protected BinaryFormatter binaryFormatter = new BinaryFormatter();
+        protected MemoryStream memeoryStream = null;
 
         protected virtual void Initialize()
         {
@@ -103,6 +104,7 @@ namespace BaseGameLogic.Networking.PeerToPeer
 
             if (newPear != null && newPear.ConnectionID == connectionId)
             {
+                SendPeersList();
                 return;
             }
 
@@ -132,6 +134,40 @@ namespace BaseGameLogic.Networking.PeerToPeer
             }
         }
 
+        protected Message HandleMessages(byte[] buffer, int sieze)
+        {
+            memeoryStream = new MemoryStream(recBuffer);
+            memeoryStream.Position = 0;
+            Message message = (Message)binaryFormatter.Deserialize(memeoryStream);
+
+            switch(message.MessageID)
+            {
+                case PeerToPeerMessageID.PEAR_LIST:
+                    List<PeerInfo> peerList = (List<PeerInfo>)message.Data;
+                    _connectedPeers.AddRange(peerList);
+                    for (int i = 0; i < peerList.Count; i++)
+                    {
+                        PeerInfo peer = peerList[i];
+                        ConnectToPear(ref peer);
+                    }
+                    break;
+            }
+
+            return message;
+        }
+
+        protected virtual NetworkError ConnectToPear(ref PeerInfo peer)
+        {
+            peer.ConnectionID = NetworkTransport.Connect(
+                hostID,
+                peer.IPAdres,
+                peer.Port,
+                0,
+                out error);
+
+            return NetworkUtility.GetNetworkError(error);
+        }
+
         protected virtual void HandleBrodcastNewConnection()
         {
             NetworkTransport.GetBroadcastConnectionInfo(hostID, out adres, out port, out error);
@@ -153,9 +189,7 @@ namespace BaseGameLogic.Networking.PeerToPeer
 
             _logs.Add(log);
 
-            newPear.ConnectionID = NetworkTransport.Connect(hostID, adres, port, 0, out error);
-
-            NetworkError networkError = NetworkUtility.GetNetworkError(error);
+            NetworkError networkError = ConnectToPear(ref newPear);
 
             if (networkError == NetworkError.Ok)
             {
@@ -164,8 +198,6 @@ namespace BaseGameLogic.Networking.PeerToPeer
                     newPear.IPAdres,
                     newPear.Port,
                     System.DateTime.Now.ToString());
-
-                _connectedPeers.Add(newPear);
             }
             else
             {
@@ -177,20 +209,26 @@ namespace BaseGameLogic.Networking.PeerToPeer
             }
 
             _logs.Add(log);
+        }
 
-            Message message = new Message(PearToPearMessageID.PEAR_LIST);
+        protected void SendPeersList()
+        {
+            Message message = new Message(PeerToPeerMessageID.PEAR_LIST);
+
             message.Data = _connectedPeers;
-            MemoryStream memoryStream = new MemoryStream();
-            binaryFormatter.Serialize(memoryStream, message);
-            byte[] arry = memoryStream.ToArray();
+            memeoryStream = new MemoryStream();
+            binaryFormatter.Serialize(memeoryStream, message);
+            byte[] arry = memeoryStream.ToArray();
 
             NetworkTransport.Send(
-                hostID, 
-                newPear.ConnectionID, 
-                channelDictionary[QosType.Reliable], 
-                arry, 
-                arry.Length, 
+                hostID,
+                newPear.ConnectionID,
+                channelDictionary[QosType.Reliable],
+                arry,
+                arry.Length,
                 out error);
+
+            _connectedPeers.Add(newPear);
         }
 
         protected virtual void Update()
@@ -220,10 +258,7 @@ namespace BaseGameLogic.Networking.PeerToPeer
                     break;
 
                 case NetworkEventType.DataEvent:       //3
-                    MemoryStream stream = new MemoryStream(recBuffer);
-                    stream.Position = 0;
-                    Message message = (Message)binaryFormatter.Deserialize(stream);
-
+                    HandleMessages(recBuffer, dataSize);
                     break;
 
                 case NetworkEventType.DisconnectEvent: //4
@@ -235,7 +270,6 @@ namespace BaseGameLogic.Networking.PeerToPeer
             }
         }
 
-		int connectionIdTT;
         public void Connect()
         {
             byte error;

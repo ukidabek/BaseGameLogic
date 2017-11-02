@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 
+using BaseGameLogic.Networking;
+
 namespace BaseGameLogic.Networking.PeerToPeer
 {
     public abstract class PeerToPearNetworkManager : MonoBehaviour
@@ -23,9 +25,15 @@ namespace BaseGameLogic.Networking.PeerToPeer
         [SerializeField, Tooltip("List of connected peers. Do not setup!")]
         protected List<PeerInfo> _connectedPeers = new List<PeerInfo>();
 
+        [SerializeField]
+        protected List<string> _logs = new List<string>();
+
         protected int port = 0;
         protected byte error = 0;
         protected string adres = string.Empty;
+        protected int connectionId = 0;
+        protected byte[] recBuffer = null;
+
         protected PeerInfo newPear = null;
 
         protected Dictionary<QosType, int> channelDictionary = new Dictionary<QosType, int>();
@@ -74,26 +82,116 @@ namespace BaseGameLogic.Networking.PeerToPeer
             channelDictionary.Add(type, channelId);
         }
 
+        protected virtual void HandleNewConnection()
+        {
+            if(NetworkTransport.IsBroadcastDiscoveryRunning())
+            {
+                NetworkTransport.StopBroadcastDiscovery();
+            }
+
+            NetworkID networkID;
+            NodeID node;
+
+            NetworkTransport.GetConnectionInfo(
+                hostID,
+                connectionId,
+                out adres,
+                out port,
+                out networkID,
+                out node,
+                out error);
+
+            if (newPear != null && newPear.ConnectionID == connectionId)
+                return;
+
+
+            NetworkError networkError = NetworkUtility.GetNetworkError(error);
+            if(networkError == NetworkError.Ok)
+            {
+                newPear = new PeerInfo(adres, port);
+
+                string log = string.Format(
+                    PeerToPearNetworkManagerLogs.NEW_CONNECTION_APPEARED,
+                    newPear.IPAdres,
+                    newPear.Port,
+                    System.DateTime.Now.ToString());
+
+                _logs.Add(log);
+
+                newPear.ConnectionID = connectionId;
+                _connectedPeers.Add(newPear);
+            }
+        }
+
+        protected virtual void HandleBrodcastNewConnection()
+        {
+            NetworkTransport.GetBroadcastConnectionInfo(hostID, out adres, out port, out error);
+            newPear = new PeerInfo(adres, port);
+
+            string log = string.Format(
+                PeerToPearNetworkManagerLogs.NEW_PEER_TRY_TO_CONNECT,
+                newPear.IPAdres,
+                newPear.Port,
+                System.DateTime.Now.ToString());
+
+            _logs.Add(log);
+
+            log = string.Format(
+                PeerToPearNetworkManagerLogs.CONNECTING_TO_PEER,
+                newPear.IPAdres,
+                newPear.Port,
+                System.DateTime.Now.ToString());
+
+            _logs.Add(log);
+
+            newPear.ConnectionID = NetworkTransport.Connect(hostID, adres, port, 0, out error);
+
+            NetworkError networkError = NetworkUtility.GetNetworkError(error);
+
+            if (networkError == NetworkError.Ok)
+            {
+                log = string.Format(
+                    PeerToPearNetworkManagerLogs.CONNECTING_TO_PEER_SUCCEEDED,
+                    newPear.IPAdres,
+                    newPear.Port,
+                    System.DateTime.Now.ToString());
+                _connectedPeers.Add(newPear);
+            }
+            else
+            {
+                log = string.Format(
+                    PeerToPearNetworkManagerLogs.CONNECTING_TO_PEER_FAIL,
+                    newPear.IPAdres,
+                    newPear.Port,
+                    System.DateTime.Now.ToString());
+            }
+            _logs.Add(log);
+        }
+
         protected virtual void Update()
         {
             int recHostId;
-            int connectionId;
             int channelId;
-            byte[] recBuffer = new byte[1024];
-            int bufferSize = 1024;
             int dataSize;
-            byte error;
-            NetworkEventType recData = NetworkTransport.Receive(out recHostId, out connectionId, out channelId, recBuffer, bufferSize, out dataSize, out error);
+
+            recBuffer = new byte[_settings.BufferSize];
+
+            NetworkEventType recData = NetworkTransport.Receive(
+                out recHostId, 
+                out connectionId, 
+                out channelId, 
+                recBuffer, 
+                _settings.BufferSize, 
+                out dataSize, 
+                out error);
+
             switch (recData)
             {
                 case NetworkEventType.Nothing:         //1
                     break;
+
 				case NetworkEventType.ConnectEvent:    //2
-                    NetworkID networkID;
-                    NodeID node;
-                    NetworkTransport.GetConnectionInfo(hostID, connectionId, out adres, out port, out networkID, out node, out error);
-                    newPear = new PeerInfo(adres, port);
-                    newPear.ConnectionID = connectionId;
+                    HandleNewConnection();
                     break;
 
                 case NetworkEventType.DataEvent:       //3
@@ -103,12 +201,7 @@ namespace BaseGameLogic.Networking.PeerToPeer
                     break;
 
                 case NetworkEventType.BroadcastEvent:
-                    NetworkTransport.GetBroadcastConnectionInfo(hostID, out adres, out port, out error);
-                    newPear = new PeerInfo(adres, port);
-                    newPear.ConnectionID = NetworkTransport.Connect(hostID, adres, port, 0, out error);
-                    _connectedPeers.Add(newPear);
-                    NetworkError er = (NetworkError)error;
-                    Debug.Log(er);
+                    HandleBrodcastNewConnection();
                     break;
             }
         }
@@ -118,7 +211,16 @@ namespace BaseGameLogic.Networking.PeerToPeer
         {
             byte error;
 
-            NetworkTransport.StartBroadcastDiscovery(hostID, _settings.Port, 1, 1, 1, null, 0, 3, out error);
+            NetworkTransport.StartBroadcastDiscovery(
+                hostID, 
+                _settings.Port,
+                _broadcastCredentials.Key,
+                _broadcastCredentials.Version,
+                _broadcastCredentials.Subcersion, 
+                null, 
+                0, 
+                _broadcastCredentials.Timeout, 
+                out error);
         }
     }
 }

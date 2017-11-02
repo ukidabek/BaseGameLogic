@@ -1,10 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine.Networking;
+using UnityEngine.Networking.Types;
+
 
 namespace BaseGameLogic.Networking
 {
-
     public static class NetworkUtility
     {
         private static readonly char[] IP_ADRES_SEPARATORS = { ':' };
@@ -14,6 +13,11 @@ namespace BaseGameLogic.Networking
             string[] ipAdresParts = ipAdressString.Split(IP_ADRES_SEPARATORS);
             int ipAdresIndex = ipAdresParts.Length - 1;
             return ipAdresParts[ipAdresIndex];
+        }
+
+        public static NetworkError GetNetworkError(byte error)
+        {
+            return (NetworkError)error;
         }
     }
 }

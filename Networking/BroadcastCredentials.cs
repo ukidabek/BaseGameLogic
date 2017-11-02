@@ -20,5 +20,9 @@ namespace BaseGameLogic.Networking
         [SerializeField]
         private int _subcersion = 1;
         public int Subcersion { get { return _subcersion; } }
+
+        [SerializeField, Tooltip("Time between broadcast messages in ms.")]
+        private int _timeout = 3000;
+        public int Timeout { get { return _timeout; } }
     }
 }

@@ -49,6 +49,7 @@ namespace BaseGameLogic.Networking.PeerToPeer
             ConnectionConfig config = new ConnectionConfig();
 
             AddChanel(ref config, QosType.Reliable);
+            AddChanel(ref config, QosType.UnreliableSequenced);
 
             // Topology configuration.
             HostTopology topology = new HostTopology(config, _settings.ConnectionsCount);
@@ -69,7 +70,7 @@ namespace BaseGameLogic.Networking.PeerToPeer
             }
         }
 
-        public void Awake()
+        public virtual void Awake()
         {
             Initialize();
             
@@ -139,7 +140,7 @@ namespace BaseGameLogic.Networking.PeerToPeer
             memeoryStream = new MemoryStream(recBuffer);
             memeoryStream.Position = 0;
             Message message = (Message)binaryFormatter.Deserialize(memeoryStream);
-
+            
             switch(message.MessageID)
             {
                 case PeerToPeerMessageID.PEAR_LIST:
@@ -150,7 +151,7 @@ namespace BaseGameLogic.Networking.PeerToPeer
                         PeerInfo peer = peerList[i];
                         ConnectToPear(ref peer);
                     }
-                    break;
+                    return null;
             }
 
             return message;
@@ -215,6 +216,13 @@ namespace BaseGameLogic.Networking.PeerToPeer
         {
             Message message = new Message(PeerToPeerMessageID.PEAR_LIST);
 
+            SendReliable(message);
+
+            _connectedPeers.Add(newPear);
+        }
+
+        protected virtual NetworkError SendReliable(Message message)
+        {
             message.Data = _connectedPeers;
             memeoryStream = new MemoryStream();
             binaryFormatter.Serialize(memeoryStream, message);
@@ -228,7 +236,25 @@ namespace BaseGameLogic.Networking.PeerToPeer
                 arry.Length,
                 out error);
 
-            _connectedPeers.Add(newPear);
+            return NetworkUtility.GetNetworkError(error);
+        }
+
+        protected virtual NetworkError UpdateUnreiable(Message message)
+        {
+            message.Data = _connectedPeers;
+            memeoryStream = new MemoryStream();
+            binaryFormatter.Serialize(memeoryStream, message);
+            byte[] array = memeoryStream.ToArray();
+
+            NetworkTransport.Send(
+                hostID,
+                newPear.ConnectionID,
+                channelDictionary[QosType.UnreliableSequenced],
+                array,
+                array.Length,
+                out error);
+
+            return NetworkUtility.GetNetworkError(error);
         }
 
         protected virtual void Update()

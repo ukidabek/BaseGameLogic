@@ -1,8 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+
+using System;
+
 namespace BaseGameLogic.Serialization
 {
+    [Serializable]
     public class SerializedVector3 : SerializedVector2
     {
         public float Z = 0f;

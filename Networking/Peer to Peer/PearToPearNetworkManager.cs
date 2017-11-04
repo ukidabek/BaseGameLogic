@@ -245,12 +245,12 @@ namespace BaseGameLogic.Networking.PeerToPeer
         {
             Message message = new Message(PeerToPeerMessageID.PEAR_LIST);
 
-            SendReliable(message);
+            SendReliable(message, newPear.ConnectionID);
 
             _connectedPeers.Add(newPear);
         }
 
-        protected virtual NetworkError SendReliable(Message message)
+        protected virtual NetworkError SendReliable(Message message, int connectionId)
         {
             message.Data = _connectedPeers;
             memeoryStream = new MemoryStream();
@@ -259,7 +259,7 @@ namespace BaseGameLogic.Networking.PeerToPeer
 
             NetworkTransport.Send(
                 hostID,
-                newPear.ConnectionID,
+                connectionId,
                 channelDictionary[QosType.Reliable],
                 arry,
                 arry.Length,
@@ -268,16 +268,15 @@ namespace BaseGameLogic.Networking.PeerToPeer
             return NetworkUtility.GetNetworkError(error);
         }
 
-        protected virtual NetworkError UpdateUnreiable(Message message)
+        protected virtual NetworkError UpdateUnreiable(Message message, int connectionId)
         {
-            message.Data = _connectedPeers;
             memeoryStream = new MemoryStream();
             binaryFormatter.Serialize(memeoryStream, message);
             byte[] array = memeoryStream.ToArray();
 
             NetworkTransport.Send(
                 hostID,
-                newPear.ConnectionID,
+                connectionId,
                 channelDictionary[QosType.UnreliableSequenced],
                 array,
                 array.Length,

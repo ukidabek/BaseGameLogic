@@ -111,20 +111,25 @@ namespace BaseGameLogic.Character
             MissingWarning(characterNavMeshAgent, gameObject.name);
             #endif
         }
-            
+
+        protected virtual void Register()
+        {
+            if (CharacterRegisterInstance != null)
+            {
+                CharacterRegisterInstance.RegisterCharacter(this);
+            }
+            else
+            {
+                // exeption
+            }
+        }
+
+
         protected override void Start()
         {
             base.Start();
-
-			if (CharacterRegisterInstance != null) 
-			{
-				CharacterRegisterInstance.RegisterCharacter (this);
-			}
-			else
-			{
-				// exeption
-			}
-		}
+            Register();
+        }
                                                 
         protected virtual void OnAnimatorIK(int layerIndex)
         {

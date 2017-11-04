@@ -13,6 +13,8 @@ namespace BaseGameLogic.Networking.PeerToPeer
 {
     public abstract class PeerToPearNetworkManager : MonoBehaviour
     {
+        public static PeerToPearNetworkManager Instance { get; protected set; }
+
         [SerializeField]
         protected PeerToPearNetworkManagerSettings _settings = new PeerToPearNetworkManagerSettings();
 
@@ -73,9 +75,31 @@ namespace BaseGameLogic.Networking.PeerToPeer
         public virtual void Awake()
         {
             Initialize();
-            
+            if(Instance == null)
+            {
+                Instance = this;
+            }
+            else
+            {
+                Destroy(this);
+                return;
+            }
+
             // Make sure if connected pears list is empty
             _connectedPeers.Clear();
+        }
+
+        public virtual void Start() {}
+
+        protected virtual bool NewPearConedted(int connectionId)
+        {
+            if (newPear != null && newPear.ConnectionID == connectionId)
+            {
+                SendPeersList();
+                return true;
+            }
+
+            return false;
         }
 
         protected void AddChanel(ref ConnectionConfig conectionConfig, QosType type)
@@ -103,9 +127,8 @@ namespace BaseGameLogic.Networking.PeerToPeer
                 out node,
                 out error);
 
-            if (newPear != null && newPear.ConnectionID == connectionId)
+            if (NewPearConedted(connectionId))
             {
-                SendPeersList();
                 return;
             }
 
@@ -135,7 +158,7 @@ namespace BaseGameLogic.Networking.PeerToPeer
             }
         }
 
-        protected Message HandleMessages(byte[] buffer, int sieze)
+        protected virtual Message HandleMessages(byte[] buffer, int sieze)
         {
             memeoryStream = new MemoryStream(recBuffer);
             memeoryStream.Position = 0;

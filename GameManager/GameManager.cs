@@ -12,7 +12,7 @@ namespace BaseGameLogic.Management
 {
 	public abstract class GameManager : MonoBehaviour 
 	{
-		public static GameManager Instance  { get; private set; }
+		public static GameManager Instance  { get; protected set; }
 
 		public Action ObjectInitializationCallBack = null;
 
@@ -81,6 +81,9 @@ namespace BaseGameLogic.Management
 
 		protected virtual void Awake()
 		{
+            transform.ResetPosition();
+            transform.ResetRotation();
+
 			CreateInstance ();
 			CreateManagersInstance ();
 		}

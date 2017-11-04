@@ -40,7 +40,7 @@ namespace BaseGameLogic.Character
 			get { return GameManagerInstance.InputCollectorManager; }
 		}
 
-		[SerializeField, Range(0,128)]
+		[SerializeField]
 		private int _playerNumber = 0;
 		public int PlayerNumber 
 		{

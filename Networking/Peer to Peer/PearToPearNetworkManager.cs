@@ -91,7 +91,7 @@ namespace BaseGameLogic.Networking.PeerToPeer
 
         public virtual void Start() {}
 
-        protected virtual bool NewPearConedted(int connectionId)
+        protected virtual bool NewPearFromBroadcastConedted(int connectionId)
         {
             if (newPear != null && newPear.ConnectionID == connectionId)
             {
@@ -101,6 +101,8 @@ namespace BaseGameLogic.Networking.PeerToPeer
 
             return false;
         }
+
+        protected virtual void NewPeerConected(int connectionId) {}
 
         protected void AddChanel(ref ConnectionConfig conectionConfig, QosType type)
         {
@@ -127,7 +129,7 @@ namespace BaseGameLogic.Networking.PeerToPeer
                 out node,
                 out error);
 
-            if (NewPearConedted(connectionId))
+            if (NewPearFromBroadcastConedted(connectionId))
             {
                 return;
             }
@@ -155,6 +157,8 @@ namespace BaseGameLogic.Networking.PeerToPeer
 
                 newPear.ConnectionID = connectionId;
                 _connectedPeers.Add(newPear);
+
+                NewPeerConected(newPear.ConnectionID);
             }
         }
 
@@ -222,6 +226,8 @@ namespace BaseGameLogic.Networking.PeerToPeer
                     newPear.IPAdres,
                     newPear.Port,
                     System.DateTime.Now.ToString());
+
+                NewPeerConected(newPear.ConnectionID);
             }
             else
             {

@@ -167,8 +167,9 @@ namespace BaseGameLogic.Networking.PeerToPeer
             memeoryStream = new MemoryStream(recBuffer);
             memeoryStream.Position = 0;
             Message message = (Message)binaryFormatter.Deserialize(memeoryStream);
-            
-            switch(message.MessageID)
+            message.ConnectionID = connectionId;
+
+            switch (message.MessageID)
             {
                 case PeerToPeerMessageID.PEAR_LIST:
                     List<PeerInfo> peerList = (List<PeerInfo>)message.Data;

@@ -9,6 +9,8 @@ namespace BaseGameLogic.Networking
     [Serializable]
     public class Message
     {
+        public int ConnectionID { get; set; }
+
         private int _messageID = -1;
         public int MessageID
         {

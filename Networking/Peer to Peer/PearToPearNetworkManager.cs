@@ -33,7 +33,7 @@ namespace BaseGameLogic.Networking.PeerToPeer
         protected int port = 0;
         protected byte error = 0;
         protected string adres = string.Empty;
-        protected int connectionId = 0;
+        protected int connectionID = 0;
         protected byte[] recBuffer = null;
 
         protected PeerInfo newPear = null;
@@ -72,6 +72,12 @@ namespace BaseGameLogic.Networking.PeerToPeer
             }
         }
 
+        protected void AddChanel(ref ConnectionConfig conectionConfig, QosType type)
+        {
+            int channelId = conectionConfig.AddChannel(type);
+            channelDictionary.Add(type, channelId);
+        }
+
         public virtual void Awake()
         {
             Initialize();
@@ -91,6 +97,8 @@ namespace BaseGameLogic.Networking.PeerToPeer
 
         public virtual void Start() {}
 
+        protected virtual void PeerConected(int connectionId) {}
+
         protected virtual bool NewPearFromBroadcastConedted(int connectionId)
         {
             if (newPear != null && newPear.ConnectionID == connectionId)
@@ -102,15 +110,7 @@ namespace BaseGameLogic.Networking.PeerToPeer
             return false;
         }
 
-        protected virtual void NewPeerConected(int connectionId) {}
-
-        protected void AddChanel(ref ConnectionConfig conectionConfig, QosType type)
-        {
-            int channelId = conectionConfig.AddChannel(type);
-            channelDictionary.Add(type, channelId);
-        }
-
-        protected virtual void HandleNewConnection()
+        protected virtual void HandleConnection()
         {
             if(NetworkTransport.IsBroadcastDiscoveryRunning())
             {
@@ -122,14 +122,14 @@ namespace BaseGameLogic.Networking.PeerToPeer
 
             NetworkTransport.GetConnectionInfo(
                 hostID,
-                connectionId,
+                connectionID,
                 out adres,
                 out port,
                 out networkID,
                 out node,
                 out error);
 
-            if (NewPearFromBroadcastConedted(connectionId))
+            if (NewPearFromBroadcastConedted(connectionID))
             {
                 return;
             }
@@ -155,11 +155,19 @@ namespace BaseGameLogic.Networking.PeerToPeer
 
                 _logs.Add(log);
 
-                newPear.ConnectionID = connectionId;
+                newPear.ConnectionID = connectionID;
                 _connectedPeers.Add(newPear);
 
-                NewPeerConected(newPear.ConnectionID);
+                PeerConected(newPear.ConnectionID);
             }
+        }
+
+        protected virtual void PeerDisconected(int connectionID) { }
+
+        protected virtual void HandleDisconnection()
+        {
+            Debug.LogFormat("Conection ID: {0}", connectionID);
+            PeerDisconected(connectionID);
         }
 
         protected virtual Message HandleMessages(byte[] buffer, int sieze)
@@ -167,7 +175,7 @@ namespace BaseGameLogic.Networking.PeerToPeer
             memeoryStream = new MemoryStream(recBuffer);
             memeoryStream.Position = 0;
             Message message = (Message)binaryFormatter.Deserialize(memeoryStream);
-            message.ConnectionID = connectionId;
+            message.ConnectionID = connectionID;
 
             switch (message.MessageID)
             {
@@ -228,7 +236,7 @@ namespace BaseGameLogic.Networking.PeerToPeer
                     newPear.Port,
                     System.DateTime.Now.ToString());
 
-                NewPeerConected(newPear.ConnectionID);
+                PeerConected(newPear.ConnectionID);
             }
             else
             {
@@ -296,7 +304,7 @@ namespace BaseGameLogic.Networking.PeerToPeer
 
             NetworkEventType recData = NetworkTransport.Receive(
                 out recHostId, 
-                out connectionId, 
+                out connectionID, 
                 out channelId, 
                 recBuffer, 
                 _settings.BufferSize, 
@@ -309,7 +317,7 @@ namespace BaseGameLogic.Networking.PeerToPeer
                     break;
 
 				case NetworkEventType.ConnectEvent:    //2
-                    HandleNewConnection();
+                    HandleConnection();
                     break;
 
                 case NetworkEventType.DataEvent:       //3
@@ -317,6 +325,7 @@ namespace BaseGameLogic.Networking.PeerToPeer
                     break;
 
                 case NetworkEventType.DisconnectEvent: //4
+                    HandleDisconnection();
                     break;
 
                 case NetworkEventType.BroadcastEvent:

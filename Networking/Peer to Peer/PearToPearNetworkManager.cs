@@ -166,7 +166,16 @@ namespace BaseGameLogic.Networking.PeerToPeer
 
         protected virtual void HandleDisconnection()
         {
-            Debug.LogFormat("Conection ID: {0}", connectionID);
+            for (int i = 0; i < _connectedPeers.Count; i++)
+            {
+                PeerInfo info = _connectedPeers[i];
+                if(info.ConnectionID == connectionID)
+                {
+                    _connectedPeers.RemoveAt(i);
+                    break;
+                }
+            }
+
             PeerDisconected(connectionID);
         }
 

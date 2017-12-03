@@ -3,10 +3,12 @@
 using System.Collections;
 using System.Collections.Generic;
 
+using BaseGameLogic.Singleton;
+
 namespace BaseGameLogic.Character
 {
-	public class CharacterRegister : MonoBehaviour 
-	{
+	public class CharacterRegister : Singleton<CharacterRegister>
+    {
         #if UNITY_EDITOR
         /// <summary>
         /// List of characters. In editor olny. 

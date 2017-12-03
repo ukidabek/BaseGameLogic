@@ -80,7 +80,11 @@ namespace BaseGameLogic.Networking.PeerToPeer
 
         public virtual void Awake()
         {
-            Initialize();
+            if(_settings.InitializationOnAwake)
+            {
+                Initialize();
+            }
+
             if(Instance == null)
             {
                 Instance = this;
@@ -96,6 +100,11 @@ namespace BaseGameLogic.Networking.PeerToPeer
         }
 
         public virtual void Start() {}
+
+        public virtual void SetPeerType(PeerToPeerNetworkManagerEnum type)
+        {
+            _settings.PearType = type;
+        }
 
         protected virtual void PeerConected(int connectionId) {}
 

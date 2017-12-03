@@ -3,6 +3,7 @@
 	public enum GameStatusEnum 
 	{
 		Play,
-		Pause
+		Pause,
+        Loading
 	}
 }

@@ -3,10 +3,12 @@
 using System.Collections;
 using System.Collections.Generic;
 
+using BaseGameLogic.Singleton;
+
 namespace BaseGameLogic.Inputs
 {
-	public abstract class InputCollectorManager : MonoBehaviour 
-	{
+	public abstract class InputCollectorManager : Singleton<InputCollectorManager>
+    {
         [SerializeField]
         [Tooltip("List of input collectors active in game.")]
         private InputCollector [] _inputCollectors = null;
@@ -16,8 +18,10 @@ namespace BaseGameLogic.Inputs
         /// </summary>
 		private Dictionary<int, InputCollector> _inputCollectorsDictionary = new Dictionary<int, InputCollector>();
 
-		public void Awake()
+		protected override void Awake()
 		{
+            base.Awake();
+
             // Collecting InputCollector instances. 
             _inputCollectors = GetComponentsInChildren<InputCollector>();
 

@@ -3,6 +3,7 @@
 using System;
 using System.Collections;
 
+using BaseGameLogic.Singleton;
 using BaseGameLogic.Inputs;
 using BaseGameLogic.TimeManagment;
 using BaseGameLogic.Events;
@@ -10,10 +11,8 @@ using BaseGameLogic.Character;
 
 namespace BaseGameLogic.Management
 {
-	public abstract class GameManager : MonoBehaviour 
+	public abstract class GameManager : Singleton<GameManager> 
 	{
-		public static GameManager Instance  { get; protected set; }
-
 		public Action ObjectInitializationCallBack = null;
 
 		[SerializeField]
@@ -34,18 +33,6 @@ namespace BaseGameLogic.Management
 
         [Obsolete("EventManager is now separate singleton. Use directly singleton reference.")]
         public EventManager EventManagerInstance { get { return EventManager.Instance; } }
-
-		protected virtual void CreateInstance()
-		{
-			if (Instance == null) 
-			{
-				Instance = this;
-			} 
-			else 
-			{
-				Destroy (this.gameObject);
-			}
-		}
 
 		protected virtual void CreateManagersInstance()
 		{
@@ -79,31 +66,41 @@ namespace BaseGameLogic.Management
 			return componentInstance;
 		}
 
-		protected virtual void Awake()
+		protected override void Awake()
 		{
+            base.Awake();
+
             transform.ResetPosition();
             transform.ResetRotation();
 
-			CreateInstance ();
 			CreateManagersInstance ();
 		}
 
 		protected virtual void Update()
 		{
 			this.enabled = false;
-			InitalizeOtherObjects ();
+            if(_gameStatus != GameStatusEnum.Loading)
+            {
+			    InitalizeOtherObjects ();
+            }
 		}
 
 		public void PauseGame()
 		{
 			_gameStatus = GameStatusEnum.Pause;
-			TimeManagerInstance.Factor = 0f;
+            if(TimeManagerInstance != null)
+            {
+			    TimeManagerInstance.Factor = 0f;
+            }
 		}
 
 		public void ResumeGame()
 		{
 			_gameStatus = GameStatusEnum.Play;
-			TimeManagerInstance.Factor = 1f;
+            if (TimeManagerInstance != null)
+            {
+                TimeManagerInstance.Factor = 1f;
+            }
 		}
 	}
 }

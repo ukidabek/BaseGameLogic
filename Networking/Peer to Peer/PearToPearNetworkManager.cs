@@ -7,11 +7,12 @@ using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 
+using BaseGameLogic.Singleton;
 using BaseGameLogic.Networking;
 
 namespace BaseGameLogic.Networking.PeerToPeer
 {
-    public abstract class PeerToPearNetworkManager : MonoBehaviour
+    public abstract class PeerToPearNetworkManager : Singleton<PeerToPearNetworkManager>
     {
         public static PeerToPearNetworkManager Instance { get; protected set; }
 

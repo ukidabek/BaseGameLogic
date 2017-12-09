@@ -269,18 +269,18 @@ namespace BaseGameLogic.Networking.PeerToPeer
             _logs.Add(log);
         }
 
-        protected void SendPeersList()
+        protected virtual void SendPeersList()
         {
             Message message = new Message(PeerToPeerMessageID.PEAR_LIST);
 
             SendReliable(message, newPear.ConnectionID);
+            message.Data = _connectedPeers;
 
             _connectedPeers.Add(newPear);
         }
 
         protected virtual NetworkError SendReliable(Message message, int connectionId)
         {
-            message.Data = _connectedPeers;
             memoryStream = new MemoryStream();
             binaryFormatter.Serialize(memoryStream, message);
             byte[] arry = memoryStream.ToArray();

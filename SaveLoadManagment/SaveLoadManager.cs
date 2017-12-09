@@ -13,7 +13,11 @@ namespace BaseGameLogic.SceneManagement
     {
         public Action GameLoadedCallBack = null;
 
-        public SceneSet SceneSet = null;
+        public int ScentToLoadIndex = 0; 
+        [SerializeField]
+        private List<SceneSet> _sceneSetList = new List<SceneSet>();
+        public SceneSet SceneSet { get { return _sceneSetList[ScentToLoadIndex]; } }
+
         public bool LoadGameSave = false;
 
         private AsyncOperation _loadOperation = null;
@@ -30,14 +34,11 @@ namespace BaseGameLogic.SceneManagement
             }
         }
 
-        public int _scentToLoadIndex = 0; 
-
         protected override void Awake()
         {
             base.Awake();
 
             gameObject.SetActive(false);
-            //LoadGame();
         }
 
         private void Update()
@@ -46,7 +47,7 @@ namespace BaseGameLogic.SceneManagement
             {
                 if(_loadOperation.isDone)
                 {
-                    if(_scentToLoadIndex == SceneToLoadCount - 1)
+                    if(ScentToLoadIndex == SceneToLoadCount - 1)
                     {
                         gameObject.SetActive(false);
                         if (GameLoadedCallBack != null)
@@ -56,7 +57,7 @@ namespace BaseGameLogic.SceneManagement
                     }
                     else
                     {
-                        _scentToLoadIndex++;
+                        ScentToLoadIndex++;
                         StartSceneLoading();
                     }
                 }
@@ -66,20 +67,17 @@ namespace BaseGameLogic.SceneManagement
         public void LoadGame()
         {
             this.gameObject.SetActive(true);
-            _scentToLoadIndex = 0;
+            ScentToLoadIndex = 0;
             StartSceneLoading();
         }
 
         public void StartSceneLoading()
         {
-            string sceneName = SceneSet.SceneInfoList[_scentToLoadIndex].SceneName;
-            LoadSceneMode mode = _scentToLoadIndex == 0 ? LoadSceneMode.Single : LoadSceneMode.Additive;
+            string sceneName = SceneSet.SceneInfoList[ScentToLoadIndex].SceneName;
+            LoadSceneMode mode = ScentToLoadIndex == 0 ? LoadSceneMode.Single : LoadSceneMode.Additive;
             _loadOperation = SceneManager.LoadSceneAsync(sceneName, mode);
         }
 
-        public void SaveGame()
-        {
-
-        }
+        public void SaveGame() { }
     }
 }

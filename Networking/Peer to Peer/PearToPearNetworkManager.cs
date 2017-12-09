@@ -85,21 +85,21 @@ namespace BaseGameLogic.Networking.PeerToPeer
             _connectedPeers.Clear();
         }
 
-        public virtual void Start() 
+        public virtual void Start()
         {
-            if (SaveLoadManager.Instance != null)
-            {
-                SaveLoadManager.Instance.GameLoadedCallBack -= Connect;
-                SaveLoadManager.Instance.GameLoadedCallBack += Connect;
-            }
+            //if (SaveLoadManager.Instance != null)
+            //{
+            //    SaveLoadManager.Instance.GameLoadedCallBack -= Connect;
+            //    SaveLoadManager.Instance.GameLoadedCallBack += Connect;
+            //}
         }
 
         protected virtual void OnDestroy()
         {
-            if (SaveLoadManager.Instance != null)
-            {
-                SaveLoadManager.Instance.GameLoadedCallBack -= Connect;
-            }
+            //if (SaveLoadManager.Instance != null)
+            //{
+            //    SaveLoadManager.Instance.GameLoadedCallBack -= Connect;
+            //}
         }
 
         public virtual void SetPeerType(PeerToPeerNetworkManagerEnum type)

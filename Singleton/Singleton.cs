@@ -8,6 +8,8 @@ namespace BaseGameLogic.Singleton
     public abstract class Singleton<T> : MonoBehaviour where T : Singleton<T>
     {
         public static T Instance { get; protected set; }
+        [SerializeField]
+        private bool _dontDestroyOnLoad = false;
 
         protected virtual void CreateInstance()
         {
@@ -18,6 +20,11 @@ namespace BaseGameLogic.Singleton
             else
             {
                 Destroy(gameObject);
+            }
+
+            if(_dontDestroyOnLoad)
+            {
+                DontDestroyOnLoad(this.gameObject);
             }
         }
 

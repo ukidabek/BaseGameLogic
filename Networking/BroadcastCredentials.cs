@@ -18,8 +18,8 @@ namespace BaseGameLogic.Networking
         public int Version { get { return _version; } }
 
         [SerializeField]
-        private int _subcersion = 1;
-        public int Subcersion { get { return _subcersion; } }
+        private int _subversion = 1;
+        public int Subversion { get { return _subversion; } }
 
         [SerializeField, Tooltip("Time between broadcast messages in ms.")]
         private int _timeout = 3000;

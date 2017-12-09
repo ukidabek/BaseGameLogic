@@ -53,7 +53,7 @@ namespace BaseGameLogic.Management
 		{
 			if (prefab == null) 
 			{
-				// Throw exeption. 
+				// Throw exception. 
 				return null;
 			}
 

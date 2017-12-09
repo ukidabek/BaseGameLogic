@@ -4,7 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace BaseGameLogic.SceneManagment
+namespace BaseGameLogic.SceneManagement
 { 
     [Serializable]
     public class SceneInfo

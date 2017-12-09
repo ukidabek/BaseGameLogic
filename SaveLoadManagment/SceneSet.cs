@@ -3,7 +3,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace BaseGameLogic.SceneManagment
+namespace BaseGameLogic.SceneManagement
 {
     [CreateAssetMenu(fileName = "SceneSet",
       menuName = "SceneManagment/SceneSet",

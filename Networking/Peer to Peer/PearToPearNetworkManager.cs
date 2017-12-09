@@ -8,14 +8,12 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 
 using BaseGameLogic.Singleton;
-using BaseGameLogic.Networking;
+using BaseGameLogic.SceneManagement;
 
 namespace BaseGameLogic.Networking.PeerToPeer
 {
     public abstract class PeerToPearNetworkManager : Singleton<PeerToPearNetworkManager>
     {
-        public static PeerToPearNetworkManager Instance { get; protected set; }
-
         [SerializeField]
         protected PeerToPearNetworkManagerSettings _settings = new PeerToPearNetworkManagerSettings();
 
@@ -41,14 +39,14 @@ namespace BaseGameLogic.Networking.PeerToPeer
 
         protected Dictionary<QosType, int> channelDictionary = new Dictionary<QosType, int>();
         protected BinaryFormatter binaryFormatter = new BinaryFormatter();
-        protected MemoryStream memeoryStream = null;
+        protected MemoryStream memoryStream = null;
 
         protected virtual void Initialize()
         {
             // Transport layer initialization.
             NetworkTransport.Init();
 
-            // Conection configuration.
+            // Connection configuration.
             ConnectionConfig config = new ConnectionConfig();
 
             AddChanel(ref config, QosType.Reliable);
@@ -60,54 +58,56 @@ namespace BaseGameLogic.Networking.PeerToPeer
             // Set get port settings. If master use value for settings if not use first free port.
             int portToUse = _settings.PearType == PeerToPeerNetworkManagerEnum.MasterPear ? _settings.Port : 0;
             hostID = NetworkTransport.AddHost(topology, portToUse);
-
-            // If master setup the broadcast settings, for incoming connection handling.
-            if (_settings.PearType == PeerToPeerNetworkManagerEnum.MasterPear)
-            {
-                NetworkTransport.SetBroadcastCredentials(
-                    hostID,
-                    _broadcastCredentials.Key,
-                    _broadcastCredentials.Version,
-                    _broadcastCredentials.Subcersion,
-                    out error);
-            }
         }
 
-        protected void AddChanel(ref ConnectionConfig conectionConfig, QosType type)
+        public virtual void StartSession()
         {
-            int channelId = conectionConfig.AddChannel(type);
+            _settings.PearType = PeerToPeerNetworkManagerEnum.MasterPear;
+        }
+
+        public virtual void JoinSession()
+        {
+            _settings.PearType = PeerToPeerNetworkManagerEnum.Pear;
+        }
+
+        protected void AddChanel(ref ConnectionConfig connectionConfig, QosType type)
+        {
+            int channelId = connectionConfig.AddChannel(type);
             channelDictionary.Add(type, channelId);
         }
 
-        public virtual void Awake()
+        protected override void Awake()
         {
-            if(_settings.InitializationOnAwake)
-            {
-                Initialize();
-            }
-
-            if(Instance == null)
-            {
-                Instance = this;
-            }
-            else
-            {
-                Destroy(this);
-                return;
-            }
+            base.Awake();
+            Initialize();
 
             // Make sure if connected pears list is empty
             _connectedPeers.Clear();
         }
 
-        public virtual void Start() {}
+        public virtual void Start() 
+        {
+            if (SaveLoadManager.Instance != null)
+            {
+                SaveLoadManager.Instance.GameLoadedCallBack -= Connect;
+                SaveLoadManager.Instance.GameLoadedCallBack += Connect;
+            }
+        }
+
+        protected virtual void OnDestroy()
+        {
+            if (SaveLoadManager.Instance != null)
+            {
+                SaveLoadManager.Instance.GameLoadedCallBack -= Connect;
+            }
+        }
 
         public virtual void SetPeerType(PeerToPeerNetworkManagerEnum type)
         {
             _settings.PearType = type;
         }
 
-        protected virtual void PeerConected(int connectionId) {}
+        protected virtual void PeerConnected(int connectionId) {}
 
         protected virtual bool NewPearFromBroadcastConedted(int connectionId)
         {
@@ -168,11 +168,11 @@ namespace BaseGameLogic.Networking.PeerToPeer
                 newPear.ConnectionID = connectionID;
                 _connectedPeers.Add(newPear);
 
-                PeerConected(newPear.ConnectionID);
+                PeerConnected(newPear.ConnectionID);
             }
         }
 
-        protected virtual void PeerDisconected(int connectionID) { }
+        protected virtual void PeerDisconnected(int connectionID) { }
 
         protected virtual void HandleDisconnection()
         {
@@ -186,14 +186,14 @@ namespace BaseGameLogic.Networking.PeerToPeer
                 }
             }
 
-            PeerDisconected(connectionID);
+            PeerDisconnected(connectionID);
         }
 
         protected virtual Message HandleMessages(byte[] buffer, int sieze)
         {
-            memeoryStream = new MemoryStream(recBuffer);
-            memeoryStream.Position = 0;
-            Message message = (Message)binaryFormatter.Deserialize(memeoryStream);
+            memoryStream = new MemoryStream(recBuffer);
+            memoryStream.Position = 0;
+            Message message = (Message)binaryFormatter.Deserialize(memoryStream);
             message.ConnectionID = connectionID;
 
             switch (message.MessageID)
@@ -255,7 +255,7 @@ namespace BaseGameLogic.Networking.PeerToPeer
                     newPear.Port,
                     System.DateTime.Now.ToString());
 
-                PeerConected(newPear.ConnectionID);
+                PeerConnected(newPear.ConnectionID);
             }
             else
             {
@@ -281,9 +281,9 @@ namespace BaseGameLogic.Networking.PeerToPeer
         protected virtual NetworkError SendReliable(Message message, int connectionId)
         {
             message.Data = _connectedPeers;
-            memeoryStream = new MemoryStream();
-            binaryFormatter.Serialize(memeoryStream, message);
-            byte[] arry = memeoryStream.ToArray();
+            memoryStream = new MemoryStream();
+            binaryFormatter.Serialize(memoryStream, message);
+            byte[] arry = memoryStream.ToArray();
 
             NetworkTransport.Send(
                 hostID,
@@ -298,9 +298,9 @@ namespace BaseGameLogic.Networking.PeerToPeer
 
         protected virtual NetworkError UpdateUnreiable(Message message, int connectionId)
         {
-            memeoryStream = new MemoryStream();
-            binaryFormatter.Serialize(memeoryStream, message);
-            byte[] array = memeoryStream.ToArray();
+            memoryStream = new MemoryStream();
+            binaryFormatter.Serialize(memoryStream, message);
+            byte[] array = memoryStream.ToArray();
 
             NetworkTransport.Send(
                 hostID,
@@ -353,20 +353,38 @@ namespace BaseGameLogic.Networking.PeerToPeer
             }
         }
 
-        public void Connect()
+        public virtual void Connect()
         {
-            byte error;
+            byte error = 0;
 
-            NetworkTransport.StartBroadcastDiscovery(
-                hostID, 
-                _settings.Port,
-                _broadcastCredentials.Key,
-                _broadcastCredentials.Version,
-                _broadcastCredentials.Subcersion, 
-                null, 
-                0, 
-                _broadcastCredentials.Timeout, 
-                out error);
+            switch(_settings.PearType)
+            {
+                case PeerToPeerNetworkManagerEnum.MasterPear:
+                    //  Master setup the broadcast settings, for incoming connection handling.
+                    if (_settings.PearType == PeerToPeerNetworkManagerEnum.MasterPear)
+                    {
+                        NetworkTransport.SetBroadcastCredentials(
+                        hostID,
+                        _broadcastCredentials.Key,
+                        _broadcastCredentials.Version,
+                        _broadcastCredentials.Subversion,
+                        out error);
+                    }
+                    break;
+
+                case PeerToPeerNetworkManagerEnum.Pear:
+                    NetworkTransport.StartBroadcastDiscovery(
+                        hostID,
+                        _settings.Port,
+                        _broadcastCredentials.Key,
+                        _broadcastCredentials.Version,
+                        _broadcastCredentials.Subversion,
+                        null,
+                        0,
+                        _broadcastCredentials.Timeout,
+                        out error);
+                    break;
+            }
         }
     }
 }

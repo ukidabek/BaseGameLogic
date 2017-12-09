@@ -74,7 +74,7 @@ namespace BaseGameLogic.Character
 		/// <summary>
         /// Character settings.
         /// </summary>
-		[Header("Character settings & managment.")]
+		[Header("Character settings & management.")]
 		[SerializeField, Tooltip("Slot for CharacterSettings instance.")]
         protected BaseCharacterSettings settings = null;
         public BaseCharacterSettings Settings 
@@ -120,7 +120,7 @@ namespace BaseGameLogic.Character
             }
             else
             {
-                // exeption
+                // exception
             }
         }
 
@@ -131,9 +131,7 @@ namespace BaseGameLogic.Character
             Register();
         }
                                                 
-        protected virtual void OnAnimatorIK(int layerIndex)
-        {
-        }
+        protected virtual void OnAnimatorIK(int layerIndex) {}
 
 		protected override void OnDestroy ()
     	{
@@ -143,7 +141,7 @@ namespace BaseGameLogic.Character
 			}
 			else
 			{
-				// exeption
+				// exception
 			}
 				
     		base.OnDestroy ();

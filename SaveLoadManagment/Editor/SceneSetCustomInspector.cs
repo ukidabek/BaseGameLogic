@@ -5,7 +5,7 @@ using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace BaseGameLogic.SceneManagment
+namespace BaseGameLogic.SceneManagement
 {
     [CustomEditor(typeof(SceneSet))]
     public class SceneSetCustomInspector : Editor

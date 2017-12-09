@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace BaseGameLogic.SceneManagement
 {
-    [CustomEditor(typeof(SceneSet))]
+    [CustomEditor(typeof(SceneSet), true)]
     public class SceneSetCustomInspector : Editor
     {
         private SceneSet _item = null;

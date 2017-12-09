@@ -5,10 +5,7 @@ using System.Collections.Generic;
 
 namespace BaseGameLogic.SceneManagement
 {
-    [CreateAssetMenu(fileName = "SceneSet",
-      menuName = "SceneManagment/SceneSet",
-      order = 1)]
-    public class SceneSet : ScriptableObject
+    public abstract class SceneSet : ScriptableObject
     {
         [SerializeField]
         private List<SceneInfo> _sceneInfoList = new List<SceneInfo>();

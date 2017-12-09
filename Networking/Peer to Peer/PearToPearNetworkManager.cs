@@ -273,8 +273,8 @@ namespace BaseGameLogic.Networking.PeerToPeer
         {
             Message message = new Message(PeerToPeerMessageID.PEAR_LIST);
 
-            SendReliable(message, newPear.ConnectionID);
             message.Data = _connectedPeers;
+            SendReliable(message, newPear.ConnectionID);
 
             _connectedPeers.Add(newPear);
         }

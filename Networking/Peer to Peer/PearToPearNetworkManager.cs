@@ -58,16 +58,20 @@ namespace BaseGameLogic.Networking.PeerToPeer
             // Set get port settings. If master use value for settings if not use first free port.
             int portToUse = _settings.PearType == PeerToPeerNetworkManagerEnum.MasterPear ? _settings.Port : 0;
             hostID = NetworkTransport.AddHost(topology, portToUse);
+
+            this.enabled = false;
         }
 
         public virtual void StartSession()
         {
             _settings.PearType = PeerToPeerNetworkManagerEnum.MasterPear;
+            Initialize();
         }
 
         public virtual void JoinSession()
         {
             _settings.PearType = PeerToPeerNetworkManagerEnum.Pear;
+            Initialize();
         }
 
         protected void AddChanel(ref ConnectionConfig connectionConfig, QosType type)
@@ -79,7 +83,8 @@ namespace BaseGameLogic.Networking.PeerToPeer
         protected override void Awake()
         {
             base.Awake();
-            Initialize();
+            this.enabled = false;
+            //Initialize();
 
             // Make sure if connected pears list is empty
             _connectedPeers.Clear();

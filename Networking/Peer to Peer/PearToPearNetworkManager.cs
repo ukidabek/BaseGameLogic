@@ -65,6 +65,13 @@ namespace BaseGameLogic.Networking.PeerToPeer
         public virtual void StartSession()
         {
             _settings.PearType = PeerToPeerNetworkManagerEnum.MasterPear;
+
+            if (SaveLoadManager.Instance != null)
+            {
+                SaveLoadManager.Instance.GameLoadedCallBack -= Connect;
+                SaveLoadManager.Instance.GameLoadedCallBack += Connect;
+            }
+
             Initialize();
         }
 
@@ -92,19 +99,14 @@ namespace BaseGameLogic.Networking.PeerToPeer
 
         public virtual void Start()
         {
-            //if (SaveLoadManager.Instance != null)
-            //{
-            //    SaveLoadManager.Instance.GameLoadedCallBack -= Connect;
-            //    SaveLoadManager.Instance.GameLoadedCallBack += Connect;
-            //}
         }
 
         protected virtual void OnDestroy()
         {
-            //if (SaveLoadManager.Instance != null)
-            //{
-            //    SaveLoadManager.Instance.GameLoadedCallBack -= Connect;
-            //}
+            if (SaveLoadManager.Instance != null)
+            {
+                SaveLoadManager.Instance.GameLoadedCallBack -= Connect;
+            }
         }
 
         public virtual void SetPeerType(PeerToPeerNetworkManagerEnum type)

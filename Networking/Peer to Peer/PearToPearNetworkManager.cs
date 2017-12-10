@@ -79,6 +79,7 @@ namespace BaseGameLogic.Networking.PeerToPeer
         {
             _settings.PearType = PeerToPeerNetworkManagerEnum.Pear;
             Initialize();
+            Connect();
         }
 
         protected void AddChanel(ref ConnectionConfig connectionConfig, QosType type)

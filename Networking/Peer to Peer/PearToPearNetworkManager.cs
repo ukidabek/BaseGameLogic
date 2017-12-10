@@ -59,7 +59,7 @@ namespace BaseGameLogic.Networking.PeerToPeer
             int portToUse = _settings.PearType == PeerToPeerNetworkManagerEnum.MasterPear ? _settings.Port : 0;
             hostID = NetworkTransport.AddHost(topology, portToUse);
 
-            this.enabled = false;
+            this.enabled = true;
         }
 
         public virtual void StartSession()
@@ -366,15 +366,12 @@ namespace BaseGameLogic.Networking.PeerToPeer
             {
                 case PeerToPeerNetworkManagerEnum.MasterPear:
                     //  Master setup the broadcast settings, for incoming connection handling.
-                    if (_settings.PearType == PeerToPeerNetworkManagerEnum.MasterPear)
-                    {
-                        NetworkTransport.SetBroadcastCredentials(
+                    NetworkTransport.SetBroadcastCredentials(
                         hostID,
                         _broadcastCredentials.Key,
                         _broadcastCredentials.Version,
                         _broadcastCredentials.Subversion,
                         out error);
-                    }
                     break;
 
                 case PeerToPeerNetworkManagerEnum.Pear:

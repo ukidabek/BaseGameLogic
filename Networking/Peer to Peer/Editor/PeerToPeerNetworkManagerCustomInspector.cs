@@ -22,6 +22,7 @@ namespace BaseGameLogic.Networking.PeerToPeer
 
             if(GUILayout.Button("Connect"))
             {
+                manager.StartSession();
                 manager.Connect();
             }
         }

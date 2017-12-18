@@ -98,9 +98,7 @@ namespace BaseGameLogic.Networking.PeerToPeer
             _connectedPeers.Clear();
         }
 
-        public virtual void Start()
-        {
-        }
+        public virtual void Start() {}
 
         protected virtual void OnDestroy()
         {
@@ -364,6 +362,10 @@ namespace BaseGameLogic.Networking.PeerToPeer
         public virtual void Connect()
         {
             byte error = 0;
+            if(gameObject.activeSelf != true)
+            {
+                gameObject.SetActive(true);
+            }
 
             switch(_settings.PearType)
             {

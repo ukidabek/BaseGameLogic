@@ -49,7 +49,7 @@ namespace BaseGameLogic.Inputs
 				
 		}
 
-		// Tylko do wyświetlania w inspektorze.
+		// Only for display in inspector.
         [SerializeField]
         private float anagloValue = 0f;
         public float AnagloValue
@@ -77,7 +77,6 @@ namespace BaseGameLogic.Inputs
 
         [SerializeField]
 		public KeyCode keyCode;
-
 
 		public override void Read ()
     	{

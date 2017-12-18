@@ -20,10 +20,15 @@ namespace BaseGameLogic.Networking.PeerToPeer
         {
             base.OnInspectorGUI();
 
-            if(GUILayout.Button("Connect"))
+            if(GUILayout.Button("Create game"))
             {
                 manager.StartSession();
                 manager.Connect();
+            }
+
+            if (GUILayout.Button("Join game"))
+            {
+                manager.JoinSession();
             }
         }
     }

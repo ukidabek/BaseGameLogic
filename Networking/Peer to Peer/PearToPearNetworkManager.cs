@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Networking.Types;
+using UnityEngine.Networking.Match;
 
 using System.Collections;
 using System.Collections.Generic;
@@ -14,30 +15,56 @@ namespace BaseGameLogic.Networking.PeerToPeer
 {
     public abstract class PeerToPearNetworkManager : Singleton<PeerToPearNetworkManager>
     {
-        [SerializeField]
+        [SerializeField, Header("Network settings.")]
         protected PeerToPearNetworkManagerSettings _settings = new PeerToPearNetworkManagerSettings();
 
         [SerializeField]
         protected BroadcastCredentials _broadcastCredentials = new BroadcastCredentials();
 
         [SerializeField]
-        protected int hostID = 0;
+        protected MatchSettings matchSettings = new MatchSettings();
 
-        [SerializeField, Tooltip("List of connected peers. Do not setup!")]
+        // Match making.
+        protected List<MatchInfoSnapshot> m_MatchList = new List<MatchInfoSnapshot>();
+        protected MatchInfo matchInfo;
+
+        [SerializeField, Header("Match settings.")]
+        protected bool matchCreated;
+        [SerializeField]
+        protected bool matchJoined;
+        [SerializeField]
+        protected NetworkMatch networkMatch;
+
+        [SerializeField, Header("Run time values."), Tooltip("List of connected peers. Do not setup!")]
         protected List<PeerInfo> _connectedPeers = new List<PeerInfo>();
+
+        [SerializeField]
+        protected int hostID = 0;
 
         [SerializeField]
         protected List<string> _logs = new List<string>();
 
+        [SerializeField]
         protected int port = 0;
+        [SerializeField]
         protected byte error = 0;
+        [SerializeField]
         protected string adres = string.Empty;
+        [SerializeField]
         protected int connectionID = 0;
+        [SerializeField]
+        protected int recHostId;
+        [SerializeField]
+        protected int channelId;
+        [SerializeField]
+        protected int dataSize;
+        [SerializeField]
         protected byte[] recBuffer = null;
 
         protected PeerInfo newPear = null;
 
         protected Dictionary<QosType, int> channelDictionary = new Dictionary<QosType, int>();
+
         protected BinaryFormatter binaryFormatter = new BinaryFormatter();
         protected MemoryStream memoryStream = null;
 
@@ -64,22 +91,29 @@ namespace BaseGameLogic.Networking.PeerToPeer
 
         public virtual void StartSession()
         {
-            _settings.PearType = PeerToPeerNetworkManagerEnum.MasterPear;
+            //_settings.PearType = PeerToPeerNetworkManagerEnum.MasterPear;
 
             if (SaveLoadManager.Instance != null)
             {
-                SaveLoadManager.Instance.GameLoadedCallBack -= Connect;
-                SaveLoadManager.Instance.GameLoadedCallBack += Connect;
+                SaveLoadManager.Instance.GameLoadedCallBack -= CreateMatch;
+                SaveLoadManager.Instance.GameLoadedCallBack += CreateMatch;
             }
 
-            Initialize();
+            //Initialize();
         }
 
         public virtual void JoinSession()
         {
-            _settings.PearType = PeerToPeerNetworkManagerEnum.Pear;
-            Initialize();
-            Connect();
+            networkMatch.ListMatches(0,1,"",true,0,0, (success, info, matches) =>
+            {
+                if (success && matches.Count > 0)
+                {
+                    networkMatch.JoinMatch(matches[0].networkId, "", "", "", 0, 0, OnMatchJoined);
+                }
+            });
+            //_settings.PearType = PeerToPeerNetworkManagerEnum.Pear;
+            //Initialize();
+            //Connect();
         }
 
         protected void AddChanel(ref ConnectionConfig connectionConfig, QosType type)
@@ -91,6 +125,9 @@ namespace BaseGameLogic.Networking.PeerToPeer
         protected override void Awake()
         {
             base.Awake();
+
+            networkMatch = gameObject.AddComponent<NetworkMatch>();
+
             this.enabled = false;
             //Initialize();
 
@@ -111,6 +148,11 @@ namespace BaseGameLogic.Networking.PeerToPeer
         public virtual void SetPeerType(PeerToPeerNetworkManagerEnum type)
         {
             _settings.PearType = type;
+        }
+
+        protected virtual void OnApplicationQuit()
+        {
+            NetworkTransport.Shutdown();
         }
 
         protected virtual void PeerConnected(int connectionId) {}
@@ -321,42 +363,89 @@ namespace BaseGameLogic.Networking.PeerToPeer
 
         protected virtual void Update()
         {
-            int recHostId;
-            int channelId;
-            int dataSize;
+            if(hostID == -1)
+            {
+                this.enabled = false;
+                return;
+            }
 
             recBuffer = new byte[_settings.BufferSize];
 
-            NetworkEventType recData = NetworkTransport.Receive(
-                out recHostId, 
-                out connectionID, 
-                out channelId, 
-                recBuffer, 
-                _settings.BufferSize, 
-                out dataSize, 
-                out error);
+            // Get events from the relay connection
+            NetworkEventType networkEvent = NetworkTransport.ReceiveRelayEventFromHost(hostID, out error);
 
-            switch (recData)
+            if (networkEvent == NetworkEventType.ConnectEvent)
+                Debug.Log("Relay server connected");
+
+            if (networkEvent == NetworkEventType.DisconnectEvent)
+                Debug.Log("Relay server disconnected");
+
+            do
             {
-                case NetworkEventType.Nothing:         //1
-                    break;
+                // Get events from the server/client game connection
+                networkEvent = NetworkTransport.ReceiveFromHost(
+                    hostID, 
+                    out connectionID, 
+                    out channelId,
+                    recBuffer, 
+                    recBuffer.Length, 
+                    out dataSize, 
+                    out error);
 
-				case NetworkEventType.ConnectEvent:    //2
-                    HandleConnection();
-                    break;
+                if ((NetworkError)error != NetworkError.Ok)
+                {
+                    Debug.LogError("Error while receiving network message: " + (NetworkError)error);
+                }
 
-                case NetworkEventType.DataEvent:       //3
-                    HandleMessages(recBuffer, dataSize);
-                    break;
+                switch (networkEvent)
+                {
+                    case NetworkEventType.ConnectEvent:
+                        HandleConnection();
+                        break;
 
-                case NetworkEventType.DisconnectEvent: //4
-                    HandleDisconnection();
-                    break;
+                    case NetworkEventType.DataEvent:
+                        HandleMessages(recBuffer, dataSize);
+                        break;
 
-                case NetworkEventType.BroadcastEvent:
-                    HandleBrodcastNewConnection();
-                    break;
-            }
+                    case NetworkEventType.DisconnectEvent:
+                        HandleDisconnection();
+                        break;
+
+                    case NetworkEventType.Nothing:
+                        break;
+                }
+            } while (networkEvent != NetworkEventType.Nothing);
+
+            //        networkEvent = NetworkTransport.Receive(
+            //            out recHostId, 
+            //            out connectionID, 
+            //            out channelId, 
+            //            recBuffer, 
+            //            _settings.BufferSize, 
+            //            out dataSize, 
+            //            out error);
+
+            //        switch (networkEvent)
+            //        {
+            //            case NetworkEventType.Nothing:         //1
+            //                break;
+
+            //case NetworkEventType.ConnectEvent:    //2
+            //                HandleConnection();
+            //                break;
+
+            //            case NetworkEventType.DataEvent:       //3
+            //                HandleMessages(recBuffer, dataSize);
+            //                break;
+
+            //            case NetworkEventType.DisconnectEvent: //4
+            //                HandleDisconnection();
+            //                break;
+
+            //            case NetworkEventType.BroadcastEvent:
+            //                HandleBrodcastNewConnection();
+            //                break;
+            //        }
         }
 
         public virtual void Connect()
@@ -392,6 +481,119 @@ namespace BaseGameLogic.Networking.PeerToPeer
                         out error);
                     break;
             }
+        }
+
+        // Match making 
+        public virtual void CreateMatch()
+        {
+            if (networkMatch != null)
+            {
+                networkMatch.CreateMatch(
+                    matchSettings.MatchName,
+                    matchSettings.MatchSize,
+                    matchSettings.MatchAdresatice,
+                    "",
+                    "",
+                    "",
+                    0,
+                    0,
+                    OnMatchCreate);
+            }
+        }
+
+        public virtual void OnMatchCreate(bool success, string extendedInfo, MatchInfo matchInfo)
+        {
+            if (success)
+            {
+                Debug.Log("Create match succeeded");
+                Utility.SetAccessTokenForNetwork(matchInfo.networkId, matchInfo.accessToken);
+
+                matchCreated = true;
+                this.matchInfo = matchInfo;
+
+                StartServer(matchInfo.address, matchInfo.port, matchInfo.networkId,
+                    matchInfo.nodeId);
+            }
+            else
+            {
+                Debug.LogError("Create match failed: " + extendedInfo);
+            }
+        }
+
+        public void OnMatchList(bool success, string extendedInfo, List<MatchInfoSnapshot> matches)
+        {
+            if (success && matches != null)
+            {
+                m_MatchList = matches;
+            }
+            else if (!success)
+            {
+                Debug.LogError("List match failed: " + extendedInfo);
+            }
+        }
+
+        // When we've joined a match we connect to the server/host
+        public virtual void OnMatchJoined(bool success, string extendedInfo, MatchInfo matchInfo)
+        {
+            if (success)
+            {
+                Debug.Log("Join match succeeded");
+                Utility.SetAccessTokenForNetwork(matchInfo.networkId, matchInfo.accessToken);
+
+                matchJoined = true;
+                this.matchInfo = matchInfo;
+
+                Debug.Log(
+                    "Connecting to Address:" + matchInfo.address +
+                    " Port:" + matchInfo.port +
+                    " NetworKID: " + matchInfo.networkId +
+                    " NodeID: " + matchInfo.nodeId);
+
+                ConnectThroughRelay(
+                    matchInfo.address, 
+                    matchInfo.port, 
+                    matchInfo.networkId,
+                    matchInfo.nodeId);
+            }
+            else
+            {
+                Debug.LogError("Join match failed: " + extendedInfo);
+            }
+        }
+
+
+        public virtual void StartServer(string relayIP, int relayPort, NetworkID networkID, NodeID nodeID)
+        {
+            _settings.PearType = PeerToPeerNetworkManagerEnum.MasterPear;
+            Initialize();
+
+            SourceID sourceID = Utility.GetSourceID();
+            NetworkTransport.ConnectAsNetworkHost(
+                hostID, 
+                relayIP, 
+                relayPort, 
+                networkID, 
+                sourceID, 
+                nodeID, 
+                out error);
+        }
+
+        public virtual void ConnectThroughRelay(string relayIp, int relayPort, NetworkID networkId, NodeID nodeId)
+        {
+            _settings.PearType = PeerToPeerNetworkManagerEnum.Pear;
+            Initialize();
+
+            SourceID sourceID = Utility.GetSourceID();
+            NetworkTransport.ConnectToNetworkPeer(
+                hostID, 
+                relayIp, 
+                relayPort, 
+                0, 
+                0, 
+                networkId, 
+                sourceID, 
+                nodeId, 
+                out error);
         }
     }
 }

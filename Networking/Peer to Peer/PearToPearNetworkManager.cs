@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using System.Linq;
 
 using BaseGameLogic.Singleton;
 using BaseGameLogic.SceneManagement;
@@ -91,15 +92,11 @@ namespace BaseGameLogic.Networking.PeerToPeer
 
         public virtual void StartSession()
         {
-            //_settings.PearType = PeerToPeerNetworkManagerEnum.MasterPear;
-
             if (SaveLoadManager.Instance != null)
             {
                 SaveLoadManager.Instance.GameLoadedCallBack -= CreateMatch;
                 SaveLoadManager.Instance.GameLoadedCallBack += CreateMatch;
             }
-
-            //Initialize();
         }
 
         public virtual void JoinSession()
@@ -111,9 +108,6 @@ namespace BaseGameLogic.Networking.PeerToPeer
                     networkMatch.JoinMatch(matches[0].networkId, "", "", "", 0, 0, OnMatchJoined);
                 }
             });
-            //_settings.PearType = PeerToPeerNetworkManagerEnum.Pear;
-            //Initialize();
-            //Connect();
         }
 
         protected void AddChanel(ref ConnectionConfig connectionConfig, QosType type)
@@ -129,7 +123,6 @@ namespace BaseGameLogic.Networking.PeerToPeer
             networkMatch = gameObject.AddComponent<NetworkMatch>();
 
             this.enabled = false;
-            //Initialize();
 
             // Make sure if connected pears list is empty
             _connectedPeers.Clear();
@@ -163,24 +156,8 @@ namespace BaseGameLogic.Networking.PeerToPeer
             }
         }
 
-        protected virtual bool NewPearFromBroadcastConedted(int connectionId)
-        {
-            if (newPear != null && newPear.ConnectionID == connectionId)
-            {
-                SendPeersList();
-                return true;
-            }
-
-            return false;
-        }
-
         protected virtual void HandleConnection()
         {
-            if(NetworkTransport.IsBroadcastDiscoveryRunning())
-            {
-                NetworkTransport.StopBroadcastDiscovery();
-            }
-
             NetworkID networkID;
             NodeID node;
 
@@ -192,11 +169,6 @@ namespace BaseGameLogic.Networking.PeerToPeer
                 out networkID,
                 out node,
                 out error);
-
-            //if (NewPearFromBroadcastConedted(connectionID))
-            //{
-            //    return;
-            //}
 
             string log = string.Format(
                 PeerToPearNetworkManagerLogs.NEW_CONNECTION_APPEARED,
@@ -253,12 +225,16 @@ namespace BaseGameLogic.Networking.PeerToPeer
             switch (message.MessageID)
             {
                 case PeerToPeerMessageID.PEAR_LIST:
-                    List<PeerInfo> peerList = (List<PeerInfo>)message.Data;
-                    _connectedPeers.AddRange(peerList);
-                    for (int i = 0; i < peerList.Count; i++)
+                    if(_settings.PearType == PeerToPeerNetworkManagerEnum.Pear)
                     {
-                        PeerInfo peer = peerList[i];
-                        ConnectToPear(ref peer);
+                        List<PeerInfo> peerList = (List<PeerInfo>)message.Data;
+                        _connectedPeers.AddRange(peerList);
+                        for (int i = 0; i < peerList.Count; i++)
+                        {
+                            PeerInfo peer = peerList[i];
+
+                            ConnectToPear(ref peer);
+                        }
                     }
                     return null;
             }
@@ -276,51 +252,6 @@ namespace BaseGameLogic.Networking.PeerToPeer
                 out error);
 
             return NetworkUtility.GetNetworkError(error);
-        }
-
-        protected virtual void HandleBrodcastNewConnection()
-        {
-            NetworkTransport.GetBroadcastConnectionInfo(hostID, out adres, out port, out error);
-            newPear = new PeerInfo(adres, port);
-
-            string log = string.Format(
-                PeerToPearNetworkManagerLogs.NEW_PEER_TRY_TO_CONNECT,
-                newPear.IPAdres,
-                newPear.Port,
-                System.DateTime.Now.ToString());
-
-            _logs.Add(log);
-
-            log = string.Format(
-                PeerToPearNetworkManagerLogs.CONNECTING_TO_PEER,
-                newPear.IPAdres,
-                newPear.Port,
-                System.DateTime.Now.ToString());
-
-            _logs.Add(log);
-
-            NetworkError networkError = ConnectToPear(ref newPear);
-
-            if (networkError == NetworkError.Ok)
-            {
-                log = string.Format(
-                    PeerToPearNetworkManagerLogs.CONNECTING_TO_PEER_SUCCEEDED,
-                    newPear.IPAdres,
-                    newPear.Port,
-                    System.DateTime.Now.ToString());
-
-                PeerConnected(newPear.ConnectionID);
-            }
-            else
-            {
-                log = string.Format(
-                    PeerToPearNetworkManagerLogs.CONNECTING_TO_PEER_FAIL,
-                    newPear.IPAdres,
-                    newPear.Port,
-                    System.DateTime.Now.ToString());
-            }
-
-            _logs.Add(log);
         }
 
         protected virtual void SendPeersList()
@@ -420,38 +351,8 @@ namespace BaseGameLogic.Networking.PeerToPeer
                     case NetworkEventType.Nothing:
                         break;
                 }
-            } while (networkEvent != NetworkEventType.Nothing);
-
-            //        networkEvent = NetworkTransport.Receive(
-            //            out recHostId, 
-            //            out connectionID, 
-            //            out channelId, 
-            //            recBuffer, 
-            //            _settings.BufferSize, 
-            //            out dataSize, 
-            //            out error);
-
-            //        switch (networkEvent)
-            //        {
-            //            case NetworkEventType.Nothing:         //1
-            //                break;
-
-            //case NetworkEventType.ConnectEvent:    //2
-            //                HandleConnection();
-            //                break;
-
-            //            case NetworkEventType.DataEvent:       //3
-            //                HandleMessages(recBuffer, dataSize);
-            //                break;
-
-            //            case NetworkEventType.DisconnectEvent: //4
-            //                HandleDisconnection();
-            //                break;
-
-            //            case NetworkEventType.BroadcastEvent:
-            //                HandleBrodcastNewConnection();
-            //                break;
-            //        }
+            }
+            while (networkEvent != NetworkEventType.Nothing);
         }
 
         public virtual void Connect()
@@ -517,7 +418,10 @@ namespace BaseGameLogic.Networking.PeerToPeer
                 matchCreated = true;
                 this.matchInfo = matchInfo;
 
-                StartServer(matchInfo.address, matchInfo.port, matchInfo.networkId,
+                StartServer(
+                    matchInfo.address, 
+                    matchInfo.port, 
+                    matchInfo.networkId,
                     matchInfo.nodeId);
             }
             else
@@ -566,7 +470,6 @@ namespace BaseGameLogic.Networking.PeerToPeer
                 Debug.LogError("Join match failed: " + extendedInfo);
             }
         }
-
 
         public virtual void StartServer(string relayIP, int relayPort, NetworkID networkID, NodeID nodeID)
         {

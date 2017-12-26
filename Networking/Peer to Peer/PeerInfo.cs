@@ -23,7 +23,12 @@ namespace BaseGameLogic.Networking.PeerToPeer
             get { return _ipAdres; }
         }
 
-        public int ConnectionID { get; set; }
+        public int _connectionID = -1;
+        public int ConnectionID
+        {
+            get { return _connectionID; }
+            set { _connectionID = value; }
+        }
 
         public PeerInfo(string ipAdress, int port)
         {

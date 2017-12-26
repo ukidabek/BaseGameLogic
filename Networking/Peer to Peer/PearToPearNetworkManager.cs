@@ -104,7 +104,7 @@ namespace BaseGameLogic.Networking.PeerToPeer
 
         public virtual void JoinSession()
         {
-            networkMatch.ListMatches(0,1,"",true,0,0, (success, info, matches) =>
+            networkMatch.ListMatches(0, 1, "", true, 0, 0, (success, info, matches) =>
             {
                 if (success && matches.Count > 0)
                 {
@@ -155,7 +155,13 @@ namespace BaseGameLogic.Networking.PeerToPeer
             NetworkTransport.Shutdown();
         }
 
-        protected virtual void PeerConnected(int connectionId) {}
+        protected virtual void PeerConnected(int connectionId)
+        {
+            if (newPear != null && newPear.ConnectionID == connectionId)
+            {
+                SendPeersList();
+            }
+        }
 
         protected virtual bool NewPearFromBroadcastConedted(int connectionId)
         {
@@ -187,10 +193,10 @@ namespace BaseGameLogic.Networking.PeerToPeer
                 out node,
                 out error);
 
-            if (NewPearFromBroadcastConedted(connectionID))
-            {
-                return;
-            }
+            //if (NewPearFromBroadcastConedted(connectionID))
+            //{
+            //    return;
+            //}
 
             string log = string.Format(
                 PeerToPearNetworkManagerLogs.NEW_CONNECTION_APPEARED,

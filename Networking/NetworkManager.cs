@@ -26,8 +26,6 @@ namespace BaseGameLogic.Networking
         protected MatchSettings matchSettings = new MatchSettings();
 
         // Match making.
-        protected List<MatchInfoSnapshot> matchList = new List<MatchInfoSnapshot>();
-        protected MatchInfo matchInfo;
 
         [SerializeField, Header("Match settings.")]
         protected bool matchCreated;
@@ -36,8 +34,11 @@ namespace BaseGameLogic.Networking
         [SerializeField]
         protected NetworkMatch networkMatch;
 
+        protected List<MatchInfoSnapshot> matchList = new List<MatchInfoSnapshot>();
+        protected MatchInfo matchInfo;
+
         [SerializeField, Header("Run time values."), Tooltip("List of connected peers. Do not setup!")]
-        protected List<PeerInfo> _connectedPeers = new List<PeerInfo>();
+        protected List<PeerInfo> connectedPeers = new List<PeerInfo>();
 
         [SerializeField]
         protected int hostID = 0;
@@ -45,21 +46,13 @@ namespace BaseGameLogic.Networking
         [SerializeField]
         protected List<string> _logs = new List<string>();
 
-        [SerializeField]
         protected int port = 0;
-        [SerializeField]
         protected byte error = 0;
-        [SerializeField]
         protected string adres = string.Empty;
-        [SerializeField]
         protected int connectionID = 0;
-        [SerializeField]
         protected int recHostId;
-        [SerializeField]
         protected int channelID;
-        [SerializeField]
         protected int dataSize;
-        [SerializeField]
         protected byte[] recBuffer = null;
 
         protected PeerInfo newPear = null;
@@ -92,15 +85,22 @@ namespace BaseGameLogic.Networking
 
         public virtual void StartSession()
         {
+            _settings.PearType = NetworkManagerTypeEnum.Server;
             if (SaveLoadManager.Instance != null)
             {
                 SaveLoadManager.Instance.GameLoadedCallBack -= CreateMatch;
                 SaveLoadManager.Instance.GameLoadedCallBack += CreateMatch;
             }
+            else
+            {
+                CreateMatch();
+            }
         }
 
         public virtual void JoinSession()
         {
+            _settings.PearType = NetworkManagerTypeEnum.Server;
+
             networkMatch.ListMatches(0, 1, "", true, 0, 0, (success, info, matches) =>
             {
                 if (success && matches.Count > 0)
@@ -125,7 +125,7 @@ namespace BaseGameLogic.Networking
             this.enabled = false;
 
             // Make sure if connected pears list is empty
-            _connectedPeers.Clear();
+            connectedPeers.Clear();
         }
 
         public virtual void Start() {}
@@ -144,13 +144,7 @@ namespace BaseGameLogic.Networking
             NetworkTransport.Shutdown();
         }
 
-        protected virtual void PeerConnected(int connectionId)
-        {
-            if (newPear != null && newPear.ConnectionID == connectionId)
-            {
-                SendPeersList();
-            }
-        }
+        protected virtual void ClientConnected(int connectionId) {}
 
         protected virtual void HandleConnection()
         {
@@ -187,10 +181,9 @@ namespace BaseGameLogic.Networking
 
                 _logs.Add(log);
 
-                _connectedPeers.Add(newPear);
-                SendPeersList();
+                connectedPeers.Add(newPear);
 
-                //PeerConnected(newPear.ConnectionID);
+                ClientConnected(newPear.ConnectionID);
             }
         }
 
@@ -198,12 +191,12 @@ namespace BaseGameLogic.Networking
 
         protected virtual void HandleDisconnection()
         {
-            for (int i = 0; i < _connectedPeers.Count; i++)
+            for (int i = 0; i < connectedPeers.Count; i++)
             {
-                PeerInfo info = _connectedPeers[i];
+                PeerInfo info = connectedPeers[i];
                 if(info.ConnectionID == connectionID)
                 {
-                    _connectedPeers.RemoveAt(i);
+                    connectedPeers.RemoveAt(i);
                     break;
                 }
             }
@@ -224,7 +217,7 @@ namespace BaseGameLogic.Networking
                     if(_settings.PearType == NetworkManagerTypeEnum.Client)
                     {
                         List<PeerInfo> peerList = (List<PeerInfo>)message.Data;
-                        _connectedPeers.AddRange(peerList);
+                        connectedPeers.AddRange(peerList);
                         for (int i = 0; i < peerList.Count; i++)
                         {
                             PeerInfo peer = peerList[i];
@@ -248,14 +241,6 @@ namespace BaseGameLogic.Networking
                 out error);
 
             return NetworkUtility.GetNetworkError(error);
-        }
-
-        protected virtual void SendPeersList()
-        {
-            Message message = new Message(NetworkMessageID.PEAR_LIST);
-
-            message.Data = _connectedPeers;
-            SendReliable(message, newPear.ConnectionID);
         }
 
         protected virtual NetworkError SendReliable(Message message, int connectionId)

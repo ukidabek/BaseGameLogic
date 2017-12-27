@@ -4,16 +4,16 @@ using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace BaseGameLogic.Networking.PeerToPeer
+namespace BaseGameLogic.Networking
 {
-    [CustomEditor(typeof(PeerToPearNetworkManager), true)]
-    public class PeerToPeerNetworkManagerCustomInspector : Editor
+    [CustomEditor(typeof(NetworkManager), true)]
+    public class NetworkManagerCustomInspector : Editor
     {
-        private PeerToPearNetworkManager manager = null;
+        private NetworkManager manager = null;
 
         private void OnEnable()
         {
-            manager = target as PeerToPearNetworkManager;
+            manager = target as NetworkManager;
         }
 
         public override void OnInspectorGUI()

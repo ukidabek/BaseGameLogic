@@ -6,14 +6,14 @@ using System.Collections.Generic;
 
 using BaseGameLogic.Networking;
 
-namespace BaseGameLogic.Networking.PeerToPeer
+namespace BaseGameLogic.Networking
 {
     [Serializable]
-    public class PeerToPearNetworkManagerSettings : BaseNetworkManagerSettings
+    public class NetworkManagerSettings : BaseNetworkManagerSettings
     {
         [SerializeField]
-        protected PeerToPeerNetworkManagerEnum _pearType = PeerToPeerNetworkManagerEnum.MasterPear;
-        public PeerToPeerNetworkManagerEnum PearType
+        protected NetworkManagerTypeEnum _pearType = NetworkManagerTypeEnum.Server;
+        public NetworkManagerTypeEnum PearType
         {
             get { return _pearType; }
             set { _pearType = value; }

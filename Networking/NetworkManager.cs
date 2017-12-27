@@ -12,12 +12,12 @@ using System.Linq;
 using BaseGameLogic.Singleton;
 using BaseGameLogic.SceneManagement;
 
-namespace BaseGameLogic.Networking.PeerToPeer
+namespace BaseGameLogic.Networking
 {
-    public abstract class PeerToPearNetworkManager : Singleton<PeerToPearNetworkManager>
+    public abstract class NetworkManager : Singleton<NetworkManager>
     {
         [SerializeField, Header("Network settings.")]
-        protected PeerToPearNetworkManagerSettings _settings = new PeerToPearNetworkManagerSettings();
+        protected NetworkManagerSettings _settings = new NetworkManagerSettings();
 
         [SerializeField]
         protected BroadcastCredentials _broadcastCredentials = new BroadcastCredentials();
@@ -26,7 +26,7 @@ namespace BaseGameLogic.Networking.PeerToPeer
         protected MatchSettings matchSettings = new MatchSettings();
 
         // Match making.
-        protected List<MatchInfoSnapshot> m_MatchList = new List<MatchInfoSnapshot>();
+        protected List<MatchInfoSnapshot> matchList = new List<MatchInfoSnapshot>();
         protected MatchInfo matchInfo;
 
         [SerializeField, Header("Match settings.")]
@@ -56,7 +56,7 @@ namespace BaseGameLogic.Networking.PeerToPeer
         [SerializeField]
         protected int recHostId;
         [SerializeField]
-        protected int channelId;
+        protected int channelID;
         [SerializeField]
         protected int dataSize;
         [SerializeField]
@@ -84,7 +84,7 @@ namespace BaseGameLogic.Networking.PeerToPeer
             HostTopology topology = new HostTopology(config, _settings.ConnectionsCount);
 
             // Set get port settings. If master use value for settings if not use first free port.
-            int portToUse = _settings.PearType == PeerToPeerNetworkManagerEnum.MasterPear ? _settings.Port : 0;
+            int portToUse = _settings.PearType == NetworkManagerTypeEnum.Server ? _settings.Port : 0;
             hostID = NetworkTransport.AddHost(topology, portToUse);
 
             this.enabled = true;
@@ -132,13 +132,9 @@ namespace BaseGameLogic.Networking.PeerToPeer
 
         protected virtual void OnDestroy()
         {
-            if (SaveLoadManager.Instance != null)
-            {
-                SaveLoadManager.Instance.GameLoadedCallBack -= Connect;
-            }
         }
 
-        public virtual void SetPeerType(PeerToPeerNetworkManagerEnum type)
+        public virtual void SetPeerType(NetworkManagerTypeEnum type)
         {
             _settings.PearType = type;
         }
@@ -171,7 +167,7 @@ namespace BaseGameLogic.Networking.PeerToPeer
                 out error);
 
             string log = string.Format(
-                PeerToPearNetworkManagerLogs.NEW_CONNECTION_APPEARED,
+                NetworkManagerLogs.NEW_CONNECTION_APPEARED,
                 NetworkUtility.GetIPAdress(adres),
                 port,
                 System.DateTime.Now.ToString());
@@ -181,20 +177,20 @@ namespace BaseGameLogic.Networking.PeerToPeer
             NetworkError networkError = NetworkUtility.GetNetworkError(error);
             if(networkError == NetworkError.Ok)
             {
-                newPear = new PeerInfo(adres, port);
+                newPear = new PeerInfo(connectionID, adres, port);
 
                 log = string.Format(
-                    PeerToPearNetworkManagerLogs.CONNECTING_TO_PEER_SUCCEEDED,
+                    NetworkManagerLogs.CONNECTING_TO_PEER_SUCCEEDED,
                     newPear.IPAdres,
                     newPear.Port,
                     System.DateTime.Now.ToString());
 
                 _logs.Add(log);
 
-                newPear.ConnectionID = connectionID;
                 _connectedPeers.Add(newPear);
+                SendPeersList();
 
-                PeerConnected(newPear.ConnectionID);
+                //PeerConnected(newPear.ConnectionID);
             }
         }
 
@@ -224,8 +220,8 @@ namespace BaseGameLogic.Networking.PeerToPeer
 
             switch (message.MessageID)
             {
-                case PeerToPeerMessageID.PEAR_LIST:
-                    if(_settings.PearType == PeerToPeerNetworkManagerEnum.Pear)
+                case NetworkMessageID.PEAR_LIST:
+                    if(_settings.PearType == NetworkManagerTypeEnum.Client)
                     {
                         List<PeerInfo> peerList = (List<PeerInfo>)message.Data;
                         _connectedPeers.AddRange(peerList);
@@ -256,12 +252,10 @@ namespace BaseGameLogic.Networking.PeerToPeer
 
         protected virtual void SendPeersList()
         {
-            Message message = new Message(PeerToPeerMessageID.PEAR_LIST);
+            Message message = new Message(NetworkMessageID.PEAR_LIST);
 
             message.Data = _connectedPeers;
             SendReliable(message, newPear.ConnectionID);
-
-            _connectedPeers.Add(newPear);
         }
 
         protected virtual NetworkError SendReliable(Message message, int connectionId)
@@ -323,7 +317,7 @@ namespace BaseGameLogic.Networking.PeerToPeer
                 networkEvent = NetworkTransport.ReceiveFromHost(
                     hostID, 
                     out connectionID, 
-                    out channelId,
+                    out channelID,
                     recBuffer, 
                     recBuffer.Length, 
                     out dataSize, 
@@ -353,41 +347,6 @@ namespace BaseGameLogic.Networking.PeerToPeer
                 }
             }
             while (networkEvent != NetworkEventType.Nothing);
-        }
-
-        public virtual void Connect()
-        {
-            byte error = 0;
-            if(gameObject.activeSelf != true)
-            {
-                gameObject.SetActive(true);
-            }
-
-            switch(_settings.PearType)
-            {
-                case PeerToPeerNetworkManagerEnum.MasterPear:
-                    //  Master setup the broadcast settings, for incoming connection handling.
-                    NetworkTransport.SetBroadcastCredentials(
-                        hostID,
-                        _broadcastCredentials.Key,
-                        _broadcastCredentials.Version,
-                        _broadcastCredentials.Subversion,
-                        out error);
-                    break;
-
-                case PeerToPeerNetworkManagerEnum.Pear:
-                    NetworkTransport.StartBroadcastDiscovery(
-                        hostID,
-                        _settings.Port,
-                        _broadcastCredentials.Key,
-                        _broadcastCredentials.Version,
-                        _broadcastCredentials.Subversion,
-                        null,
-                        0,
-                        _broadcastCredentials.Timeout,
-                        out error);
-                    break;
-            }
         }
 
         // Match making 
@@ -434,7 +393,7 @@ namespace BaseGameLogic.Networking.PeerToPeer
         {
             if (success && matches != null)
             {
-                m_MatchList = matches;
+                matchList = matches;
             }
             else if (!success)
             {
@@ -473,7 +432,7 @@ namespace BaseGameLogic.Networking.PeerToPeer
 
         public virtual void StartServer(string relayIP, int relayPort, NetworkID networkID, NodeID nodeID)
         {
-            _settings.PearType = PeerToPeerNetworkManagerEnum.MasterPear;
+            _settings.PearType = NetworkManagerTypeEnum.Server;
             Initialize();
 
             SourceID sourceID = Utility.GetSourceID();
@@ -487,21 +446,21 @@ namespace BaseGameLogic.Networking.PeerToPeer
                 out error);
         }
 
-        public virtual void ConnectThroughRelay(string relayIp, int relayPort, NetworkID networkId, NodeID nodeId)
+        public virtual void ConnectThroughRelay(string relayIP, int relayPort, NetworkID networkID, NodeID nodeID)
         {
-            _settings.PearType = PeerToPeerNetworkManagerEnum.Pear;
+            _settings.PearType = NetworkManagerTypeEnum.Client;
             Initialize();
 
             SourceID sourceID = Utility.GetSourceID();
             NetworkTransport.ConnectToNetworkPeer(
                 hostID, 
-                relayIp, 
+                relayIP, 
                 relayPort, 
                 0, 
                 0, 
-                networkId, 
+                networkID, 
                 sourceID, 
-                nodeId, 
+                nodeID, 
                 out error);
         }
     }

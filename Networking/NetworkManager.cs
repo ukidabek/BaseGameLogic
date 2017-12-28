@@ -243,10 +243,16 @@ namespace BaseGameLogic.Networking
             return NetworkUtility.GetNetworkError(error);
         }
 
-        protected virtual void SendToAllReliable(Message message)
+        protected virtual void SendToAllReliable(Message message, int skipConnectionID = -1)
         {
             for (int i = 0; i < connectedPeers.Count; i++)
             {
+                int connectionID = connectedPeers[i].ConnectionID;
+                if (skipConnectionID > 0 && connectionID == skipConnectionID)
+                {
+                    continue;
+                }
+
                 SendReliable(message, connectedPeers[i].ConnectionID);
             }
         }
@@ -267,7 +273,6 @@ namespace BaseGameLogic.Networking
 
             return NetworkUtility.GetNetworkError(error);
         }
-
 
         protected virtual void UpdateForAllReliable(Message message)
         {

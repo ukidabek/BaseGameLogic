@@ -243,6 +243,14 @@ namespace BaseGameLogic.Networking
             return NetworkUtility.GetNetworkError(error);
         }
 
+        protected virtual void SendToAllReliable(Message message)
+        {
+            for (int i = 0; i < connectedPeers.Count; i++)
+            {
+                SendReliable(message, connectedPeers[i].ConnectionID);
+            }
+        }
+
         protected virtual NetworkError SendReliable(Message message, int connectionId)
         {
             memoryStream = new MemoryStream();
@@ -258,6 +266,15 @@ namespace BaseGameLogic.Networking
                 out error);
 
             return NetworkUtility.GetNetworkError(error);
+        }
+
+
+        protected virtual void UpdateForAllReliable(Message message)
+        {
+            for (int i = 0; i < connectedPeers.Count; i++)
+            {
+                UpdateUnreiable(message, connectedPeers[i].ConnectionID);
+            }
         }
 
         protected virtual NetworkError UpdateUnreiable(Message message, int connectionId)

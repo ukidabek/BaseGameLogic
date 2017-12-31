@@ -62,6 +62,18 @@ namespace BaseGameLogic.Networking
         protected BinaryFormatter binaryFormatter = new BinaryFormatter();
         protected MemoryStream memoryStream = null;
 
+        [SerializeField]
+        private float _send = 0;
+        [SerializeField]
+        private float _received = 0;
+
+        public float Send = 0;
+        public float Received = 0;
+        public float Total = 0;
+
+        [SerializeField]
+        private float _counter = 0;
+
         protected virtual void Initialize()
         {
             // Transport layer initialization.
@@ -209,7 +221,6 @@ namespace BaseGameLogic.Networking
             memoryStream = new MemoryStream(recBuffer);
             memoryStream.Position = 0;
             Message message = (Message)binaryFormatter.Deserialize(memoryStream);
-            message.ConnectionID = connectionID;
 
             switch (message.MessageID)
             {
@@ -261,17 +272,23 @@ namespace BaseGameLogic.Networking
         {
             memoryStream = new MemoryStream();
             binaryFormatter.Serialize(memoryStream, message);
-            byte[] arry = memoryStream.ToArray();
+            byte[] array = memoryStream.ToArray();
 
             NetworkTransport.Send(
                 hostID,
                 connectionId,
                 channelDictionary[QosType.Reliable],
-                arry,
-                arry.Length,
+                array,
+                array.Length,
                 out error);
 
-            return NetworkUtility.GetNetworkError(error);
+            NetworkError networkError = NetworkUtility.GetNetworkError(error);
+            if(networkError == NetworkError.Ok)
+            {
+                _send += array.Length;
+            }
+
+            return networkError;
         }
 
         protected virtual void UpdateForAllReliable(Message message)
@@ -296,7 +313,13 @@ namespace BaseGameLogic.Networking
                 array.Length,
                 out error);
 
-            return NetworkUtility.GetNetworkError(error);
+            NetworkError networkError = NetworkUtility.GetNetworkError(error);
+            if (networkError == NetworkError.Ok)
+            {
+                _send += array.Length;
+            }
+
+            return networkError;
         }
 
         protected virtual void Update()
@@ -306,6 +329,8 @@ namespace BaseGameLogic.Networking
                 this.enabled = false;
                 return;
             }
+
+            _counter += Time.deltaTime;
 
             recBuffer = new byte[_settings.BufferSize];
 
@@ -342,6 +367,7 @@ namespace BaseGameLogic.Networking
                         break;
 
                     case NetworkEventType.DataEvent:
+                        _received += dataSize;
                         HandleMessages(recBuffer, dataSize);
                         break;
 
@@ -354,6 +380,17 @@ namespace BaseGameLogic.Networking
                 }
             }
             while (networkEvent != NetworkEventType.Nothing);
+
+            if(_counter > 1f)
+            {
+                _counter = 0;
+                Send = _send / 1024f;
+                _send = 0;
+                Received = _received / 1024f;
+                _received = 0;
+
+                Total = Send + Received;
+            }
         }
 
         // Match making 

@@ -9,10 +9,8 @@ namespace BaseGameLogic.Networking
     [Serializable]
     public class Message
     {
-        public int ConnectionID { get; set; }
-
-        private int _messageID = -1;
-        public int MessageID
+        private byte _messageID = 1;
+        public byte MessageID
         {
             get { return _messageID; }
         }
@@ -21,7 +19,7 @@ namespace BaseGameLogic.Networking
 
         private Message() {}
 
-        public Message(int messafgeID)
+        public Message(byte messafgeID)
         {
             _messageID = messafgeID;
         }

@@ -216,31 +216,7 @@ namespace BaseGameLogic.Networking
             PeerDisconnected(connectionID);
         }
 
-        protected virtual Message HandleMessages(byte[] buffer, int sieze)
-        {
-            memoryStream = new MemoryStream(recBuffer);
-            memoryStream.Position = 0;
-            Message message = (Message)binaryFormatter.Deserialize(memoryStream);
-
-            switch (message.MessageID)
-            {
-                case NetworkMessageID.PEAR_LIST:
-                    if(_settings.PearType == NetworkManagerTypeEnum.Client)
-                    {
-                        List<PeerInfo> peerList = (List<PeerInfo>)message.Data;
-                        connectedPeers.AddRange(peerList);
-                        for (int i = 0; i < peerList.Count; i++)
-                        {
-                            PeerInfo peer = peerList[i];
-
-                            ConnectToPear(ref peer);
-                        }
-                    }
-                    return null;
-            }
-
-            return message;
-        }
+        protected virtual void HandleMessages(byte[] buffer, int sieze) {}
 
         protected virtual NetworkError ConnectToPear(ref PeerInfo peer)
         {
@@ -264,28 +240,28 @@ namespace BaseGameLogic.Networking
                     continue;
                 }
 
-                SendReliable(message, connectedPeers[i].ConnectionID);
+                //SendReliable(message, connectedPeers[i].ConnectionID);
             }
         }
 
-        protected virtual NetworkError SendReliable(Message message, int connectionId)
+        protected virtual NetworkError SendReliable(byte[] message, int connectionId)
         {
-            memoryStream = new MemoryStream();
-            binaryFormatter.Serialize(memoryStream, message);
-            byte[] array = memoryStream.ToArray();
+            //memoryStream = new MemoryStream();
+            //binaryFormatter.Serialize(memoryStream, message);
+            //byte[] array = memoryStream.ToArray();
 
             NetworkTransport.Send(
                 hostID,
                 connectionId,
                 channelDictionary[QosType.Reliable],
-                array,
-                array.Length,
+                message,
+                message.Length,
                 out error);
 
             NetworkError networkError = NetworkUtility.GetNetworkError(error);
             if(networkError == NetworkError.Ok)
             {
-                _send += array.Length;
+                _send += message.Length;
             }
 
             return networkError;

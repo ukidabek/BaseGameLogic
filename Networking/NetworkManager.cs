@@ -259,7 +259,7 @@ namespace BaseGameLogic.Networking
             return networkError;
         }
 
-        protected virtual void UpdateForAllReliable(Message message)
+        protected virtual void UpdateForAllReliable(byte[] message)
         {
             for (int i = 0; i < connectedPeers.Count; i++)
             {
@@ -267,25 +267,25 @@ namespace BaseGameLogic.Networking
             }
         }
 
-        protected virtual NetworkError UpdateUnreiable(Message message, int connectionId)
+        protected virtual NetworkError UpdateUnreiable(byte [] message, int connectionId)
         {
             //memoryStream = new MemoryStream();
             //binaryFormatter.Serialize(memoryStream, message);
             //byte[] array = memoryStream.ToArray();
 
-            //NetworkTransport.Send(
-            //    hostID,
-            //    connectionId,
-            //    channelDictionary[QosType.UnreliableSequenced],
-            //    array,
-            //    array.Length,
-            //    out error);
+            NetworkTransport.Send(
+                hostID,
+                connectionId,
+                channelDictionary[QosType.UnreliableSequenced],
+                message,
+                message.Length,
+                out error);
 
-            //NetworkError networkError = NetworkUtility.GetNetworkError(error);
-            //if (networkError == NetworkError.Ok)
-            //{
-            //    _send += array.Length;
-            //}
+            NetworkError networkError = NetworkUtility.GetNetworkError(error);
+            if (networkError == NetworkError.Ok)
+            {
+                _send += message.Length;
+            }
 
             return NetworkError.Ok;
         }

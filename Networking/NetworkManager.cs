@@ -59,9 +59,6 @@ namespace BaseGameLogic.Networking
 
         protected Dictionary<QosType, int> channelDictionary = new Dictionary<QosType, int>();
 
-        protected BinaryFormatter binaryFormatter = new BinaryFormatter();
-        protected MemoryStream memoryStream = null;
-
         [SerializeField]
         private float _send = 0;
         [SerializeField]
@@ -142,9 +139,7 @@ namespace BaseGameLogic.Networking
 
         public virtual void Start() {}
 
-        protected virtual void OnDestroy()
-        {
-        }
+        protected virtual void OnDestroy() {}
 
         public virtual void SetPeerType(NetworkManagerTypeEnum type)
         {
@@ -230,7 +225,7 @@ namespace BaseGameLogic.Networking
             return NetworkUtility.GetNetworkError(error);
         }
 
-        protected virtual void SendToAllReliable(Message message, int skipConnectionID = -1)
+        protected virtual void SendToAllReliable(byte[] message, int skipConnectionID = -1)
         {
             for (int i = 0; i < connectedPeers.Count; i++)
             {
@@ -240,16 +235,12 @@ namespace BaseGameLogic.Networking
                     continue;
                 }
 
-                //SendReliable(message, connectedPeers[i].ConnectionID);
+                SendReliable(message, connectedPeers[i].ConnectionID);
             }
         }
 
         protected virtual NetworkError SendReliable(byte[] message, int connectionId)
         {
-            //memoryStream = new MemoryStream();
-            //binaryFormatter.Serialize(memoryStream, message);
-            //byte[] array = memoryStream.ToArray();
-
             NetworkTransport.Send(
                 hostID,
                 connectionId,
@@ -259,6 +250,7 @@ namespace BaseGameLogic.Networking
                 out error);
 
             NetworkError networkError = NetworkUtility.GetNetworkError(error);
+
             if(networkError == NetworkError.Ok)
             {
                 _send += message.Length;
@@ -277,25 +269,25 @@ namespace BaseGameLogic.Networking
 
         protected virtual NetworkError UpdateUnreiable(Message message, int connectionId)
         {
-            memoryStream = new MemoryStream();
-            binaryFormatter.Serialize(memoryStream, message);
-            byte[] array = memoryStream.ToArray();
+            //memoryStream = new MemoryStream();
+            //binaryFormatter.Serialize(memoryStream, message);
+            //byte[] array = memoryStream.ToArray();
 
-            NetworkTransport.Send(
-                hostID,
-                connectionId,
-                channelDictionary[QosType.UnreliableSequenced],
-                array,
-                array.Length,
-                out error);
+            //NetworkTransport.Send(
+            //    hostID,
+            //    connectionId,
+            //    channelDictionary[QosType.UnreliableSequenced],
+            //    array,
+            //    array.Length,
+            //    out error);
 
-            NetworkError networkError = NetworkUtility.GetNetworkError(error);
-            if (networkError == NetworkError.Ok)
-            {
-                _send += array.Length;
-            }
+            //NetworkError networkError = NetworkUtility.GetNetworkError(error);
+            //if (networkError == NetworkError.Ok)
+            //{
+            //    _send += array.Length;
+            //}
 
-            return networkError;
+            return NetworkError.Ok;
         }
 
         protected virtual void Update()
@@ -482,6 +474,27 @@ namespace BaseGameLogic.Networking
                 sourceID, 
                 nodeID, 
                 out error);
+        }
+
+        public byte[] ConvertToBytes(object objectToConvert)
+        {
+            BinaryFormatter binaryFormatter = new BinaryFormatter();
+            MemoryStream memoryStream = new MemoryStream();
+
+            binaryFormatter.Serialize(memoryStream, objectToConvert);
+            byte[] array = memoryStream.ToArray();
+
+            return array;
+        }
+
+        public T ConvertToObject<T>(byte[] array, int start = 0)
+        {
+            BinaryFormatter binaryFormatter = new BinaryFormatter();
+            MemoryStream memoryStream = new MemoryStream(array, start, array.Length - start);
+
+            T objectFormBytes = (T)binaryFormatter.Deserialize(memoryStream);
+
+            return objectFormBytes;
         }
     }
 }

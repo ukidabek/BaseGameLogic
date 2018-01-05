@@ -68,6 +68,9 @@ namespace BaseGameLogic.Networking
         public float Received = 0;
         public float Total = 0;
 
+        public AnimationCurve recive = new AnimationCurve();
+        public AnimationCurve send = new AnimationCurve();
+
         [SerializeField]
         private float _counter = 0;
 
@@ -211,7 +214,7 @@ namespace BaseGameLogic.Networking
             PeerDisconnected(connectionID);
         }
 
-        protected virtual void HandleMessages(byte[] buffer, int sieze) { }
+        protected virtual void HandleMessages(byte[] buffer, int size) {}
 
         protected virtual NetworkError ConnectToPear(ref PeerInfo peer)
         {
@@ -353,11 +356,20 @@ namespace BaseGameLogic.Networking
             {
                 _counter = 0;
                 Send = _send / 1024f;
-                _send = 0;
                 Received = _received / 1024f;
-                _received = 0;
 
                 Total = Send + Received;
+
+                if(recive.length == 30)
+                {
+                    recive.RemoveKey(0);
+                    send.RemoveKey(0);
+                }
+                recive.AddKey(recive.length, _received);
+                send.AddKey(recive.length, _send);
+
+                _send = 0;
+                _received = 0;
             }
         }
 

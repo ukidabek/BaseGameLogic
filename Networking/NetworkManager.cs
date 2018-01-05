@@ -137,9 +137,9 @@ namespace BaseGameLogic.Networking
             connectedPeers.Clear();
         }
 
-        public virtual void Start() {}
+        public virtual void Start() { }
 
-        protected virtual void OnDestroy() {}
+        protected virtual void OnDestroy() { }
 
         public virtual void SetPeerType(NetworkManagerTypeEnum type)
         {
@@ -151,7 +151,7 @@ namespace BaseGameLogic.Networking
             NetworkTransport.Shutdown();
         }
 
-        protected virtual void ClientConnected(int connectionId) {}
+        protected virtual void ClientConnected(int connectionId) { }
 
         protected virtual void HandleConnection()
         {
@@ -176,7 +176,7 @@ namespace BaseGameLogic.Networking
             _logs.Add(log);
 
             NetworkError networkError = NetworkUtility.GetNetworkError(error);
-            if(networkError == NetworkError.Ok)
+            if (networkError == NetworkError.Ok)
             {
                 newPear = new PeerInfo(connectionID, adres, port);
 
@@ -201,7 +201,7 @@ namespace BaseGameLogic.Networking
             for (int i = 0; i < connectedPeers.Count; i++)
             {
                 PeerInfo info = connectedPeers[i];
-                if(info.ConnectionID == connectionID)
+                if (info.ConnectionID == connectionID)
                 {
                     connectedPeers.RemoveAt(i);
                     break;
@@ -211,7 +211,7 @@ namespace BaseGameLogic.Networking
             PeerDisconnected(connectionID);
         }
 
-        protected virtual void HandleMessages(byte[] buffer, int sieze) {}
+        protected virtual void HandleMessages(byte[] buffer, int sieze) { }
 
         protected virtual NetworkError ConnectToPear(ref PeerInfo peer)
         {
@@ -251,7 +251,7 @@ namespace BaseGameLogic.Networking
 
             NetworkError networkError = NetworkUtility.GetNetworkError(error);
 
-            if(networkError == NetworkError.Ok)
+            if (networkError == NetworkError.Ok)
             {
                 _send += message.Length;
             }
@@ -267,7 +267,7 @@ namespace BaseGameLogic.Networking
             }
         }
 
-        protected virtual NetworkError UpdateUnreiable(byte [] message, int connectionId)
+        protected virtual NetworkError UpdateUnreiable(byte[] message, int connectionId)
         {
             //memoryStream = new MemoryStream();
             //binaryFormatter.Serialize(memoryStream, message);
@@ -292,7 +292,7 @@ namespace BaseGameLogic.Networking
 
         protected virtual void Update()
         {
-            if(hostID == -1)
+            if (hostID == -1)
             {
                 this.enabled = false;
                 return;
@@ -315,12 +315,12 @@ namespace BaseGameLogic.Networking
             {
                 // Get events from the server/client game connection
                 networkEvent = NetworkTransport.ReceiveFromHost(
-                    hostID, 
-                    out connectionID, 
+                    hostID,
+                    out connectionID,
                     out channelID,
-                    recBuffer, 
-                    recBuffer.Length, 
-                    out dataSize, 
+                    recBuffer,
+                    recBuffer.Length,
+                    out dataSize,
                     out error);
 
                 if ((NetworkError)error != NetworkError.Ok)
@@ -349,7 +349,7 @@ namespace BaseGameLogic.Networking
             }
             while (networkEvent != NetworkEventType.Nothing);
 
-            if(_counter > 1f)
+            if (_counter > 1f)
             {
                 _counter = 0;
                 Send = _send / 1024f;
@@ -390,8 +390,8 @@ namespace BaseGameLogic.Networking
                 this.matchInfo = matchInfo;
 
                 StartServer(
-                    matchInfo.address, 
-                    matchInfo.port, 
+                    matchInfo.address,
+                    matchInfo.port,
                     matchInfo.networkId,
                     matchInfo.nodeId);
             }
@@ -431,8 +431,8 @@ namespace BaseGameLogic.Networking
                     " NodeID: " + matchInfo.nodeId);
 
                 ConnectThroughRelay(
-                    matchInfo.address, 
-                    matchInfo.port, 
+                    matchInfo.address,
+                    matchInfo.port,
                     matchInfo.networkId,
                     matchInfo.nodeId);
             }
@@ -449,12 +449,12 @@ namespace BaseGameLogic.Networking
 
             SourceID sourceID = Utility.GetSourceID();
             NetworkTransport.ConnectAsNetworkHost(
-                hostID, 
-                relayIP, 
-                relayPort, 
-                networkID, 
-                sourceID, 
-                nodeID, 
+                hostID,
+                relayIP,
+                relayPort,
+                networkID,
+                sourceID,
+                nodeID,
                 out error);
         }
 
@@ -465,14 +465,14 @@ namespace BaseGameLogic.Networking
 
             SourceID sourceID = Utility.GetSourceID();
             NetworkTransport.ConnectToNetworkPeer(
-                hostID, 
-                relayIP, 
-                relayPort, 
-                0, 
-                0, 
-                networkID, 
-                sourceID, 
-                nodeID, 
+                hostID,
+                relayIP,
+                relayPort,
+                0,
+                0,
+                networkID,
+                sourceID,
+                nodeID,
                 out error);
         }
 
@@ -487,10 +487,10 @@ namespace BaseGameLogic.Networking
             return array;
         }
 
-        public T ConvertToObject<T>(byte[] array, int start = 0)
+        public T ConvertToObject<T>(byte[] array, int start = 0, int length = 0)
         {
             BinaryFormatter binaryFormatter = new BinaryFormatter();
-            MemoryStream memoryStream = new MemoryStream(array, start, array.Length - start);
+            MemoryStream memoryStream = new MemoryStream(array, start, length > 0 ? length - start : array.Length - start);
 
             T objectFormBytes = (T)binaryFormatter.Deserialize(memoryStream);
 

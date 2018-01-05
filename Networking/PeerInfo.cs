@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking.Types;
 
 using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace BaseGameLogic.Networking.PeerToPeer
+namespace BaseGameLogic.Networking
 {
     [Serializable]
     public class PeerInfo
@@ -17,16 +18,23 @@ namespace BaseGameLogic.Networking.PeerToPeer
         }
 
         [SerializeField]
-        public string _ipAdres = string.Empty;
+        private string _ipAdres = string.Empty;
         public string IPAdres
         {
             get { return _ipAdres; }
         }
 
-        public int ConnectionID { get; set; }
-
-        public PeerInfo(string ipAdress, int port)
+        [SerializeField]
+        private int _connectionID = -1;
+        public int ConnectionID
         {
+            get { return _connectionID; }
+            set { _connectionID = value; }
+        }
+
+        public PeerInfo(int connectionID, string ipAdress, int port)
+        {
+            _connectionID = connectionID;
             _ipAdres = NetworkUtility.GetIPAdress(ipAdress);
             _port = port;
         } 

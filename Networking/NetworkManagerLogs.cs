@@ -1,7 +1,7 @@
 ﻿
-namespace BaseGameLogic.Networking.PeerToPeer
+namespace BaseGameLogic.Networking
 {
-    public class PeerToPearNetworkManagerLogs
+    public class NetworkManagerLogs
     {
         public const string NEW_PEER_TRY_TO_CONNECT = "New pear try to cennect to network with ip: {0} on port: {1}. {2}";
         public const string CONNECTING_TO_PEER = "Connecting to peer with ip: {0} on port: {1}. {2}";

@@ -26,10 +26,6 @@ namespace BaseGameLogic.Character
         protected virtual void Initialize()
         {
             baseCharacterController = target as BaseCharacterController;
-            ScriptableObject tmp = null; 
-
-            tmp = baseCharacterController.Settings as ScriptableObject;
-            AddScriptableObject(tmp);
 
             showEditor = new bool[scriptableObjects.Count];
             editors = new Editor[scriptableObjects.Count];

@@ -18,7 +18,7 @@ namespace BaseGameLogic.Inputs
         [Tooltip("Number of player that InputCollector will be assigned do.")]
 		private int _playerNumber = 0;
         /// <summary>
-        /// If more the one local play is used to bound InputCollector to PlayerController by player number.
+        /// If more the one local play is used to bound InputCollector to HellspawnPlayerController  by player number.
         /// </summary>
         public int PlayerNumber 
 		{

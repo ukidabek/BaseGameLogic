@@ -74,7 +74,9 @@ namespace BaseGameLogic.Management
             transform.ResetRotation();
 
 			CreateManagersInstance ();
-		}
+
+            Cursor.visible = false;
+        }
 
 		protected virtual void Update()
 		{
@@ -92,15 +94,19 @@ namespace BaseGameLogic.Management
             {
 			    TimeManagerInstance.Factor = 0f;
             }
-		}
 
-		public void ResumeGame()
+            Cursor.visible = true;
+        }
+
+        public void ResumeGame()
 		{
 			_gameStatus = GameStatusEnum.Play;
             if (TimeManagerInstance != null)
             {
                 TimeManagerInstance.Factor = 1f;
             }
-		}
-	}
+
+            Cursor.visible = false;
+        }
+    }
 }

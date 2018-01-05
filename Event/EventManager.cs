@@ -112,7 +112,7 @@ namespace BaseGameLogic.Events
 				#if UNITY_EDITOR
 				if(showLogData)
 				{
-					Debug.LogFormat("Event of id:{0} was registred & added", eventID);
+					Debug.LogFormat("Event of id:{0} was registered & added", eventID);
 				}
 				#endif
 			} 
@@ -123,7 +123,7 @@ namespace BaseGameLogic.Events
 				#if UNITY_EDITOR
 				if(showLogData)
 				{
-					Debug.LogFormat("Event of id:{0} was registred.", eventID);
+					Debug.LogFormat("Event of id:{0} was registered.", eventID);
 				}
 				#endif
 			}
@@ -153,7 +153,7 @@ namespace BaseGameLogic.Events
 				#if UNITY_EDITOR
 				if(showLogData)
 				{
-					Debug.LogFormat("Event of id:{0} was unregistred.", eventID);
+					Debug.LogFormat("Event of id:{0} was unregistered.", eventID);
 				}
 				#endif
 			}

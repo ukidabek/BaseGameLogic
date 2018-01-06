@@ -68,9 +68,6 @@ namespace BaseGameLogic.Networking
         public float Received = 0;
         public float Total = 0;
 
-        public AnimationCurve recive = new AnimationCurve();
-        public AnimationCurve send = new AnimationCurve();
-
         [SerializeField]
         private float _counter = 0;
 
@@ -262,35 +259,32 @@ namespace BaseGameLogic.Networking
             return networkError;
         }
 
-        protected virtual void UpdateForAllReliable(byte[] message)
+        protected virtual void UpdateForAllReliable(byte[] message, int messageSize = 0)
         {
             for (int i = 0; i < connectedPeers.Count; i++)
             {
-                UpdateUnreiable(message, connectedPeers[i].ConnectionID);
+                UpdateUnreiable(message, connectedPeers[i].ConnectionID, messageSize);
             }
         }
 
-        protected virtual NetworkError UpdateUnreiable(byte[] message, int connectionId)
+        protected virtual NetworkError UpdateUnreiable(byte[] message, int connectionId, int messageSize = 0)
         {
-            //memoryStream = new MemoryStream();
-            //binaryFormatter.Serialize(memoryStream, message);
-            //byte[] array = memoryStream.ToArray();
-
+            int size = messageSize > 0 ? messageSize : message.Length;
             NetworkTransport.Send(
                 hostID,
                 connectionId,
                 channelDictionary[QosType.UnreliableSequenced],
                 message,
-                message.Length,
+                size,
                 out error);
 
             NetworkError networkError = NetworkUtility.GetNetworkError(error);
             if (networkError == NetworkError.Ok)
             {
-                _send += message.Length;
+                _send += size;
             }
 
-            return NetworkError.Ok;
+            return networkError;
         }
 
         protected virtual void Update()
@@ -355,18 +349,10 @@ namespace BaseGameLogic.Networking
             if (_counter > 1f)
             {
                 _counter = 0;
-                Send = _send / 1024f;
-                Received = _received / 1024f;
+                Send = _send;
+                Received = _received;
 
                 Total = Send + Received;
-
-                if(recive.length == 30)
-                {
-                    recive.RemoveKey(0);
-                    send.RemoveKey(0);
-                }
-                recive.AddKey(recive.length, _received);
-                send.AddKey(recive.length, _send);
 
                 _send = 0;
                 _received = 0;

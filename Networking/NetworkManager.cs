@@ -60,16 +60,16 @@ namespace BaseGameLogic.Networking
         protected Dictionary<QosType, int> channelDictionary = new Dictionary<QosType, int>();
 
         [SerializeField]
-        private float _send = 0;
+        protected float _send = 0;
         [SerializeField]
-        private float _received = 0;
+        protected float _received = 0;
 
         public float Send = 0;
         public float Received = 0;
         public float Total = 0;
 
         [SerializeField]
-        private float _counter = 0;
+        protected float _counter = 0;
 
         protected virtual void Initialize()
         {
@@ -269,6 +269,11 @@ namespace BaseGameLogic.Networking
 
         protected virtual NetworkError UpdateUnreiable(byte[] message, int connectionId, int messageSize = 0)
         {
+            if(message == null || message.Length == 0)
+            {
+                return NetworkError.Ok;
+            }
+
             int size = messageSize > 0 ? messageSize : message.Length;
             NetworkTransport.Send(
                 hostID,

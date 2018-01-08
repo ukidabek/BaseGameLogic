@@ -14,20 +14,24 @@ namespace BaseGameLogic.States
     public abstract class BaseState
     {
 		protected List<BaseStateMode> stateModes = new List<BaseStateMode> ();
-		public List<BaseStateMode> StateModes {
+		public List<BaseStateMode> StateModes
+        {
     		get { return this.stateModes; }
     	}
 
         protected BaseStateObject controlledObject = null;
-		public BaseStateObject ControlledObject {
+		public BaseStateObject ControlledObject
+        {
     		get { return this.controlledObject; }
     	}
 
-        protected Animator characterAnimatior {
+        protected Animator characterAnimatior
+        {
     		get{ return controlledObject.ObjectAnimator; }
     	}
 
-        protected AnimationEventsBroadcaster animationEventsBroadcaster {
+        protected AnimationEventsBroadcaster animationEventsBroadcaster
+        {
             get { return controlledObject.AnimationEventsBroadcaster; }
         }
 
@@ -39,10 +43,7 @@ namespace BaseGameLogic.States
             this.controlledObject = controlledObject;
         }
 
-        public virtual bool EnterConditions()
-        {
-            return true;
-        }
+        public virtual bool EnterConditions() { return true; }
 
         public abstract void Enter();
         public abstract void Exit();
@@ -57,7 +58,9 @@ namespace BaseGameLogic.States
 
         public virtual void HandleAnimator() {}
 
-		public void AddStateMode(BaseStateMode mode)
+        public virtual void OnAnimatorIK(int layerIndex) {}
+
+        public void AddStateMode(BaseStateMode mode)
 		{
             stateModes.Add (mode);
             mode.ModAdded();

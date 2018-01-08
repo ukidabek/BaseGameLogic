@@ -350,6 +350,15 @@ namespace BaseGameLogic.States
 
         public virtual void OnTriggerExit(Collider collision) {}
 
+        public virtual void OnAnimatorIK(int layerIndex)
+        {
+            if (IsGamePaused)
+                return;
+
+            if (CurrentState != null)
+                CurrentState.OnAnimatorIK(layerIndex);
+        }
+
         #endregion
 
         /// <summary>

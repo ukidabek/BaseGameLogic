@@ -124,8 +124,6 @@ namespace BaseGameLogic.Character
             Register();
         }
                                                 
-        protected virtual void OnAnimatorIK(int layerIndex) {}
-
 		protected override void OnDestroy ()
     	{
 			if (CharacterRegisterInstance != null) 

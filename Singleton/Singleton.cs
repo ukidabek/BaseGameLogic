@@ -22,7 +22,7 @@ namespace BaseGameLogic.Singleton
                 Destroy(gameObject);
             }
 
-            if(_dontDestroyOnLoad)
+            if(Instance != null && _dontDestroyOnLoad)
             {
                 DontDestroyOnLoad(this.gameObject);
             }

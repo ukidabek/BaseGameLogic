@@ -10,7 +10,7 @@ namespace BaseGameLogic.States
     /// Each state creator should inherit from this class.
     /// </summary>
     public abstract class BaseStateCreator : BaseCreator 
-    {
+    { 
         public abstract BaseState CreateProduct(
             BaseStateObject controlledObject,
             BaseInputCache inputCache, 

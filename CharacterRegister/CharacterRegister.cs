@@ -3,10 +3,12 @@
 using System.Collections;
 using System.Collections.Generic;
 
+using BaseGameLogic.Singleton;
+
 namespace BaseGameLogic.Character
 {
-	public class CharacterRegister : MonoBehaviour 
-	{
+	public class CharacterRegister : Singleton<CharacterRegister>
+    {
         #if UNITY_EDITOR
         /// <summary>
         /// List of characters. In editor olny. 
@@ -99,7 +101,7 @@ namespace BaseGameLogic.Character
 		}
 
         /// <summary>
-        /// Unregister character fom players if character is player.
+        /// Unregister character from players if character is player.
         /// </summary>
         /// <param name="character">Character instance.</param>
         public void UnregisterPlayer(BaseCharacterController character)

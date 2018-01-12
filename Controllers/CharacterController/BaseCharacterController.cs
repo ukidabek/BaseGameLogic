@@ -12,7 +12,7 @@ namespace BaseGameLogic.Character
     /// <summary>
     /// Base character controller.
     /// </summary>
-    public class BaseCharacterController : BaseStateObject
+    public abstract class BaseCharacterController : BaseStateObject
     {
 		public virtual bool IsPlayer { get { return false; } }
 
@@ -74,15 +74,8 @@ namespace BaseGameLogic.Character
 		/// <summary>
         /// Character settings.
         /// </summary>
-		[Header("Character settings & managment.")]
-		[SerializeField, Tooltip("Slot for CharacterSettings instance.")]
-        protected CharacterSettings settings = null;
-        public CharacterSettings Settings 
-        {
-            get { return this.settings; }
-            set { settings = value; }
-        }
-
+		[Header("Character settings & management.")]
+		[SerializeField]
 		private CharacterStatus characterStatus = null;
 		public CharacterStatus CharacterStatus 
 		{
@@ -111,25 +104,26 @@ namespace BaseGameLogic.Character
             MissingWarning(characterNavMeshAgent, gameObject.name);
             #endif
         }
-            
+
+        protected virtual void Register()
+        {
+            if (CharacterRegisterInstance != null)
+            {
+                CharacterRegisterInstance.RegisterCharacter(this);
+            }
+            else
+            {
+                // exception
+            }
+        }
+
+
         protected override void Start()
         {
             base.Start();
-
-			if (CharacterRegisterInstance != null) 
-			{
-				CharacterRegisterInstance.RegisterCharacter (this);
-			}
-			else
-			{
-				// exeption
-			}
-		}
-                                                
-        protected virtual void OnAnimatorIK(int layerIndex)
-        {
+            Register();
         }
-
+                                                
 		protected override void OnDestroy ()
     	{
 			if (CharacterRegisterInstance != null) 
@@ -138,7 +132,7 @@ namespace BaseGameLogic.Character
 			}
 			else
 			{
-				// exeption
+				// exception
 			}
 				
     		base.OnDestroy ();

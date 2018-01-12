@@ -1,12 +1,16 @@
 ﻿using UnityEngine;
+
 using System.Collections;
+
+using BaseGameLogic.Singleton;
+
 namespace BaseGameLogic.TimeManagment
 {
     /// <summary>
     /// Time manager.
     /// The purpose of this class is a time management.
     /// </summary>
-    public class TimeManager : MonoBehaviour 
+    public abstract class TimeManager : Singleton<TimeManager>
     {
         private const float _maximumDeltaTimeFactor = 3;
 

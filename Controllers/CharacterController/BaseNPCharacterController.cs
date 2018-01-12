@@ -8,7 +8,7 @@ namespace BaseGameLogic.Character
     /// <summary>
     /// Base NP character controller.
     /// </summary>
-    public class BaseNPCharacterController : BaseCharacterController 
+    public abstract class BaseNPCharacterController : BaseCharacterController 
     {
     }
 }

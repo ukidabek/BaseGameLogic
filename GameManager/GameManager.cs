@@ -3,6 +3,7 @@
 using System;
 using System.Collections;
 
+using BaseGameLogic.Singleton;
 using BaseGameLogic.Inputs;
 using BaseGameLogic.TimeManagment;
 using BaseGameLogic.Events;
@@ -10,10 +11,8 @@ using BaseGameLogic.Character;
 
 namespace BaseGameLogic.Management
 {
-	public class GameManager : MonoBehaviour 
+	public abstract class GameManager : Singleton<GameManager> 
 	{
-		public static GameManager Instance  { get; private set; }
-
 		public Action ObjectInitializationCallBack = null;
 
 		[SerializeField]
@@ -35,18 +34,6 @@ namespace BaseGameLogic.Management
         [Obsolete("EventManager is now separate singleton. Use directly singleton reference.")]
         public EventManager EventManagerInstance { get { return EventManager.Instance; } }
 
-		protected virtual void CreateInstance()
-		{
-			if (Instance == null) 
-			{
-				Instance = this;
-			} 
-			else 
-			{
-				Destroy (this.gameObject);
-			}
-		}
-
 		protected virtual void CreateManagersInstance()
 		{
 			InputCollectorManager = CreateInstance<InputCollectorManager> (inputCollectorManagerPrefab);
@@ -66,7 +53,7 @@ namespace BaseGameLogic.Management
 		{
 			if (prefab == null) 
 			{
-				// Throw exeption. 
+				// Throw exception. 
 				return null;
 			}
 
@@ -79,28 +66,47 @@ namespace BaseGameLogic.Management
 			return componentInstance;
 		}
 
-		protected virtual void Awake()
+		protected override void Awake()
 		{
-			CreateInstance ();
+            base.Awake();
+
+            transform.ResetPosition();
+            transform.ResetRotation();
+
 			CreateManagersInstance ();
-		}
+
+            Cursor.visible = false;
+        }
 
 		protected virtual void Update()
 		{
 			this.enabled = false;
-			InitalizeOtherObjects ();
+            if(_gameStatus != GameStatusEnum.Loading)
+            {
+			    InitalizeOtherObjects ();
+            }
 		}
 
 		public void PauseGame()
 		{
 			_gameStatus = GameStatusEnum.Pause;
-			TimeManagerInstance.Factor = 0f;
-		}
+            if(TimeManagerInstance != null)
+            {
+			    TimeManagerInstance.Factor = 0f;
+            }
 
-		public void ResumeGame()
+            Cursor.visible = true;
+        }
+
+        public void ResumeGame()
 		{
 			_gameStatus = GameStatusEnum.Play;
-			TimeManagerInstance.Factor = 1f;
-		}
-	}
+            if (TimeManagerInstance != null)
+            {
+                TimeManagerInstance.Factor = 1f;
+            }
+
+            Cursor.visible = false;
+        }
+    }
 }

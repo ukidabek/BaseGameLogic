@@ -8,7 +8,7 @@ namespace BaseGameLogic.Audio
     /// <summary>
     /// Dezigned to handling sound effects envoked by animation events.
     /// </summary>
-    public class SoundEffectManager : BaseSoundEffectManager 
+    public abstract class SoundEffectManager : BaseSoundEffectManager 
     {
         [SerializeField, Header("On demand sound effects.")]
         private List<SoundEffect> _soundEffectsList = new List<SoundEffect>();

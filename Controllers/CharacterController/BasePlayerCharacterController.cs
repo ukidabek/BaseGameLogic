@@ -8,7 +8,7 @@ using BaseGameLogic.Inputs;
 
 namespace BaseGameLogic.Character
 {
-	public class BasePlayerCharacterController : BaseCharacterController, IComparable 
+	public abstract class BasePlayerCharacterController : BaseCharacterController, IComparable 
 	{
 		public override bool IsPlayer { get { return true; } }
 
@@ -40,11 +40,12 @@ namespace BaseGameLogic.Character
 			get { return GameManagerInstance.InputCollectorManager; }
 		}
 
-		[SerializeField, Range(0,7)]
+		[SerializeField]
 		private int _playerNumber = 0;
 		public int PlayerNumber 
 		{
 			get { return this._playerNumber; }
+            set { this._playerNumber = value; }
 		}
 
 		public int CompareTo (object obj)

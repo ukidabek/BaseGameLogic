@@ -11,6 +11,17 @@ namespace BaseGameLogic
     {
         [SerializeField]
         protected string productName = "";
-        public string ProductName { get { return this.productName; } }
+        public string ProductName
+        {
+            get
+            {
+                if(!string.IsNullOrEmpty(productName))
+                {
+                    return this.productName;
+                }
+
+                return this.name;
+            }
+        }
     }
 }

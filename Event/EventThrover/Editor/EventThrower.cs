@@ -51,7 +51,7 @@ namespace BaseGameLogic.Events
 	    }
 
 	    private const string WindowTitle = "Event Thrower";
-	    private const string MenuLocation = "Kursk/Event Thrower";
+	    private const string MenuLocation = "Utility/Event Thrower";
 	    private const string OpenWindowLocation = "";
 	    
 	    private int EventsCount 

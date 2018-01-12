@@ -2,8 +2,8 @@
 using System.Collections;
 
 namespace BaseGameLogic.Audio
-{   
-    public class OnCollisionSoundEffectManager : BaseSoundEffectManager 
+{
+    public abstract class OnCollisionSoundEffectManager : BaseSoundEffectManager 
     {
         [SerializeField, Header("Enable trigger & colliders events sound effects.")]
         private bool _useOnTriggerEnterSoundEffect = false; 

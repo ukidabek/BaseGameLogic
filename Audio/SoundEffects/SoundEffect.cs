@@ -15,7 +15,8 @@ namespace BaseGameLogic.Audio
     {
         [SerializeField, Tooltip("Unique sound effect ID.")]
         private string soundEffectId = string.Empty;
-        public string SoundEffectId {
+        public string SoundEffectId
+        {
             get { return this.soundEffectId; }
         }
 

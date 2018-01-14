@@ -154,6 +154,13 @@ namespace BaseGameLogic.Character
             return null;
 		}
 
+        /// <summary>
+        /// Spawn player form prefab on spawnPoint
+        /// </summary>
+        /// <typeparam name="T">Type of player to spawn.</typeparam>
+        /// <param name="playerPrefab">Prefab reference.</param>
+        /// <param name="spawnPoint">Spawn point transform.</param>
+        /// <returns>Reference to spawned player of type T.</returns>
         public T SpawnPlayer<T>(GameObject playerPrefab, Transform spawnPoint) where T : BaseCharacterController
         {
             GameObject newLocalPlayer = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);

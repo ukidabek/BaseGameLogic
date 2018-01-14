@@ -15,10 +15,13 @@ namespace BaseGameLogic.States
     /// Base game object.
     /// </summary>
     public abstract class BaseStateObject : MonoBehaviour
-    {   
+    {
+        [SerializeField]
+        public StatTree tree = new StatTree();
+        
         #if UNITY_EDITOR
 
-		[Header("Debug display & options.")]
+        [Header("Debug display & options.")]
         [SerializeField, Tooltip("Visualizes the contents of the stack.")]
         protected List<string> currentStateTypes = new List<string>();
 
@@ -212,7 +215,6 @@ namespace BaseGameLogic.States
             if (defaultStateCreator == null)
                 return;
 
-
             BaseState defaultState = null;
 
             if (defaultStateCreator != null)
@@ -230,8 +232,11 @@ namespace BaseGameLogic.States
         {
             RegisterAllEvents();
 
-			GameManagerInstance.ObjectInitializationCallBack -= InitializeObject;
-			GameManagerInstance.ObjectInitializationCallBack += InitializeObject;
+            if(GameManagerInstance != null)
+            {
+			    GameManagerInstance.ObjectInitializationCallBack -= InitializeObject;
+			    GameManagerInstance.ObjectInitializationCallBack += InitializeObject;
+            }
         }
 
 		/// <summary>
@@ -305,7 +310,10 @@ namespace BaseGameLogic.States
             string name = this.gameObject.name;
             Debug.LogFormat("{0} was destroyed", name);
 
-            GameManagerInstance.ObjectInitializationCallBack -= InitializeObject;
+            if(GameManagerInstance != null)
+            {
+                GameManagerInstance.ObjectInitializationCallBack -= InitializeObject;
+            }
         }
 
         protected virtual void Update ()

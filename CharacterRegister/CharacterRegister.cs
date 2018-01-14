@@ -153,5 +153,13 @@ namespace BaseGameLogic.Character
 
             return null;
 		}
-	}
+
+        public T SpawnPlayer<T>(GameObject playerPrefab, Transform spawnPoint) where T : BaseCharacterController
+        {
+            GameObject newLocalPlayer = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
+            T player = newLocalPlayer.GetComponent<T>();
+
+            return player;
+        }
+    }
 }

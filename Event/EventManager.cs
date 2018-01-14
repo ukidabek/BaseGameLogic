@@ -5,13 +5,14 @@ using System.Collections;
 using System.Collections.Generic;
 
 using BaseGameLogic;
+using BaseGameLogic.Singleton;
 
 namespace BaseGameLogic.Events
 {
 	/// <summary>
 	/// Class to menage events.
 	/// </summary>
-	public class EventManager : MonoBehaviour 
+	public class EventManager : Singleton<EventManager> 
 	{
         private const string Anather_Instance_Error = "There is another EventManager instance. Please delete it!";
 
@@ -26,11 +27,6 @@ namespace BaseGameLogic.Events
 		#endif
 
         /// <summary>
-        /// EventManager instance. 
-        /// </summary>
-        public static EventManager Instance { get; private set; }
-
-        /// <summary>
         /// EventManager existence check 
         /// </summary>
         public static bool EventCanBeRegistred { get { return Instance != null; } }
@@ -43,20 +39,6 @@ namespace BaseGameLogic.Events
         {
 			get{ return _eventDictionary; }
 		}
-
-        private void Awake()
-        {
-            if(Instance == null)
-            {
-                Instance = this;
-                DontDestroyOnLoad(this.gameObject);
-            }
-            else
-            {
-                Debug.LogError(Anather_Instance_Error);
-            }
-        }
-
 
         /// <summary>
         /// Creates null event of ID.

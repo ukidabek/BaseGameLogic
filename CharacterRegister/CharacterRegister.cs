@@ -11,19 +11,19 @@ namespace BaseGameLogic.Character
     {
         #if UNITY_EDITOR
         /// <summary>
-        /// List of characters. In editor olny. 
+        /// List of characters. In editor only. 
         /// </summary>
         [SerializeField]
         private List<BaseCharacterController> _charactersList = new List<BaseCharacterController>();
         #endif
         /// <summary>
-        /// Characters dictionay.
+        /// Characters dictionary.
         /// </summary>
         private Dictionary<string, BaseCharacterController> _charactersDictionary = new Dictionary<string, BaseCharacterController>();
 
         #if UNITY_EDITOR
         /// <summary>
-        /// List of players. In editor olny. 
+        /// List of players. In editor only. 
         /// </summary>
         [SerializeField]
 		private List<BasePlayerCharacterController> _playersList = new List<BasePlayerCharacterController>();
@@ -42,7 +42,7 @@ namespace BaseGameLogic.Character
 			bool containsValue = _charactersDictionary.ContainsValue (character);
 			if (containsValue) 
 			{
-				//	Exeption
+				//	Exception
 			} 
 			else 
 			{
@@ -69,7 +69,7 @@ namespace BaseGameLogic.Character
                 bool containsValue = _playerDictionary.ContainsValue(player);
                 if (containsValue)
                 {
-                    //	Exeption
+                    //	Exception
                 }
                 else
                 {
@@ -96,7 +96,7 @@ namespace BaseGameLogic.Character
 
 			if (!valueRemoved) 
 			{
-				// Exeption
+				// Exception
 			}
 		}
 
@@ -125,14 +125,14 @@ namespace BaseGameLogic.Character
         /// Return character instance by it's name.
         /// </summary>
         /// <param name="characterName">Character name.</param>
-        /// <returns>BaseCharacterController intance.</returns>
+        /// <returns>BaseCharacterController instance.</returns>
         public BaseCharacterController GetCharacterInstance(string characterName)
 		{
 			BaseCharacterController character = null;
 			bool containsValue = _charactersDictionary.TryGetValue (characterName, out character);
 			if (!containsValue) 
 			{
-				//	exeption
+				//	Exception
 			}
 
 			return character;

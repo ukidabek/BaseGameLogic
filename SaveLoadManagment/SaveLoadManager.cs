@@ -78,7 +78,6 @@ namespace BaseGameLogic.SceneManagement
                     if(_loadingScreenCanvas != null)
                     {
                         _loadingScreenCanvas.LoadingProgress = _loadingProgress + (_progressPerScene * _loadOperation.progress);
-                        Debug.Log(_loadOperation.progress);
                     }
 
                     if(CurrentLoadingSceneIndex == SceneToLoadCount - 1)

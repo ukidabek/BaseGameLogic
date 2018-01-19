@@ -374,13 +374,21 @@ namespace BaseGameLogic.States
         /// </summary>
         /// <param name="stateName">Name of StateCreator.</param>
         /// <returns></returns>
-        public BaseStateCreator GetStateCreator(string stateName)
+        public T GetStateCreator<T>(string stateName = "") where T:BaseStateCreator
         {
             foreach (BaseStateCreator creator in stateCreators)
             {
-                if (creator != null &&
-                    creator.ProductName.Equals(stateName))
-                    return creator;
+                if (creator is T && !string.IsNullOrEmpty(stateName))
+                {
+                    return creator as T;
+                }
+                else
+                {
+                    if(creator.ProductName.Equals(stateName))
+                    {
+                        return creator as T;
+                    }
+                }
             }
 
             #if UNITY_EDITOR

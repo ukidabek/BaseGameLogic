@@ -80,8 +80,9 @@ namespace BaseGameLogic.TimeManagment
             Time.fixedDeltaTime = _defaultFixedDeltaTime * Time.timeScale;
         }
 
-        protected void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             CacheDefaultTimeValues();
             SetNewTimeScale(_mode, _factor);
 

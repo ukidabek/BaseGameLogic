@@ -4,14 +4,10 @@ using BaseGameLogic.States;
 
 namespace BaseGameLogic.LogicModule
 {
-    [RequireComponent(
-    typeof(Rigidbody),
-    typeof(BaseStateObject))]
+    [RequireComponent(typeof(Rigidbody))]
     public abstract class PhysicsFPPMovementModule : BaseLogicModule
     {
         [Header("Require components")]
-        [SerializeField]
-        private BaseStateObject _localPlayerController = null;
         [SerializeField]
         private Rigidbody _playerRigidbody = null;
         [SerializeField]
@@ -34,7 +30,7 @@ namespace BaseGameLogic.LogicModule
         private Vector3 _currentBodyRotationVector = Vector3.zero;
         public float CurrentBodyRotationVector { get { return _currentBodyRotationVector.y; } }
         private Vector3 _currentEyesRotationVector = Vector3.zero;
-        public float EurrentEyesRotationVector { get { return _currentEyesRotationVector.x; } }
+        public float CeurrentEyesRotationVector { get { return _currentEyesRotationVector.x; } }
 
         [Header("Ground check")]
         [SerializeField]
@@ -50,7 +46,6 @@ namespace BaseGameLogic.LogicModule
 
         private void Reset()
         {
-            _localPlayerController = GetComponent<BaseStateObject>();
             _playerRigidbody = GetComponent<Rigidbody>();
         }
 

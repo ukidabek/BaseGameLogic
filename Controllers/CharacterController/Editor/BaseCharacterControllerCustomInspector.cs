@@ -10,7 +10,6 @@ namespace BaseGameLogic.Character
     [CustomEditor(typeof(BaseCharacterController), true)]
     public class BaseCharacterControllerCustomInspector : Editor 
     {
-        private BaseCharacterController baseCharacterController = null;
         private Editor characterSettingsEditor;
         private Editor characterEquipmentEditor;
         protected List<ScriptableObject> scriptableObjects = new List<ScriptableObject>();
@@ -25,8 +24,6 @@ namespace BaseGameLogic.Character
 
         protected virtual void Initialize()
         {
-            baseCharacterController = target as BaseCharacterController;
-
             showEditor = new bool[scriptableObjects.Count];
             editors = new Editor[scriptableObjects.Count];
 

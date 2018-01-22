@@ -46,30 +46,6 @@ namespace BaseGameLogic.Character
 		}
 
 		#endregion
-
-		#region Runtime variables
-
-		[SerializeField]
-		protected GameObject _meshReference;
-		public GameObject MeshReference {
-			get { return _meshReference; }
-		}
-
-		[SerializeField]
-		protected float characterXRotationAngle = 0f; 
-		public float CharacterXRotationAngle {
-    		get { return this.characterXRotationAngle; }
-    		set { characterXRotationAngle = value; }
-    	}
-
-		[SerializeField]
-		protected float characterYRotationAngle = 0f;
-		public float CharacterYRotationAngle {
-    		get { return this.characterYRotationAngle; }
-    		set { characterYRotationAngle = value; }
-    	}
-
-		#endregion
         
 		/// <summary>
         /// Character settings.

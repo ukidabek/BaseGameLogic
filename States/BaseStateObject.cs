@@ -125,17 +125,6 @@ namespace BaseGameLogic.States
             get { return this.objectAnimator; } 
         }
 
-		/// <summary>
-		/// The animation handling data.
-		/// Contains data enabling animator control.
-		/// </summary>
-		[Header("Object settings & management.")]
-		[SerializeField]
-		protected AnimationHandlingData animationHandlingData = null;
-		public AnimationHandlingData AnimationHandlingData {
-			get { return this.animationHandlingData; }
-		}
-
 		#endregion
 
         #region Object Caches

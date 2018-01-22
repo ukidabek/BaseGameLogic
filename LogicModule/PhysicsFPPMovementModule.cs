@@ -44,18 +44,18 @@ namespace BaseGameLogic.LogicModule
         [SerializeField]
         private float _groundedCheckDistance = 0.1f;
 
-        private void Reset()
+        protected override void Reset()
         {
             _playerRigidbody = GetComponent<Rigidbody>();
         }
 
-        private void Awake()
+        protected override void Awake()
         {
             _currentEyesRotationVector = _eyesTransform.rotation.eulerAngles;
             _currentBodyRotationVector = transform.rotation.eulerAngles;
         }
 
-        private void Update()
+        protected override void Update()
         {
             HandleMovement();
             HandleRotation();

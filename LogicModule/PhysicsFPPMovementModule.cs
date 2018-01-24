@@ -9,9 +9,9 @@ namespace BaseGameLogic.LogicModule
     {
         [Header("Require components")]
         [SerializeField]
-        private Rigidbody _playerRigidbody = null;
+        protected Rigidbody _playerRigidbody = null;
         [SerializeField]
-        private Transform _eyesTransform = null;
+        protected Transform _eyesTransform = null;
 
         [Header("Inputs")]
         public Vector3 MovementVector = Vector3.zero;
@@ -19,30 +19,30 @@ namespace BaseGameLogic.LogicModule
 
         [Header("Settings")]
         [SerializeField]
-        private float _locomotionSpeed = 5;
+        protected float _locomotionSpeed = 5;
         [SerializeField]
-        private float _jumpVelocity = 5;
+        protected float _jumpVelocity = 5;
         [SerializeField, Range(0, 90)]
-        private float _minEyesRotation = 90f;
+        protected float _minEyesRotation = 90f;
         [SerializeField, Range(0, 90)]
-        private float _maxEyesRotation = 90f;
+        protected float _maxEyesRotation = 90f;
 
-        private Vector3 _currentBodyRotationVector = Vector3.zero;
-        public float CurrentBodyRotationVector { get { return _currentBodyRotationVector.y; } }
-        private Vector3 _currentEyesRotationVector = Vector3.zero;
-        public float CeurrentEyesRotationVector { get { return _currentEyesRotationVector.x; } }
+        protected Vector3 _currentBodyRotationVector = Vector3.zero;
+        public float CurrentBodyRotation { get { return _currentBodyRotationVector.y; } }
+        protected Vector3 _currentEyesRotationVector = Vector3.zero;
+        public float CurrentEyesRotation { get { return _currentEyesRotationVector.x; } }
 
         [Header("Ground check")]
         [SerializeField]
-        private bool _isGrounded = true;
+        protected bool _isGrounded = true;
         public bool IsGrounded
         {
             get { return _isGrounded; }
         }
         [SerializeField]
-        private Vector3 _groundedCheckOffset = new Vector3(0, 0.1f, 0);
+        protected Vector3 _groundedCheckOffset = new Vector3(0, 0.1f, 0);
         [SerializeField]
-        private float _groundedCheckDistance = 0.1f;
+        protected float _groundedCheckDistance = 0.1f;
 
         protected override void Reset()
         {

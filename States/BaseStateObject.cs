@@ -431,6 +431,11 @@ namespace BaseGameLogic.States
 				currentStateTypes.Insert(0, stateName);
                 #endif    
             }
+            else
+            {
+                string typeName = newState.GetType().ToString();
+                Debug.LogErrorFormat("Conditions to enter the state type of {0} were not met.", typeName);
+            }
         }
 
         /// <summary>

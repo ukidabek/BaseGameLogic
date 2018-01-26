@@ -39,6 +39,7 @@ namespace BaseGameLogic.LogicModule
         {
             get { return _isGrounded; }
         }
+
         [SerializeField]
         protected Vector3 _groundedCheckOffset = new Vector3(0, 0.1f, 0);
         [SerializeField]

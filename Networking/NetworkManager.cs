@@ -479,7 +479,7 @@ namespace BaseGameLogic.Networking
                 out error);
         }
 
-        public byte[] ConvertToBytes(object objectToConvert)
+        public byte[] ConvertObjectToBytes(object objectToConvert)
         {
             BinaryFormatter binaryFormatter = new BinaryFormatter();
             MemoryStream memoryStream = new MemoryStream();
@@ -490,7 +490,7 @@ namespace BaseGameLogic.Networking
             return array;
         }
 
-        public T ConvertToObject<T>(byte[] array, int start = 0, int length = 0)
+        public T ConvertBytesToObject<T>(byte[] array, int start = 0, int length = 0)
         {
             BinaryFormatter binaryFormatter = new BinaryFormatter();
             MemoryStream memoryStream = new MemoryStream(array, start, length > 0 ? length - start : array.Length - start);

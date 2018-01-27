@@ -367,7 +367,7 @@ namespace BaseGameLogic.States
         {
             foreach (BaseStateCreator creator in stateCreators)
             {
-                if (creator is T && !string.IsNullOrEmpty(stateName))
+                if (creator is T && string.IsNullOrEmpty(stateName))
                 {
                     return creator as T;
                 }

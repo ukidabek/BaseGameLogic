@@ -194,7 +194,7 @@ namespace BaseGameLogic.Networking
             }
         }
 
-        protected virtual void PeerDisconnected(int connectionID) { }
+        protected virtual void ClientDisconnected(int connectionID) { }
 
         protected virtual void HandleDisconnection()
         {
@@ -208,7 +208,7 @@ namespace BaseGameLogic.Networking
                 }
             }
 
-            PeerDisconnected(connectionID);
+            ClientDisconnected(connectionID);
         }
 
         protected virtual void HandleMessages(byte[] buffer, int size) {}

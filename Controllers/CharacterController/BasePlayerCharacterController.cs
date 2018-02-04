@@ -40,6 +40,8 @@ namespace BaseGameLogic.Character
 			get { return GameManagerInstance.InputCollectorManager; }
 		}
 
+        public int PlayerID = -1;
+
 		[SerializeField]
 		private int _playerNumber = 0;
 		public int PlayerNumber 

@@ -19,6 +19,8 @@ namespace BaseGameLogic.Networking
         [SerializeField, Header("Network settings.")]
         protected NetworkManagerSettings _settings = new NetworkManagerSettings();
 
+        public bool IsSetver { get { return _settings.ManagerType == NetworkManagerTypeEnum.Server; } }
+
         [SerializeField]
         protected BroadcastCredentials _broadcastCredentials = new BroadcastCredentials();
 
@@ -59,16 +61,13 @@ namespace BaseGameLogic.Networking
 
         protected Dictionary<QosType, int> channelDictionary = new Dictionary<QosType, int>();
 
-        [SerializeField]
         protected float _send = 0;
-        [SerializeField]
         protected float _received = 0;
 
         public float Send = 0;
         public float Received = 0;
         public float Total = 0;
 
-        [SerializeField]
         protected float _counter = 0;
 
         protected virtual void Initialize()
@@ -86,7 +85,7 @@ namespace BaseGameLogic.Networking
             HostTopology topology = new HostTopology(config, _settings.ConnectionsCount);
 
             // Set get port settings. If master use value for settings if not use first free port.
-            int portToUse = _settings.PearType == NetworkManagerTypeEnum.Server ? _settings.Port : 0;
+            int portToUse = _settings.ManagerType == NetworkManagerTypeEnum.Server ? _settings.Port : 0;
             hostID = NetworkTransport.AddHost(topology, portToUse);
 
             this.enabled = true;
@@ -94,21 +93,22 @@ namespace BaseGameLogic.Networking
 
         public virtual void StartSession()
         {
-            _settings.PearType = NetworkManagerTypeEnum.Server;
-            if (SaveLoadManager.Instance != null)
-            {
-                SaveLoadManager.Instance.GameLoadedCallBack -= CreateMatch;
-                SaveLoadManager.Instance.GameLoadedCallBack += CreateMatch;
-            }
-            else
-            {
-                CreateMatch();
-            }
+            //_settings.PearType = NetworkManagerTypeEnum.Server;
+            //if (SaveLoadManager.Instance != null)
+            //{
+            //    SaveLoadManager.Instance.GameLoadedCallBack -= CreateMatch;
+            //    SaveLoadManager.Instance.GameLoadedCallBack += CreateMatch;
+            //}
+            //else
+            //{
+            //    CreateMatch();
+            //}
+            CreateMatch();
         }
 
         public virtual void JoinSession()
         {
-            _settings.PearType = NetworkManagerTypeEnum.Server;
+            _settings.ManagerType = NetworkManagerTypeEnum.Server;
 
             networkMatch.ListMatches(0, 1, "", true, 0, 0, (success, info, matches) =>
             {
@@ -137,13 +137,13 @@ namespace BaseGameLogic.Networking
             connectedPeers.Clear();
         }
 
-        public virtual void Start() { }
+        public virtual void Start() {}
 
-        protected virtual void OnDestroy() { }
+        protected virtual void OnDestroy() {}
 
         public virtual void SetPeerType(NetworkManagerTypeEnum type)
         {
-            _settings.PearType = type;
+            _settings.ManagerType = type;
         }
 
         protected virtual void OnApplicationQuit()
@@ -151,7 +151,7 @@ namespace BaseGameLogic.Networking
             NetworkTransport.Shutdown();
         }
 
-        protected virtual void ClientConnected(int connectionId) { }
+        protected virtual void ClientConnected(int connectionId) {}
 
         protected virtual void HandleConnection()
         {
@@ -194,7 +194,7 @@ namespace BaseGameLogic.Networking
             }
         }
 
-        protected virtual void ClientDisconnected(int connectionID) { }
+        protected virtual void ClientDisconnected(int connectionID) {}
 
         protected virtual void HandleDisconnection()
         {
@@ -447,7 +447,7 @@ namespace BaseGameLogic.Networking
 
         public virtual void StartServer(string relayIP, int relayPort, NetworkID networkID, NodeID nodeID)
         {
-            _settings.PearType = NetworkManagerTypeEnum.Server;
+            _settings.ManagerType = NetworkManagerTypeEnum.Server;
             Initialize();
 
             SourceID sourceID = Utility.GetSourceID();
@@ -463,7 +463,7 @@ namespace BaseGameLogic.Networking
 
         public virtual void ConnectThroughRelay(string relayIP, int relayPort, NetworkID networkID, NodeID nodeID)
         {
-            _settings.PearType = NetworkManagerTypeEnum.Client;
+            _settings.ManagerType = NetworkManagerTypeEnum.Client;
             Initialize();
 
             SourceID sourceID = Utility.GetSourceID();

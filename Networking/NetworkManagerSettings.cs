@@ -13,7 +13,7 @@ namespace BaseGameLogic.Networking
     {
         [SerializeField]
         protected NetworkManagerTypeEnum _pearType = NetworkManagerTypeEnum.Server;
-        public NetworkManagerTypeEnum PearType
+        public NetworkManagerTypeEnum ManagerType
         {
             get { return _pearType; }
             set { _pearType = value; }

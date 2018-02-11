@@ -8,7 +8,7 @@ using System.Collections.Generic;
 namespace BaseGameLogic.Networking
 {
     [Serializable]
-    public class PeerInfo
+    public class ConnectionInfo
     {
         [SerializeField]
         private int _port = 0;
@@ -32,7 +32,7 @@ namespace BaseGameLogic.Networking
             set { _connectionID = value; }
         }
 
-        public PeerInfo(int connectionID, string ipAdress, int port)
+        public ConnectionInfo(int connectionID, string ipAdress, int port)
         {
             _connectionID = connectionID;
             _ipAdres = NetworkUtility.GetIPAdress(ipAdress);

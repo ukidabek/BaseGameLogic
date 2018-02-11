@@ -3,6 +3,7 @@ using UnityEngine.Networking;
 using UnityEngine.Networking.Types;
 using UnityEngine.Networking.Match;
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -19,7 +20,10 @@ namespace BaseGameLogic.Networking
         [SerializeField, Header("Network settings.")]
         protected NetworkManagerSettings _settings = new NetworkManagerSettings();
 
+        [Obsolete("Method1 is deprecated")]
         public bool IsSetver { get { return _settings.ManagerType == NetworkManagerTypeEnum.Server; } }
+
+        public NetworkManagerSettings Settings { get { return _settings; } }
 
         [SerializeField]
         protected BroadcastCredentials _broadcastCredentials = new BroadcastCredentials();
@@ -40,7 +44,7 @@ namespace BaseGameLogic.Networking
         protected MatchInfo matchInfo;
 
         [SerializeField, Header("Run time values."), Tooltip("List of connected peers. Do not setup!")]
-        protected List<PeerInfo> connectedPeers = new List<PeerInfo>();
+        protected List<ConnectionInfo> connectedPeers = new List<ConnectionInfo>();
 
         [SerializeField]
         protected int hostID = 0;
@@ -57,7 +61,7 @@ namespace BaseGameLogic.Networking
         protected int dataSize;
         protected byte[] recBuffer = null;
 
-        protected PeerInfo newPear = null;
+        protected ConnectionInfo newPear = null;
 
         protected Dictionary<QosType, int> channelDictionary = new Dictionary<QosType, int>();
 
@@ -69,6 +73,10 @@ namespace BaseGameLogic.Networking
         public float Total = 0;
 
         protected float _counter = 0;
+
+        [SerializeField]
+        protected List<BaseMessageHandler> _messageHandlersList = new List<BaseMessageHandler>();
+        protected Dictionary<int, BaseMessageHandler> _messageHandlersDictionary = new Dictionary<int, BaseMessageHandler>();
 
         protected virtual void Initialize()
         {
@@ -93,16 +101,6 @@ namespace BaseGameLogic.Networking
 
         public virtual void StartSession()
         {
-            //_settings.PearType = NetworkManagerTypeEnum.Server;
-            //if (SaveLoadManager.Instance != null)
-            //{
-            //    SaveLoadManager.Instance.GameLoadedCallBack -= CreateMatch;
-            //    SaveLoadManager.Instance.GameLoadedCallBack += CreateMatch;
-            //}
-            //else
-            //{
-            //    CreateMatch();
-            //}
             CreateMatch();
         }
 
@@ -135,6 +133,13 @@ namespace BaseGameLogic.Networking
 
             // Make sure if connected pears list is empty
             connectedPeers.Clear();
+
+            for (int i = 0; i < _messageHandlersList.Count; i++)
+            {
+                _messageHandlersDictionary.Add(
+                    _messageHandlersList[i].MessageID,
+                    _messageHandlersList[i]);
+            }
         }
 
         public virtual void Start() {}
@@ -178,7 +183,7 @@ namespace BaseGameLogic.Networking
             NetworkError networkError = NetworkUtility.GetNetworkError(error);
             if (networkError == NetworkError.Ok)
             {
-                newPear = new PeerInfo(connectionID, adres, port);
+                newPear = new ConnectionInfo(connectionID, adres, port);
 
                 log = string.Format(
                     NetworkManagerLogs.CONNECTING_TO_PEER_SUCCEEDED,
@@ -200,7 +205,7 @@ namespace BaseGameLogic.Networking
         {
             for (int i = 0; i < connectedPeers.Count; i++)
             {
-                PeerInfo info = connectedPeers[i];
+                ConnectionInfo info = connectedPeers[i];
                 if (info.ConnectionID == connectionID)
                 {
                     connectedPeers.RemoveAt(i);
@@ -211,9 +216,17 @@ namespace BaseGameLogic.Networking
             ClientDisconnected(connectionID);
         }
 
-        protected virtual void HandleMessages(byte[] buffer, int size) {}
+        protected virtual void HandleMessages(byte[] buffer, int size)
+        {
+            int messageId = recBuffer[0];
+            BaseMessageHandler baseMessageHandler = null;
+            if (_messageHandlersDictionary.TryGetValue(messageId, out baseMessageHandler))
+            {
+                baseMessageHandler.HandleMessage(recBuffer, dataSize, connectionID);
+            }
+        }
 
-        protected virtual NetworkError ConnectToPear(ref PeerInfo peer)
+        protected virtual NetworkError ConnectToPear(ref ConnectionInfo peer)
         {
             peer.ConnectionID = NetworkTransport.Connect(
                 hostID,

@@ -3,6 +3,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Networking.Match;
 
 namespace BaseGameLogic.Networking
 {
@@ -32,5 +33,31 @@ namespace BaseGameLogic.Networking
             get { return matchAdresatice; }
             set { matchAdresatice = value; }
         }
+
+
+        [SerializeField]
+        private bool matchCreated;
+        public bool MatchCreated
+        {
+            get { return matchCreated; } 
+            set { matchCreated = value; }
+        }
+
+        [SerializeField]
+        private bool matchJoined;
+        public bool MatchJoined
+        {
+            get { return matchJoined; } 
+            set { matchJoined = value; }
+        }
+
+        [SerializeField]
+        private NetworkMatch networkMatch;
+        public NetworkMatch NetworkMatch
+        {
+            get { return networkMatch; }
+            set { networkMatch = value; }
+        }
+
     }
 }

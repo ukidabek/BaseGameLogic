@@ -33,12 +33,6 @@ namespace BaseGameLogic.Networking
 
         // Match making.
 
-        [SerializeField, Header("Match settings.")]
-        protected bool matchCreated;
-        [SerializeField]
-        protected bool matchJoined;
-        [SerializeField]
-        protected NetworkMatch networkMatch;
 
         protected List<MatchInfoSnapshot> matchList = new List<MatchInfoSnapshot>();
         protected MatchInfo matchInfo;
@@ -64,15 +58,6 @@ namespace BaseGameLogic.Networking
         protected ConnectionInfo newPear = null;
 
         protected Dictionary<QosType, int> channelDictionary = new Dictionary<QosType, int>();
-
-        protected float _send = 0;
-        protected float _received = 0;
-
-        public float Send = 0;
-        public float Received = 0;
-        public float Total = 0;
-
-        protected float _counter = 0;
 
         [SerializeField]
         protected List<BaseMessageHandler> _messageHandlersList = new List<BaseMessageHandler>();
@@ -108,11 +93,11 @@ namespace BaseGameLogic.Networking
         {
             _settings.ManagerType = NetworkManagerTypeEnum.Server;
 
-            networkMatch.ListMatches(0, 1, "", true, 0, 0, (success, info, matches) =>
+            matchSettings.NetworkMatch.ListMatches(0, 1, "", true, 0, 0, (success, info, matches) =>
             {
                 if (success && matches.Count > 0)
                 {
-                    networkMatch.JoinMatch(matches[0].networkId, "", "", "", 0, 0, OnMatchJoined);
+                    matchSettings.NetworkMatch.JoinMatch(matches[0].networkId, "", "", "", 0, 0, OnMatchJoined);
                 }
             });
         }
@@ -127,7 +112,7 @@ namespace BaseGameLogic.Networking
         {
             base.Awake();
 
-            networkMatch = gameObject.AddComponent<NetworkMatch>();
+            matchSettings.NetworkMatch = gameObject.AddComponent<NetworkMatch>();
 
             this.enabled = false;
 
@@ -238,7 +223,7 @@ namespace BaseGameLogic.Networking
             return NetworkUtility.GetNetworkError(error);
         }
 
-        protected virtual void SendToAllReliable(byte[] message, int skipConnectionID = -1)
+        public virtual void SendToAllReliable(byte[] message, int skipConnectionID = -1)
         {
             for (int i = 0; i < connectedPeers.Count; i++)
             {
@@ -252,7 +237,7 @@ namespace BaseGameLogic.Networking
             }
         }
 
-        protected virtual NetworkError SendReliable(byte[] message, int connectionId)
+        public virtual NetworkError SendReliable(byte[] message, int connectionId)
         {
             NetworkTransport.Send(
                 hostID,
@@ -264,15 +249,10 @@ namespace BaseGameLogic.Networking
 
             NetworkError networkError = NetworkUtility.GetNetworkError(error);
 
-            if (networkError == NetworkError.Ok)
-            {
-                _send += message.Length;
-            }
-
             return networkError;
         }
 
-        protected virtual void UpdateForAllReliable(byte[] message, int messageSize = 0)
+        public virtual void UpdateForAllUnreiable(byte[] message, int messageSize = 0)
         {
             for (int i = 0; i < connectedPeers.Count; i++)
             {
@@ -280,7 +260,7 @@ namespace BaseGameLogic.Networking
             }
         }
 
-        protected virtual NetworkError UpdateUnreiable(byte[] message, int connectionId, int messageSize = 0)
+        public virtual NetworkError UpdateUnreiable(byte[] message, int connectionId, int messageSize = 0)
         {
             if(message == null || message.Length == 0)
             {
@@ -297,10 +277,6 @@ namespace BaseGameLogic.Networking
                 out error);
 
             NetworkError networkError = NetworkUtility.GetNetworkError(error);
-            if (networkError == NetworkError.Ok)
-            {
-                _send += size;
-            }
 
             return networkError;
         }
@@ -312,8 +288,6 @@ namespace BaseGameLogic.Networking
                 this.enabled = false;
                 return;
             }
-
-            _counter += Time.deltaTime;
 
             recBuffer = new byte[_settings.BufferSize];
 
@@ -350,7 +324,6 @@ namespace BaseGameLogic.Networking
                         break;
 
                     case NetworkEventType.DataEvent:
-                        _received += dataSize;
                         HandleMessages(recBuffer, dataSize);
                         break;
 
@@ -363,26 +336,14 @@ namespace BaseGameLogic.Networking
                 }
             }
             while (networkEvent != NetworkEventType.Nothing);
-
-            if (_counter > 1f)
-            {
-                _counter = 0;
-                Send = _send;
-                Received = _received;
-
-                Total = Send + Received;
-
-                _send = 0;
-                _received = 0;
-            }
         }
 
         // Match making 
         public virtual void CreateMatch()
         {
-            if (networkMatch != null)
+            if (matchSettings.NetworkMatch != null)
             {
-                networkMatch.CreateMatch(
+                matchSettings.NetworkMatch.CreateMatch(
                     matchSettings.MatchName,
                     matchSettings.MatchSize,
                     matchSettings.MatchAdresatice,
@@ -402,7 +363,7 @@ namespace BaseGameLogic.Networking
                 Debug.Log("Create match succeeded");
                 Utility.SetAccessTokenForNetwork(matchInfo.networkId, matchInfo.accessToken);
 
-                matchCreated = true;
+                matchSettings.MatchCreated = true;
                 this.matchInfo = matchInfo;
 
                 StartServer(
@@ -437,7 +398,7 @@ namespace BaseGameLogic.Networking
                 Debug.Log("Join match succeeded");
                 Utility.SetAccessTokenForNetwork(matchInfo.networkId, matchInfo.accessToken);
 
-                matchJoined = true;
+                matchSettings.MatchJoined = true;
                 this.matchInfo = matchInfo;
 
                 Debug.Log(
@@ -492,7 +453,7 @@ namespace BaseGameLogic.Networking
                 out error);
         }
 
-        public byte[] ConvertObjectToBytes(object objectToConvert)
+        public static byte[] ConvertObjectToBytes(object objectToConvert)
         {
             BinaryFormatter binaryFormatter = new BinaryFormatter();
             MemoryStream memoryStream = new MemoryStream();
@@ -503,7 +464,7 @@ namespace BaseGameLogic.Networking
             return array;
         }
 
-        public T ConvertBytesToObject<T>(byte[] array, int start = 0, int length = 0)
+        public static T ConvertBytesToObject<T>(byte[] array, int start = 0, int length = 0)
         {
             BinaryFormatter binaryFormatter = new BinaryFormatter();
             MemoryStream memoryStream = new MemoryStream(array, start, length > 0 ? length - start : array.Length - start);
@@ -511,6 +472,13 @@ namespace BaseGameLogic.Networking
             T objectFormBytes = (T)binaryFormatter.Deserialize(memoryStream);
 
             return objectFormBytes;
+        }
+
+        public void AddNewMessageHandler(Type type)
+        {
+            BaseMessageHandler handler = gameObject.AddComponent(type) as BaseMessageHandler;
+
+            _messageHandlersList.Add(handler);
         }
     }
 }

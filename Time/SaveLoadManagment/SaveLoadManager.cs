@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -18,8 +19,10 @@ namespace BaseGameLogic.SceneManagement
         [SerializeField]
         private LoadingScreenCanvas _loadingScreenCanvas = null;
 
-        public Action GameLoadedCallBack = null;
+        [Space]
+        public UnityEvent GameLoadedEvent = null;
 
+        [Space]
         public int MapToLoadIndex = 0; 
 
         [SerializeField]
@@ -94,11 +97,8 @@ namespace BaseGameLogic.SceneManagement
                             _loadingScreenCamera.gameObject.SetActive(false);
                         }
 
-                        if (GameLoadedCallBack != null)
-                        {
-                            CurrentLoadingSceneIndex = 0;
-                            GameLoadedCallBack();
-                        }
+                        GameLoadedEvent.Invoke();
+                        CurrentLoadingSceneIndex = 0;
                     }
                     else
                     {

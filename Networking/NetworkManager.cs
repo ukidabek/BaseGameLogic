@@ -33,7 +33,6 @@ namespace BaseGameLogic.Networking
 
         // Match making.
 
-
         protected List<MatchInfoSnapshot> matchList = new List<MatchInfoSnapshot>();
         protected MatchInfo matchInfo;
 
@@ -62,6 +61,10 @@ namespace BaseGameLogic.Networking
         [SerializeField]
         protected List<BaseMessageHandler> _messageHandlersList = new List<BaseMessageHandler>();
         protected Dictionary<int, BaseMessageHandler> _messageHandlersDictionary = new Dictionary<int, BaseMessageHandler>();
+
+        [SerializeField]
+        protected List<BaseMessageSender> _messageSendersList = new List<BaseMessageSender>();
+        protected Dictionary<int, BaseMessageSender> _messageSendersDictionary = new Dictionary<int, BaseMessageSender>();
 
         protected virtual void Initialize()
         {
@@ -125,16 +128,18 @@ namespace BaseGameLogic.Networking
                     _messageHandlersList[i].MessageID,
                     _messageHandlersList[i]);
             }
+
+            for (int i = 0; i < _messageSendersList.Count; i++)
+            {
+                _messageSendersDictionary.Add(
+                    _messageSendersList[i].MessageID,
+                    _messageSendersList[i]);
+            }
         }
 
         public virtual void Start() {}
 
         protected virtual void OnDestroy() {}
-
-        public virtual void SetPeerType(NetworkManagerTypeEnum type)
-        {
-            _settings.ManagerType = type;
-        }
 
         protected virtual void OnApplicationQuit()
         {
@@ -208,6 +213,22 @@ namespace BaseGameLogic.Networking
             if (_messageHandlersDictionary.TryGetValue(messageId, out baseMessageHandler))
             {
                 baseMessageHandler.HandleMessage(recBuffer, dataSize, connectionID);
+            }
+        }
+
+        protected virtual void SendMessage(int messageID, int connectionID = -1)
+        {
+            BaseMessageSender baseMessageSender = null;
+            if(_messageSendersDictionary.TryGetValue(messageID, out baseMessageSender))
+            {
+                if(connectionID > 0)
+                {
+                    baseMessageSender.SendMessage(connectionID);
+                }
+                else
+                {
+                    baseMessageSender.SendMessage();
+                }
             }
         }
 

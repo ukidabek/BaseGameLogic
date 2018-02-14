@@ -26,11 +26,15 @@ namespace BaseGameLogic.Networking
 
             contextMenu = new GenericMenu();
 
+            GUIContent content = null;
             for (int i = 0; i < types.Length; i++)
             {
-                GUIContent content = new GUIContent(types[i].Name);
+                content = new GUIContent(types[i].Name);
                 contextMenu.AddItem(content, false, AddMessageHandler, i);
             }
+            content = new GUIContent("Add all");
+            contextMenu.AddItem(content, false, AddAllMessageHandler);
+
         }
 
         public override void OnInspectorGUI()
@@ -48,6 +52,14 @@ namespace BaseGameLogic.Networking
             int index = (int)data;
             Type type = types[index];
             manager.AddNewMessageHandler(type);
+        }
+
+        public void AddAllMessageHandler()
+        {
+            for (int i = 0; i < types.Length; i++)
+            {
+                AddMessageHandler(types[i]);
+            }
         }
     }
 }

@@ -21,24 +21,24 @@ namespace BaseGameLogic.Management
 
 		[SerializeField]
 		private GameObject inputCollectorManagerPrefab = null;
-		public InputCollectorManager InputCollectorManager { get; protected set; }
+		public InputCollectorManager InputCollectorManager { get { return InputCollectorManager.Instance; } }
 
-		[SerializeField]
+        [SerializeField]
 		private GameObject characterRegisterPrefab = null;
-		public CharacterRegister CharacterRegisterInstance { get; protected set; }
+		public CharacterRegister CharacterRegisterInstance { get { return CharacterRegister.Instance; } }
 
-		[SerializeField]
+        [SerializeField]
 		private GameObject timeManagerPrefab = null;
-		public TimeManager TimeManagerInstance { get; protected set; }
+		public TimeManager TimeManagerInstance { get { return TimeManager.Instance; } }
 
         [Obsolete("EventManager is now separate singleton. Use directly singleton reference.")]
         public EventManager EventManagerInstance { get { return EventManager.Instance; } }
 
 		protected virtual void CreateManagersInstance()
 		{
-			InputCollectorManager = CreateInstance<InputCollectorManager> (inputCollectorManagerPrefab);
-			CharacterRegisterInstance = CreateInstance<CharacterRegister>(characterRegisterPrefab);
-			TimeManagerInstance = CreateInstance<TimeManager>(timeManagerPrefab);
+			CreateInstance<InputCollectorManager> (inputCollectorManagerPrefab);
+			CreateInstance<CharacterRegister>(characterRegisterPrefab);
+			CreateInstance<TimeManager>(timeManagerPrefab);
 		}
 
 		protected virtual void InitalizeOtherObjects()

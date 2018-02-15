@@ -58,13 +58,24 @@ namespace BaseGameLogic.Networking
 
         protected Dictionary<QosType, int> channelDictionary = new Dictionary<QosType, int>();
 
+        [SerializeField, Space]
+        private GameObject _messageHandlersHolder = null;
         [SerializeField]
+        private GameObject _messageSendersHolder = null;
+
+        [SerializeField, Space]
         protected List<BaseMessageHandler> _messageHandlersList = new List<BaseMessageHandler>();
         protected Dictionary<int, BaseMessageHandler> _messageHandlersDictionary = new Dictionary<int, BaseMessageHandler>();
 
         [SerializeField]
         protected List<BaseMessageSender> _messageSendersList = new List<BaseMessageSender>();
         protected Dictionary<int, BaseMessageSender> _messageSendersDictionary = new Dictionary<int, BaseMessageSender>();
+
+        [SerializeField]
+        protected List<BaseNetworkUpdater> _networkUpdaterList = new List<BaseNetworkUpdater>();
+
+        public event Action<int> ClientConnectedCallback = null;
+        public event Action<int> ClientDisconnectedCallback = null;
 
         protected virtual void Initialize()
         {
@@ -146,7 +157,13 @@ namespace BaseGameLogic.Networking
             NetworkTransport.Shutdown();
         }
 
-        protected virtual void ClientConnected(int connectionId) {}
+        protected virtual void ClientConnected(int connectionId)
+        {
+            if(ClientConnectedCallback != null)
+            {
+                ClientConnectedCallback(connectionId);
+            }
+        }
 
         protected virtual void HandleConnection()
         {
@@ -189,7 +206,13 @@ namespace BaseGameLogic.Networking
             }
         }
 
-        protected virtual void ClientDisconnected(int connectionID) {}
+        protected virtual void ClientDisconnected(int connectionID)
+        {
+            if(ClientDisconnectedCallback != null)
+            {
+                ClientDisconnectedCallback(connectionID);
+            }
+        }
 
         protected virtual void HandleDisconnection()
         {
@@ -216,6 +239,19 @@ namespace BaseGameLogic.Networking
             }
         }
 
+
+        protected virtual NetworkError ConnectToPear(ref ConnectionInfo peer)
+        {
+            peer.ConnectionID = NetworkTransport.Connect(
+                hostID,
+                peer.IPAdres,
+                peer.Port,
+                0,
+                out error);
+
+            return NetworkUtility.GetNetworkError(error);
+        }
+
         protected virtual void SendMessage(int messageID, int connectionID = -1)
         {
             BaseMessageSender baseMessageSender = null;
@@ -230,18 +266,6 @@ namespace BaseGameLogic.Networking
                     baseMessageSender.SendMessage();
                 }
             }
-        }
-
-        protected virtual NetworkError ConnectToPear(ref ConnectionInfo peer)
-        {
-            peer.ConnectionID = NetworkTransport.Connect(
-                hostID,
-                peer.IPAdres,
-                peer.Port,
-                0,
-                out error);
-
-            return NetworkUtility.GetNetworkError(error);
         }
 
         public virtual void SendToAllReliable(byte[] message, int skipConnectionID = -1)
@@ -474,32 +498,37 @@ namespace BaseGameLogic.Networking
                 out error);
         }
 
-        public static byte[] ConvertObjectToBytes(object objectToConvert)
-        {
-            BinaryFormatter binaryFormatter = new BinaryFormatter();
-            MemoryStream memoryStream = new MemoryStream();
-
-            binaryFormatter.Serialize(memoryStream, objectToConvert);
-            byte[] array = memoryStream.ToArray();
-
-            return array;
-        }
-
-        public static T ConvertBytesToObject<T>(byte[] array, int start = 0, int length = 0)
-        {
-            BinaryFormatter binaryFormatter = new BinaryFormatter();
-            MemoryStream memoryStream = new MemoryStream(array, start, length > 0 ? length - start : array.Length - start);
-
-            T objectFormBytes = (T)binaryFormatter.Deserialize(memoryStream);
-
-            return objectFormBytes;
-        }
-
         public void AddNewMessageHandler(Type type)
         {
-            BaseMessageHandler handler = gameObject.AddComponent(type) as BaseMessageHandler;
+            BaseMessageHandler handler = _messageHandlersHolder.AddComponent(type) as BaseMessageHandler;
 
             _messageHandlersList.Add(handler);
+        }
+
+        private void Reset()
+        {
+            if(_messageHandlersHolder == null)
+            {
+                _messageHandlersHolder = new GameObject();
+                _messageHandlersHolder.transform.SetParent(this.transform);
+            }
+
+            if (_messageSendersHolder == null)
+            {
+                _messageSendersHolder = new GameObject();
+                _messageSendersHolder.transform.SetParent(this.transform);
+            }
+        }
+
+        public void AddNetworkUpdater(BaseNetworkUpdater updater)
+        {
+            _networkUpdaterList.Add(updater);
+        }
+
+        public void RemoveNetworkUpdater(BaseNetworkUpdater updater)
+        {
+            int index = _networkUpdaterList.IndexOf(updater);
+            _networkUpdaterList.RemoveAt(index);
         }
     }
 }

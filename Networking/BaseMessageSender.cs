@@ -26,6 +26,7 @@ namespace BaseGameLogic.Networking
         public abstract int MessageID { get; }
 
         protected abstract byte[] GetMessageBytes();
+        protected abstract byte[] GetMessageBytes(int connectionID);
 
         public void SendMessage()
         {
@@ -47,7 +48,7 @@ namespace BaseGameLogic.Networking
 
         public void SendMessage(int connectionID)
         {
-            byte[] message = GetMessageBytes();
+            byte[] message = GetMessageBytes(connectionID);
             switch (SendType)
             {
                 case SendType.SendReliable:

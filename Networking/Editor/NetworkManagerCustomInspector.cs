@@ -22,7 +22,7 @@ namespace BaseGameLogic.Networking
 
             Type baseType = typeof(BaseMessageHandler);
             Assembly assembly = baseType.Assembly;
-            types = assembly.GetTypes().Where(type => type.IsSubclassOf(baseType)).ToArray();
+            types = assembly.GetTypes().Where(type => (type.IsSubclassOf(baseType) && !type.IsAbstract)).ToArray();
 
             contextMenu = new GenericMenu();
 
@@ -52,13 +52,15 @@ namespace BaseGameLogic.Networking
             int index = (int)data;
             Type type = types[index];
             manager.AddNewMessageHandler(type);
+
+            Debug.Log(string.Format("{0} added.", type.Name));
         }
 
         public void AddAllMessageHandler()
         {
             for (int i = 0; i < types.Length; i++)
             {
-                AddMessageHandler(types[i]);
+                AddMessageHandler(i);
             }
         }
     }

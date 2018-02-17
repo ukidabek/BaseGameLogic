@@ -52,7 +52,7 @@ namespace BaseGameLogic.Networking
         protected int recHostId;
         protected int channelID;
         protected int dataSize;
-        protected byte[] recBuffer = null;
+        protected byte[] receiveBuffer = null;
 
         protected ConnectionInfo newPear = null;
 
@@ -231,11 +231,11 @@ namespace BaseGameLogic.Networking
 
         protected virtual void HandleMessages(byte[] buffer, int size)
         {
-            int messageId = recBuffer[0];
+            int messageId = receiveBuffer[0];
             BaseMessageHandler baseMessageHandler = null;
             if (_messageHandlersDictionary.TryGetValue(messageId, out baseMessageHandler))
             {
-                baseMessageHandler.HandleMessage(recBuffer, dataSize, connectionID);
+                baseMessageHandler.HandleMessage(receiveBuffer, dataSize, connectionID);
             }
         }
 
@@ -257,7 +257,7 @@ namespace BaseGameLogic.Networking
             BaseMessageSender baseMessageSender = null;
             if(_messageSendersDictionary.TryGetValue(messageID, out baseMessageSender))
             {
-                if(connectionID > 0)
+                if(connectionID > -1)
                 {
                     baseMessageSender.SendMessage(connectionID);
                 }
@@ -268,28 +268,56 @@ namespace BaseGameLogic.Networking
             }
         }
 
-        public virtual void SendToAllReliable(byte[] message, int skipConnectionID = -1)
+        public virtual void Broadcast(bool reliable = true, bool update = false)
+        {
+            if (Settings.ManagerType == NetworkManagerTypeEnum.Client)
+                return;
+
+            if (update)
+            {
+                if (reliable)
+                {
+
+                }
+                else
+                {
+                    UpdateForAllUnreiable(receiveBuffer, connectionID, dataSize);
+                }
+            }
+            else
+            {
+                if (reliable)
+                {
+                    SendToAllReliable(receiveBuffer, connectionID, dataSize);
+                }
+                else
+                {
+
+                }
+            }
+        }
+
+        public virtual void SendToAllReliable(byte[] message, int skipConnectionID = -1, int size = 0)
         {
             for (int i = 0; i < connectedPeers.Count; i++)
             {
-                int connectionID = connectedPeers[i].ConnectionID;
-                if (skipConnectionID > 0 && connectionID == skipConnectionID)
+                if (connectedPeers[i].ConnectionID == skipConnectionID)
                 {
                     continue;
                 }
 
-                SendReliable(message, connectedPeers[i].ConnectionID);
+                SendReliable(message, connectedPeers[i].ConnectionID, size);
             }
         }
 
-        public virtual NetworkError SendReliable(byte[] message, int connectionId)
+        public virtual NetworkError SendReliable(byte[] message, int connectionId, int size = 0)
         {
             NetworkTransport.Send(
                 hostID,
                 connectionId,
                 channelDictionary[QosType.Reliable],
                 message,
-                message.Length,
+                size > 0 ? size : message.Length,
                 out error);
 
             NetworkError networkError = NetworkUtility.GetNetworkError(error);
@@ -297,28 +325,32 @@ namespace BaseGameLogic.Networking
             return networkError;
         }
 
-        public virtual void UpdateForAllUnreiable(byte[] message, int messageSize = 0)
+        public virtual void UpdateForAllUnreiable(byte[] message, int skipConnectionID = -1, int size = 0)
         {
             for (int i = 0; i < connectedPeers.Count; i++)
             {
-                UpdateUnreiable(message, connectedPeers[i].ConnectionID, messageSize);
+                if(connectedPeers[i].ConnectionID == skipConnectionID)
+                {
+                    continue;
+                }
+
+                UpdateUnreiable(message, connectedPeers[i].ConnectionID, size);
             }
         }
 
-        public virtual NetworkError UpdateUnreiable(byte[] message, int connectionId, int messageSize = 0)
+        public virtual NetworkError UpdateUnreiable(byte[] message, int connectionId, int size = 0)
         {
             if(message == null || message.Length == 0)
             {
                 return NetworkError.Ok;
             }
 
-            int size = messageSize > 0 ? messageSize : message.Length;
             NetworkTransport.Send(
                 hostID,
                 connectionId,
                 channelDictionary[QosType.UnreliableSequenced],
                 message,
-                size,
+                size > 0 ? size : message.Length,
                 out error);
 
             NetworkError networkError = NetworkUtility.GetNetworkError(error);
@@ -334,7 +366,7 @@ namespace BaseGameLogic.Networking
                 return;
             }
 
-            recBuffer = new byte[_settings.BufferSize];
+            receiveBuffer = new byte[_settings.BufferSize];
 
             // Get events from the relay connection
             NetworkEventType networkEvent = NetworkTransport.ReceiveRelayEventFromHost(hostID, out error);
@@ -352,8 +384,8 @@ namespace BaseGameLogic.Networking
                     hostID,
                     out connectionID,
                     out channelID,
-                    recBuffer,
-                    recBuffer.Length,
+                    receiveBuffer,
+                    receiveBuffer.Length,
                     out dataSize,
                     out error);
 
@@ -369,7 +401,7 @@ namespace BaseGameLogic.Networking
                         break;
 
                     case NetworkEventType.DataEvent:
-                        HandleMessages(recBuffer, dataSize);
+                        HandleMessages(receiveBuffer, dataSize);
                         break;
 
                     case NetworkEventType.DisconnectEvent:
@@ -504,6 +536,14 @@ namespace BaseGameLogic.Networking
 
             _messageHandlersList.Add(handler);
         }
+
+        public void AddNewMessageSender(Type type)
+        {
+            BaseMessageSender sender = _messageSendersHolder.AddComponent(type) as BaseMessageSender;
+
+            _messageSendersList.Add(sender);
+        }
+
 
         private void Reset()
         {

@@ -13,27 +13,35 @@ namespace BaseGameLogic.Networking
     public class NetworkManagerCustomInspector : Editor
     {
         private NetworkManager manager = null;
-        private Type[] types = null;
-        private GenericMenu contextMenu = null;
+        private Type[] messageSenderTypes = null;
+        private Type[] messageHandlerTypes = null;
+
+        private GenericMenu messageSendeContextMenu = new GenericMenu();
+        private GenericMenu messageHandlerContextMenu = new GenericMenu();
 
         private void OnEnable()
         {
             manager = target as NetworkManager;
 
-            Type baseType = typeof(BaseMessageHandler);
-            Assembly assembly = baseType.Assembly;
-            types = assembly.GetTypes().Where(type => (type.IsSubclassOf(baseType) && !type.IsAbstract)).ToArray();
-
-            contextMenu = new GenericMenu();
+            messageSenderTypes = AssemblyExtension.GetDerivedTypes<BaseMessageSender>();
+            messageHandlerTypes = AssemblyExtension.GetDerivedTypes<BaseMessageHandler>();
 
             GUIContent content = null;
-            for (int i = 0; i < types.Length; i++)
+            for (int i = 0; i < messageSenderTypes.Length; i++)
             {
-                content = new GUIContent(types[i].Name);
-                contextMenu.AddItem(content, false, AddMessageHandler, i);
+                content = new GUIContent(messageSenderTypes[i].Name);
+                messageSendeContextMenu.AddItem(content, false, AddMessageSender, i);
+
             }
+
+            for (int i = 0; i < messageHandlerTypes.Length; i++)
+            {
+                content = new GUIContent(messageHandlerTypes[i].Name);
+                messageHandlerContextMenu.AddItem(content, false, AddMessageHandler, i);
+            }
+
             content = new GUIContent("Add all");
-            contextMenu.AddItem(content, false, AddAllMessageHandler);
+            messageHandlerContextMenu.AddItem(content, false, AddAllMessageHandler);
 
         }
 
@@ -41,24 +49,42 @@ namespace BaseGameLogic.Networking
         {
             base.OnInspectorGUI();
 
-            if (GUILayout.Button("Add message handler"))
+            GUILayout.BeginHorizontal();
             {
-                contextMenu.ShowAsContext();
+                if (GUILayout.Button("Add message sender"))
+                {
+                    messageSendeContextMenu.ShowAsContext();
+                }
+
+                if (GUILayout.Button("Add message handler"))
+                {
+                    messageHandlerContextMenu.ShowAsContext();
+                }
             }
+            GUILayout.EndHorizontal();
         }
 
         public void AddMessageHandler(object data)
         {
             int index = (int)data;
-            Type type = types[index];
+            Type type = messageHandlerTypes[index];
             manager.AddNewMessageHandler(type);
+
+            Debug.Log(string.Format("{0} added.", type.Name));
+        }
+
+        public void AddMessageSender(object data)
+        {
+            int index = (int)data;
+            Type type = messageSenderTypes[index];
+            manager.AddNewMessageSender(type);
 
             Debug.Log(string.Format("{0} added.", type.Name));
         }
 
         public void AddAllMessageHandler()
         {
-            for (int i = 0; i < types.Length; i++)
+            for (int i = 0; i < messageHandlerTypes.Length; i++)
             {
                 AddMessageHandler(i);
             }

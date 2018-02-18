@@ -20,7 +20,6 @@ namespace BaseGameLogic.Networking
         [SerializeField, Header("Network settings.")]
         protected NetworkManagerSettings _settings = new NetworkManagerSettings();
 
-        [Obsolete("Method1 is deprecated")]
         public bool IsSetver { get { return _settings.ManagerType == NetworkManagerTypeEnum.Server; } }
 
         public NetworkManagerSettings Settings { get { return _settings; } }
@@ -173,9 +172,17 @@ namespace BaseGameLogic.Networking
 
         protected virtual void ClientConnected(int connectionId)
         {
-            if(ClientConnectedCallback != null)
+            if(ClientConnectedCallback != null && IsSetver)
             {
                 ClientConnectedCallback(connectionId);
+            }
+        }
+
+        protected virtual void ClientDisconnected(int connectionID)
+        {
+            if (ClientDisconnectedCallback != null && IsSetver)
+            {
+                ClientDisconnectedCallback(connectionID);
             }
         }
 
@@ -217,14 +224,6 @@ namespace BaseGameLogic.Networking
                 connectedPeers.Add(newPear);
 
                 ClientConnected(newPear.ConnectionID);
-            }
-        }
-
-        protected virtual void ClientDisconnected(int connectionID)
-        {
-            if(ClientDisconnectedCallback != null)
-            {
-                ClientDisconnectedCallback(connectionID);
             }
         }
 

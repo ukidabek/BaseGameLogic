@@ -76,6 +76,7 @@ namespace BaseGameLogic.Networking
 
         public event Action<int> ClientConnectedCallback = null;
         public event Action<int> ClientDisconnectedCallback = null;
+        public event Action LoadGameCallback = null;
 
         protected virtual void Initialize()
         {
@@ -148,13 +149,26 @@ namespace BaseGameLogic.Networking
             }
         }
 
-        public virtual void Start() {}
-
         protected virtual void OnDestroy() {}
 
         protected virtual void OnApplicationQuit()
         {
             NetworkTransport.Shutdown();
+        }
+
+        private void Reset()
+        {
+            if (_messageHandlersHolder == null)
+            {
+                _messageHandlersHolder = new GameObject();
+                _messageHandlersHolder.transform.SetParent(this.transform);
+            }
+
+            if (_messageSendersHolder == null)
+            {
+                _messageSendersHolder = new GameObject();
+                _messageSendersHolder.transform.SetParent(this.transform);
+            }
         }
 
         protected virtual void ClientConnected(int connectionId)
@@ -238,7 +252,6 @@ namespace BaseGameLogic.Networking
                 baseMessageHandler.HandleMessage(receiveBuffer, dataSize, connectionID);
             }
         }
-
 
         protected virtual NetworkError ConnectToPear(ref ConnectionInfo peer)
         {
@@ -544,22 +557,6 @@ namespace BaseGameLogic.Networking
             _messageSendersList.Add(sender);
         }
 
-
-        private void Reset()
-        {
-            if(_messageHandlersHolder == null)
-            {
-                _messageHandlersHolder = new GameObject();
-                _messageHandlersHolder.transform.SetParent(this.transform);
-            }
-
-            if (_messageSendersHolder == null)
-            {
-                _messageSendersHolder = new GameObject();
-                _messageSendersHolder.transform.SetParent(this.transform);
-            }
-        }
-
         public void AddNetworkUpdater(BaseNetworkUpdater updater)
         {
             _networkUpdaterList.Add(updater);
@@ -569,6 +566,14 @@ namespace BaseGameLogic.Networking
         {
             int index = _networkUpdaterList.IndexOf(updater);
             _networkUpdaterList.RemoveAt(index);
+        }
+
+        public virtual void StartGame()
+        {
+            if(LoadGameCallback != null)
+            {
+                LoadGameCallback();
+            }
         }
     }
 }

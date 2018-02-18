@@ -8,6 +8,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 using BaseGameLogic.Singleton;
+using BaseGameLogic.Networking;
 
 namespace BaseGameLogic.SceneManagement
 {
@@ -19,8 +20,7 @@ namespace BaseGameLogic.SceneManagement
         [SerializeField]
         private LoadingScreenCanvas _loadingScreenCanvas = null;
 
-        [Space]
-        public UnityEvent GameLoadedEvent = null;
+        public event Action GameLoadedEvent = null;
 
         [Space]
         public int MapToLoadIndex = 0; 
@@ -58,8 +58,6 @@ namespace BaseGameLogic.SceneManagement
         {
             base.Awake();
 
-            gameObject.SetActive(false);
-
             if (_loadingScreenCanvas != null)
             {
                 _loadingScreenCanvas.gameObject.SetActive(false);
@@ -69,7 +67,17 @@ namespace BaseGameLogic.SceneManagement
             {
                 _loadingScreenCamera.gameObject.SetActive(false);
             }
+        }
 
+        protected override void Start()
+        {
+            NetworkManager.Instance.LoadGameCallback -= LoadGame;
+            NetworkManager.Instance.LoadGameCallback += LoadGame;
+        }
+
+        private void OnDestroy()
+        {
+            NetworkManager.Instance.LoadGameCallback -= LoadGame;
         }
 
         private void Update()
@@ -97,7 +105,11 @@ namespace BaseGameLogic.SceneManagement
                             _loadingScreenCamera.gameObject.SetActive(false);
                         }
 
-                        GameLoadedEvent.Invoke();
+                        if(GameLoadedEvent != null)
+                        {
+                            GameLoadedEvent();
+                        }
+
                         CurrentLoadingSceneIndex = 0;
                     }
                     else
@@ -137,6 +149,6 @@ namespace BaseGameLogic.SceneManagement
             _loadOperation = SceneManager.LoadSceneAsync(sceneName, mode);
         }
 
-        public void SaveGame() { }
+        public void SaveGame() {}
     }
 }

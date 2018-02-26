@@ -26,13 +26,6 @@ namespace BaseGameLogic.Inputs
     	}
 
         [Header("Debug display & options.")]
-        [SerializeField]
-        [Tooltip("Current input type name. ")]
-        public string currentInputSourceType = string.Empty;
-        /// <summary>
-        /// Current input type name. 
-        /// </summary>
-        public string CurrentInputSourceType {  get { return currentInputSourceType; } }
 
         public Action InputSourceInstanceChanged = null;
 
@@ -56,7 +49,9 @@ namespace BaseGameLogic.Inputs
 			}
 		}
 
-		[Header("Input sources managment.")]
+        public event Action<BaseInputSource> InputSourceChanged = null;
+
+        [Header("Input sources managment.")]
         [SerializeField]
         private List<BaseInputSource> inputSources = new List<BaseInputSource>();
         /// <summary>
@@ -86,19 +81,16 @@ namespace BaseGameLogic.Inputs
 		/// </summary>
 		/// <returns><c>true</c>, if input source instance was change, <c>false</c> if the source is the same.</returns>
 		/// <param name="source">Source.</param>
-		protected virtual bool SelectCurrentInputSourceInstance(BaseInputSource source)
-		{
-            if (source == CurrentInputSourceInstance && 
-                CurrentInputSourceInstance != null && 
-                source != null) 
-			{
-				return false;
-			}
-
-			currentInputSourceType = source.InputSourceType;
-			CurrentInputSourceInstance = source;
-
-			return true;
+		protected virtual void SelectCurrentInputSourceInstance(BaseInputSource source)
+		{           
+            if(CurrentInputSourceInstance != source)
+            {
+			    CurrentInputSourceInstance = source;
+                if(InputSourceChanged != null)
+                {
+                    InputSourceChanged(source);
+                }
+            }
 		}
 
         /// <summary>

@@ -12,24 +12,13 @@ namespace BaseGameLogic.Character
 	{
 		public override bool IsPlayer { get { return true; } }
 
-		[SerializeField]
-		protected InputCollector inputCollector = null;
-		public InputCollector InputCollector 
-		{
-			get { return this.inputCollector; }
-			protected set { inputCollector = value; }
-		}
-
-		protected BaseInputSource CurrentInputSource
-		{
-			get 
-			{ 
-				if (InputCollector == null)
-					return null;
-
-				return InputCollector.CurrentInputSourceInstance;
-			}
-		}
+		//[SerializeField]
+		//protected InputCollector inputCollector = null;
+		//public InputCollector InputCollector 
+		//{
+		//	get { return this.inputCollector; }
+		//	protected set { inputCollector = value; }
+		//}
 
 		/// <summary>
 		/// The input collector.
@@ -71,7 +60,6 @@ namespace BaseGameLogic.Character
 		{
 			base.Start ();
 
-			InputCollector = InputCollectorManagerInstance.GetInputCollector (PlayerNumber);
 		}
 	}
 }

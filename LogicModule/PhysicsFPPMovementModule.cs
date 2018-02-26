@@ -4,7 +4,6 @@ using BaseGameLogic.States;
 
 namespace BaseGameLogic.LogicModule
 {
-    [RequireComponent(typeof(Rigidbody))]
     public abstract class PhysicsFPPMovementModule : BaseLogicModule
     {
         [Header("Require components")]

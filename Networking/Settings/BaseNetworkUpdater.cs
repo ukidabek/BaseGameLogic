@@ -15,12 +15,23 @@ namespace BaseGameLogic.Networking
 
         protected virtual void Start()
         {
-            NetworkManagerInstance.AddNetworkUpdater(this);
+            if(NetworkManagerInstance == null)
+            {
+                enabled = false;
+            }
+            else
+            {
+                NetworkManagerInstance.AddNetworkUpdater(this);
+            }
+
         }
 
         protected virtual void OnDestroy()
         {
-            NetworkManagerInstance.RemoveNetworkUpdater(this);
+            if (NetworkManagerInstance != null)
+            {
+                NetworkManagerInstance.RemoveNetworkUpdater(this);
+            }
         }
 
         protected virtual void Update()

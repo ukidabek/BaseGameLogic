@@ -13,9 +13,8 @@ namespace BaseGameLogic.LogicModule
         private float _locomotionSpeed = 5;
         public float LocomotionSpeed { get { return _locomotionSpeed; } }
 
-        public Movement()
+        public Movement() : base()
         {
-            _transform = null;
             _locomotionSpeed = 5;
         }
 
@@ -24,7 +23,6 @@ namespace BaseGameLogic.LogicModule
             _transform = transform;
             _locomotionSpeed = locomotionSpeed;
         }
-
 
         public Vector3 CalculatMove(Vector3 input, float deltaTime)
         {

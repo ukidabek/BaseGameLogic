@@ -18,7 +18,7 @@ namespace BaseGameLogic.LogicModule
 
         [Header("Settings")]
         [SerializeField]
-        protected float _locomotionSpeed = 5;
+        protected Movement movement = new Movement();
         [SerializeField]
         protected float _jumpVelocity = 5;
         [SerializeField, Range(0, 90)]
@@ -64,15 +64,8 @@ namespace BaseGameLogic.LogicModule
 
         public virtual void HandleMovement()
         {
-            Vector3 forward = transform.forward;
-            forward *= MovementVector.z;
-            Vector3 right = transform.right;
-            right *= MovementVector.x;
-
-            Vector3 rigidBodyVelocity = _playerRigidbody.velocity;
-
-            Vector3 movement = ((forward + right) * _locomotionSpeed) * Time.deltaTime;
-            Vector3 newPosition = transform.position + movement;
+            Vector3 move = movement.CalculatMove(MovementVector, Time.deltaTime);
+            Vector3 newPosition = transform.position + move;
             _playerRigidbody.MovePosition(newPosition);
         }
 

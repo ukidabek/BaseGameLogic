@@ -8,6 +8,7 @@ using BaseGameLogic.Management;
 using BaseGameLogic.Inputs;
 using BaseGameLogic.Audio;
 using BaseGameLogic.Events;
+using BaseGameLogic.LogicModule;
 
 namespace BaseGameLogic.States
 {
@@ -42,10 +43,13 @@ namespace BaseGameLogic.States
         [SerializeField, Tooltip("List of mode creators that can be apply to object states.")]
         protected List<BaseStateModeCreator> stateModesCreators = new List<BaseStateModeCreator>();
 
+        [SerializeField]
+        protected LogicModulesContainer logicModulesContainer = new LogicModulesContainer();
+        public LogicModulesContainer LogicModulesContainer { get { return logicModulesContainer; } }
+
         /// <summary>
         /// Stack of states.
         /// </summary>
-        [SerializeField]
         protected Stack<BaseState> states = new Stack<BaseState>();
 
         /// <summary>
@@ -163,7 +167,7 @@ namespace BaseGameLogic.States
         }
 
         #endregion
-            
+
         /// <summary>
         /// Creates the input cache.
         /// </summary>

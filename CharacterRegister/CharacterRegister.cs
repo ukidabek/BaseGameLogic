@@ -73,7 +73,7 @@ namespace BaseGameLogic.Character
                 }
                 else
                 {
-                    _playerDictionary.Add(player.PlayerID, player);
+                    _playerDictionary.Add(player.PlayerNumber, player);
                     
                     #if UNITY_EDITOR
                     _playersList.Add(player);

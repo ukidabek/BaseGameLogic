@@ -12,14 +12,6 @@ namespace BaseGameLogic.Character
 	{
 		public override bool IsPlayer { get { return true; } }
 
-		//[SerializeField]
-		//protected InputCollector inputCollector = null;
-		//public InputCollector InputCollector 
-		//{
-		//	get { return this.inputCollector; }
-		//	protected set { inputCollector = value; }
-		//}
-
 		/// <summary>
 		/// The input collector.
 		/// Contains data on inputs.
@@ -29,9 +21,7 @@ namespace BaseGameLogic.Character
 			get { return GameManagerInstance.InputCollectorManager; }
 		}
 
-        public int PlayerID = -1;
-
-		[SerializeField]
+        [SerializeField, Range(0, 8)]
 		private int _playerNumber = 0;
 		public int PlayerNumber 
 		{
@@ -43,12 +33,12 @@ namespace BaseGameLogic.Character
 		{
 			BasePlayerCharacterController otherPlayer = obj as BasePlayerCharacterController;
 
-			if (_playerNumber < otherPlayer._playerNumber) 
+			if (PlayerNumber < otherPlayer.PlayerNumber) 
 			{
 				return 1;
 			}
 
-			if (_playerNumber > otherPlayer._playerNumber) 
+			if (PlayerNumber > otherPlayer.PlayerNumber) 
 			{
 				return -1;
 			}

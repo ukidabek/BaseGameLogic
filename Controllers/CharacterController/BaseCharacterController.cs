@@ -66,21 +66,6 @@ namespace BaseGameLogic.Character
 			}
     	}
 			
-        protected override void Awake ()
-        {
-            base.Awake ();
-
-            characterController = this.gameObject.GetComponent<CharacterController>();
-            #if UNITY_EDITOR
-            MissingWarning(characterController, gameObject.name);
-            #endif
-
-            characterNavMeshAgent = this.GetComponent<UnityEngine.AI.NavMeshAgent>();
-            #if UNITY_EDITOR
-            MissingWarning(characterNavMeshAgent, gameObject.name);
-            #endif
-        }
-
         protected virtual void Register()
         {
             if (CharacterRegisterInstance != null)

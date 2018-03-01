@@ -20,16 +20,15 @@ namespace BaseGameLogic.LogicModule
         [SerializeField]
         protected Movement movement = new Movement();
         [SerializeField]
-        protected float _jumpVelocity = 5;
-        [SerializeField, Range(0, 90)]
-        protected float _minEyesRotation = 90f;
-        [SerializeField, Range(0, 90)]
-        protected float _maxEyesRotation = 90f;
+        protected SingleAxisRotation bodyRotation = new SingleAxisRotation();
+        public float CurrentBodyRotation { get { return bodyRotation.CurrentRotation; } }
 
-        protected Vector3 _currentBodyRotationVector = Vector3.zero;
-        public float CurrentBodyRotation { get { return _currentBodyRotationVector.y; } }
-        protected Vector3 _currentEyesRotationVector = Vector3.zero;
-        public float CurrentEyesRotation { get { return _currentEyesRotationVector.x; } }
+        [SerializeField]
+        protected SingleAxisRotation eyesRotation = new SingleAxisRotation();
+        public float CurrentEyesRotation { get { return eyesRotation.CurrentRotation; } }
+
+        [SerializeField]
+        protected float _jumpVelocity = 5;
 
         [Header("Ground check")]
         [SerializeField]
@@ -51,8 +50,8 @@ namespace BaseGameLogic.LogicModule
 
         protected override void Awake()
         {
-            _currentEyesRotationVector = _eyesTransform.rotation.eulerAngles;
-            _currentBodyRotationVector = transform.rotation.eulerAngles;
+            bodyRotation.CurrentRotation = _eyesTransform.rotation.eulerAngles.x;
+            eyesRotation.CurrentRotation = transform.rotation.eulerAngles.y;
         }
 
         protected override void Update()
@@ -71,19 +70,10 @@ namespace BaseGameLogic.LogicModule
 
         public virtual void HandleRotation()
         {
-            _currentBodyRotationVector.y += LookVector.x;
-            if (_currentBodyRotationVector.y > 360)
-            {
-                _currentBodyRotationVector.y -= 360;
-            }
+            bodyRotation.CalculateRotation(LookVector.x, Time.deltaTime);
+            _playerRigidbody.MoveRotation(Quaternion.Euler(bodyRotation.Rotation));
 
-            Quaternion rotation = Quaternion.Euler(_currentBodyRotationVector);
-            _playerRigidbody.MoveRotation(rotation);
-
-            _currentEyesRotationVector.x += LookVector.y;
-            _currentEyesRotationVector.x = Mathf.Clamp(_currentEyesRotationVector.x, -_maxEyesRotation, _minEyesRotation);
-            rotation = Quaternion.Euler(_currentEyesRotationVector);
-            _eyesTransform.localRotation = rotation;
+            eyesRotation.Rotate(LookVector.y, Time.deltaTime);
         }
 
         public virtual void HandleJump()

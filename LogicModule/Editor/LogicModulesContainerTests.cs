@@ -27,6 +27,21 @@ namespace BaseGameLogic.LogicModule
         }
 
         [Test]
+        public void Adding_New_Module_Test_Of_Type_That_Is_Already_On_List_Throw_Exception()
+        {
+            TestLogicModule module = new GameObject().AddComponent<TestLogicModule>();
+            TestLogicModule module1 = new GameObject().AddComponent<TestLogicModule>();
+
+
+            LogicModulesContainer container = new LogicModulesContainer();
+
+            container.AddModule(module);
+
+            Assert.Throws<LogicModuleOnListException>(() => container.AddModule(module1));
+        }
+
+
+        [Test]
         public void Passed_Module_Reference_In_Null_Exception_Throw()
         {
             LogicModulesContainer container = new LogicModulesContainer();

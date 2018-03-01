@@ -25,20 +25,7 @@ namespace BaseGameLogic.States
     		get { return this.controlledObject; }
     	}
 
-        protected Animator characterAnimatior
-        {
-    		get{ return controlledObject.ObjectAnimator; }
-    	}
-
-        protected AnimationEventsBroadcaster animationEventsBroadcaster
-        {
-            get { return controlledObject.AnimationEventsBroadcaster; }
-        }
-
-        public BaseState(
-            BaseStateObject controlledObject,
-            BaseInputCache inputCache, 
-            BaseAnimationHandlingCache animationHandlingCache)
+        public BaseState(BaseStateObject controlledObject)
         {
             this.controlledObject = controlledObject;
         }

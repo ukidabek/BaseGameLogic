@@ -31,9 +31,6 @@ namespace BaseGameLogic
             this.transform.SetParent(null);
 
             controlledCamera = this.GetComponent<Camera>();
-            #if UNITY_EDITOR
-            MissingWarning(controlledCamera, gameObject.name);
-            #endif
         }
     }
 }

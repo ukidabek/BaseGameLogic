@@ -26,9 +26,6 @@ namespace BaseGameLogic.States
         [SerializeField, Tooltip("Visualizes the contents of the stack.")]
         protected List<string> currentStateTypes = new List<string>();
 
-        [SerializeField, Tooltip("Show reference validation log? ")]
-        protected bool showReferenceValidationLog = true;
-
         #endif
 
         #region States management variables
@@ -93,43 +90,7 @@ namespace BaseGameLogic.States
 			get { return GameManagerInstance != null && GameManagerInstance.GameStatus == GameStatusEnum.Pause; }
 		}
 
-		#endregion
-
-        #region Components references
-
-        protected Rigidbody objectRigidbody = null;
-        public Rigidbody ObjectRigidbody {
-            get { return this.objectRigidbody; } 
-        }
-
-        /// <summary>
-        /// The animation events broadcaster.
-        /// </summary>
-        protected AnimationEventsBroadcaster animationEventsBroadcaster = null;
-        public AnimationEventsBroadcaster AnimationEventsBroadcaster
-        {
-            get { return this.animationEventsBroadcaster; }
-        }
-       
-        /// <summary>
-        /// The sound effect manager.
-        /// </summary>
-        protected SoundEffectManager soundEffectManager = null;
-        public SoundEffectManager SoundEffectManager
-        {
-            get { return this.soundEffectManager; }
-        }
-
-        /// <summary>
-        /// The object animator.
-        /// </summary>
-        protected Animator objectAnimator = null;
-        public Animator ObjectAnimator 
-		{
-            get { return this.objectAnimator; } 
-        }
-
-		#endregion
+        #endregion
 
         #region Object Caches
 
@@ -185,20 +146,6 @@ namespace BaseGameLogic.States
         {
             return new BaseAnimationHandlingCache();
         }
-
-        #if UNITY_EDITOR            
-
-        protected void MissingWarning<T>(T obj, string gameObjectName)
-        {
-            
-            if (showReferenceValidationLog && obj == null)
-            {
-                Type type = typeof(T);
-                Debug.LogWarningFormat("{0} is missing for {1}.", type.ToString(), this.gameObject.name);
-            }
-        }
-
-        #endif
 
 		/// <summary>
 		/// Enters the default state of the object.
@@ -274,34 +221,12 @@ namespace BaseGameLogic.States
 
         #region MonoBehaviour methods
 
-        protected virtual void Awake()
-        {
-            this.objectAnimator = gameObject.DeepGetComponent<Animator>();
-            #if UNITY_EDITOR
-            MissingWarning(objectAnimator, gameObject.name);
-            #endif
-
-            this.animationEventsBroadcaster = this.gameObject.DeepGetComponent<AnimationEventsBroadcaster>();
-            #if UNITY_EDITOR
-            MissingWarning(animationEventsBroadcaster, gameObject.name);
-            #endif
-
-            this.soundEffectManager = this.gameObject.DeepGetComponent<SoundEffectManager>();
-            #if UNITY_EDITOR
-            MissingWarning(soundEffectManager, gameObject.name);
-            #endif
-
-            this.objectRigidbody = this.gameObject.DeepGetComponent<Rigidbody>();
-            #if UNITY_EDITOR
-            MissingWarning(objectRigidbody, gameObject.name);
-            #endif
-        }
+        protected virtual void Awake() {}
 
         protected virtual void OnDestroy()
         {
             UnregisterAllEvents();
             string name = this.gameObject.name;
-            Debug.LogFormat("{0} was destroyed", name);
 
             if(GameManagerInstance != null)
             {

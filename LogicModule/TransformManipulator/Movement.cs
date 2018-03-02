@@ -36,8 +36,7 @@ namespace BaseGameLogic.LogicModule
 
         public void Move(Vector3 input, float deltaTime)
         {
-            Vector3 move = CalculatMove(input, deltaTime);
-            _transform.position += move;
+            _transform.position += CalculatMove(input, deltaTime); ;
         }
 
         public Vector3 CalculatMoveTowards(Vector3 position, float deltaTime)
@@ -47,8 +46,7 @@ namespace BaseGameLogic.LogicModule
 
         public void MoveTowards(Vector3 position, float deltaTime)
         {
-            Vector3 move = CalculatMoveTowards(position, deltaTime);
-            _transform.position = move;
+            _transform.position = CalculatMoveTowards(position, deltaTime);
         }
     }
 }

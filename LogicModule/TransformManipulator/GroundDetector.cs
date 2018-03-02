@@ -25,11 +25,6 @@ namespace BaseGameLogic.LogicModule
 
         public GroundDetector() : base() {}
 
-        public GroundDetector(string layerName) : base()
-        {
-            _groundMask = LayerMask.NameToLayer(layerName);
-        }
-
         public GroundDetector(
             Transform transform, 
             Vector3 groundedCheckOffset, 

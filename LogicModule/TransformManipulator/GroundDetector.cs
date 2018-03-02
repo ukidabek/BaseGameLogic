@@ -23,9 +23,11 @@ namespace BaseGameLogic.LogicModule
         private bool _isGrounded = false;
         public bool IsGrounded { get { return _isGrounded; } }
 
-        public GroundDetector() : base()
+        public GroundDetector() : base() {}
+
+        public GroundDetector(string layerName) : base()
         {
-            _groundMask = LayerMask.NameToLayer("Default");
+            _groundMask = LayerMask.NameToLayer(layerName);
         }
 
         public GroundDetector(
@@ -43,6 +45,5 @@ namespace BaseGameLogic.LogicModule
             Ray ray = new Ray(startPosition, -_transform.up);
             return _isGrounded = Physics.Raycast(ray, _groundedCheckDistance);
         }
-        
     }
 }

@@ -29,4 +29,9 @@ public static class TransformExtension
     {
         transform.localScale = Vector3.one;
     }
+
+    public static float Distance(this Transform transform, Transform _transform)
+    {
+        return Vector3.Distance(transform.position, _transform.position);
+    }
 }

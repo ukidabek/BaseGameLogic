@@ -4,6 +4,11 @@ using System.Reflection;
 
 public static class AssemblyExtension
 {
+    /// <summary>
+    /// Returns all types that extend type T.
+    /// </summary>
+    /// <typeparam name="T">Base type.</typeparam>
+    /// <returns>List of derived types.</returns>
     public static Type[] GetDerivedTypes<T>()
     {
         Type baseType = typeof(T);

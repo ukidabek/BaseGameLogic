@@ -4,6 +4,12 @@ using System.Collections.Generic;
 
 public static class GameObjectExtension
 {
+    /// <summary>
+    /// Tray get component form parent, object and it's children's.
+    /// </summary>
+    /// <typeparam name="T">Type of component to find.</typeparam>
+    /// <param name="gameObject">Reference to object.</param>
+    /// <returns>Reference to component.</returns>
     public static T DeepGetComponent<T>(this GameObject gameObject) where T : Component
     {
         T component = gameObject.GetComponent<T>();
@@ -18,6 +24,14 @@ public static class GameObjectExtension
         return component;
     }
 
+    /// <summary>
+    /// Create instance of prefab, and return component.
+    /// </summary>
+    /// <typeparam name="T">Type of component to return.</typeparam>
+    /// <param name="prefab">Prefab reference</param>
+    /// <param name="parrent">Parent object</param>
+    /// <param name="objectName">Object name</param>
+    /// <returns>Reference to component.</returns>
     public static T CreateInstance<T>(GameObject prefab, Transform parrent = null, string objectName = "") where T : Component
     {
         GameObject newObject = GameObject.Instantiate(prefab);
@@ -26,14 +40,19 @@ public static class GameObjectExtension
 
         newObject.transform.SetParent(parrent);
 
-        newObject.transform.localPosition = Vector3.zero;
-        newObject.transform.localRotation = Quaternion.identity;
-        newObject.transform.localScale = Vector3.one;
+        newObject.transform.Reset();
 
         return newComponent;
     }
 
-    public static T CreateObjectWithComponent<T>(Transform parrent = null, string objectName = "") where T : Component
+    /// <summary>
+    /// Create new object and add component to it.
+    /// </summary>
+    /// <typeparam name="T">Type of component to add.</typeparam>
+    /// <param name="parent">Parent object.</param>
+    /// <param name="objectName">Name of the new object.</param>
+    /// <returns>Reference to added component.</returns>
+    public static T CreateObjectWithComponent<T>(Transform parent = null, string objectName = "") where T : Component
     {
         GameObject newGameObject = new GameObject();
 
@@ -42,11 +61,9 @@ public static class GameObjectExtension
             newGameObject.name = objectName;
         }
 
-        newGameObject.transform.SetParent(parrent);
+        newGameObject.transform.SetParent(parent);
 
-        newGameObject.transform.localPosition = Vector3.zero;
-        newGameObject.transform.localRotation = Quaternion.identity;
-        newGameObject.transform.localScale = Vector3.one;
+        newGameObject.transform.Reset();
 
         T component = newGameObject.AddComponent<T>();
 

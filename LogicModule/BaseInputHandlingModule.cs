@@ -8,7 +8,7 @@ using BaseGameLogic.Character;
 
 namespace BaseGameLogic.LogicModule
 {
-    public abstract class InputHandlingModule<T> : BaseLogicModule where T : BaseInputSource
+    public abstract class BaseInputHandlingModule<T> : BaseLogicModule where T : BaseInputSource
     {
         [SerializeField]
         protected BasePlayerCharacterController _playerController = null;
@@ -26,10 +26,7 @@ namespace BaseGameLogic.LogicModule
 
         protected T ConvertToInputSourceDefinition(BaseInputSource source)
         {
-            if (source is T)
-            {
-                return source as T;
-            }
+            if (source is T) return source as T;
 
             return null;
         }
@@ -40,6 +37,7 @@ namespace BaseGameLogic.LogicModule
             {
                 InputCollector = InputCollectorManager.Instance.GetInputCollector(_playerController.PlayerNumber);
                 _currentinputSourceDefinition = ConvertToInputSourceDefinition(InputCollector.CurrentInputSourceInstance);
+
                 InputCollector.InputSourceChanged -= InputSourceChanged;
                 InputCollector.InputSourceChanged += InputSourceChanged;
             }

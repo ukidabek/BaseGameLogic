@@ -11,9 +11,6 @@ namespace BaseGameLogic.States
     /// </summary>
     public abstract class BaseStateCreator : BaseCreator 
     { 
-        public abstract BaseState CreateProduct(
-            BaseStateObject controlledObject,
-            BaseInputCache inputCache, 
-            BaseAnimationHandlingCache animationHandlingCache); 
+        public abstract BaseState CreateProduct(BaseStateObject controlledObject); 
     }
 }

@@ -105,6 +105,11 @@ namespace BaseGameLogic.LogicModule
             this._axis = _axis;
         }
 
+        public void Initialize()
+        {
+            _currentRotation = AxisRotation;
+        }
+
         public float CalculateRotation(float input, float deltaTime)
         {
             float modifyRotationBy = rotationSpeed * input * deltaTime;

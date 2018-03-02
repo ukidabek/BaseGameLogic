@@ -159,10 +159,7 @@ namespace BaseGameLogic.States
 
             if (defaultStateCreator != null)
             {
-                defaultState = defaultStateCreator.CreateProduct(
-                    this,
-                    InputCache,
-                    AnimationHandlingCache);
+                defaultState = defaultStateCreator.CreateProduct(this);
                 
                 this.EnterState(defaultState);
             }

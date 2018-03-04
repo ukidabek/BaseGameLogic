@@ -2,6 +2,7 @@
 using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.SceneManagement;
 
 [CustomEditor(typeof(Transform))]
 public class TransformCustomInspector : Editor
@@ -18,49 +19,57 @@ public class TransformCustomInspector : Editor
     public override void OnInspectorGUI()
     {
         //base.OnInspectorGUI();
-        float oldLabelWidth = EditorGUIUtility.labelWidth;
-
-        EditorGUIUtility.labelWidth = LABEL_WIDTH;
-        EditorGUILayout.BeginHorizontal();
+        EditorGUI.BeginChangeCheck();
         {
-            if(_item.parent != null)
-            {
-                _item.localPosition = EditorGUILayout.Vector3Field("Position", _item.localPosition);
-            }
-            else
-            {
-                _item.position = EditorGUILayout.Vector3Field("Position", _item.position);
-            }
+            float oldLabelWidth = EditorGUIUtility.labelWidth;
 
-            if (GUILayout.Button("R", GUILayout.Width(RESET_BUTTON_WIDTH)))
+            EditorGUIUtility.labelWidth = LABEL_WIDTH;
+            EditorGUILayout.BeginHorizontal();
             {
-                _item.ResetPosition();
+                if(_item.parent != null)
+                {
+                    _item.localPosition = EditorGUILayout.Vector3Field("Position", _item.localPosition);
+                }
+                else
+                {
+                    _item.position = EditorGUILayout.Vector3Field("Position", _item.position);
+                }
+
+                if (GUILayout.Button("R", GUILayout.Width(RESET_BUTTON_WIDTH)))
+                {
+                    _item.ResetPosition();
+                }
             }
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUIUtility.labelWidth = LABEL_WIDTH;
+            EditorGUILayout.BeginHorizontal();
+            {
+                _item.rotation = Quaternion.Euler(EditorGUILayout.Vector3Field("Rotation", _item.rotation.eulerAngles));
+                if (GUILayout.Button("R", GUILayout.Width(RESET_BUTTON_WIDTH)))
+                {
+                    _item.ResetRotation();
+                }
+            }
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUIUtility.labelWidth = LABEL_WIDTH;
+            EditorGUILayout.BeginHorizontal();
+            {
+                _item.localScale = EditorGUILayout.Vector3Field("Scale", _item.localScale);
+                if (GUILayout.Button("R", GUILayout.Width(RESET_BUTTON_WIDTH)))
+                {
+                    _item.ResetScale();
+                }
+            }
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUIUtility.labelWidth = oldLabelWidth;
         }
-        EditorGUILayout.EndHorizontal();
-
-        EditorGUIUtility.labelWidth = LABEL_WIDTH;
-        EditorGUILayout.BeginHorizontal();
+        if(EditorGUI.EndChangeCheck())
         {
-            _item.rotation = Quaternion.Euler(EditorGUILayout.Vector3Field("Rotation", _item.rotation.eulerAngles));
-            if (GUILayout.Button("R", GUILayout.Width(RESET_BUTTON_WIDTH)))
-            {
-                _item.ResetRotation();
-            }
+            EditorUtility.SetDirty(_item.gameObject);
+            EditorSceneManager.MarkSceneDirty(_item.gameObject.scene);
         }
-        EditorGUILayout.EndHorizontal();
-
-        EditorGUIUtility.labelWidth = LABEL_WIDTH;
-        EditorGUILayout.BeginHorizontal();
-        {
-            _item.localScale = EditorGUILayout.Vector3Field("Scale", _item.localScale);
-            if (GUILayout.Button("R", GUILayout.Width(RESET_BUTTON_WIDTH)))
-            {
-                _item.ResetScale();
-            }
-        }
-        EditorGUILayout.EndHorizontal();
-
-        EditorGUIUtility.labelWidth = oldLabelWidth;
     }
 }

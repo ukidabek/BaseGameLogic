@@ -51,5 +51,5 @@ namespace BaseGameLogic.Character
 			base.Start ();
 
 		}
-	}
+    }
 }

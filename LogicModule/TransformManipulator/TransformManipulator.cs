@@ -7,6 +7,14 @@ namespace BaseGameLogic.LogicModule
         [SerializeField]
         protected Transform _transform;
 
+        [SerializeField]
+        protected float speed = 10f;
+        public float Speed
+        {
+            get { return speed; }
+            set { speed = value; }
+        }
+
         public TransformManipulator()
         {
             _transform = null;
@@ -16,5 +24,11 @@ namespace BaseGameLogic.LogicModule
         {
             _transform = transform;
         }
+
+        public TransformManipulator(Transform transform, float speed) : this(transform)
+        {
+            this.speed = speed;
+        }
+
     }
 }

@@ -5,7 +5,7 @@ using System;
 namespace BaseGameLogic.Serialization
 {
     [Serializable]
-    public class SerializaedQuaternion
+    public class SerializedQuaternion
     {
         public float W = 0;
         public float X = 0;
@@ -24,9 +24,9 @@ namespace BaseGameLogic.Serialization
             }
         }
 
-        public SerializaedQuaternion() {}
+        public SerializedQuaternion() {}
 
-        public SerializaedQuaternion(Quaternion quaternion)
+        public SerializedQuaternion(Quaternion quaternion)
         {
             W = quaternion.w;
             X = quaternion.x;

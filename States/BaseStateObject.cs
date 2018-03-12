@@ -17,9 +17,6 @@ namespace BaseGameLogic.States
     /// </summary>
     public abstract class BaseStateObject : MonoBehaviour
     {
-        [SerializeField]
-        public StatTree tree = new StatTree();
-        
         #if UNITY_EDITOR
 
         [Header("Debug display & options.")]
@@ -65,21 +62,12 @@ namespace BaseGameLogic.States
 
         #endregion
 
-		#region Managers references
+        #region Managers references
 
-		protected GameManager GameManagerInstance 
+        protected bool GameManagerExist {get; private set; }
+        protected GameManager GameManagerInstance 
 		{
 			get { return GameManager.Instance; }
-		}
-
-        public EventManager EventManagerInstance
-        {
-            get { return EventManager.Instance; }
-        }
-
-        protected virtual bool EventCanBeRegistred
-		{
-			get { return EventManager.EventCanBeRegistred; }
 		}
 
         /// <summary>
@@ -87,65 +75,10 @@ namespace BaseGameLogic.States
         /// </summary>
 		protected bool IsGamePaused
 		{
-			get { return GameManagerInstance != null && GameManagerInstance.GameStatus == GameStatusEnum.Pause; }
+			get { return GameManagerExist && GameManagerInstance.GameStatus == GameStatusEnum.Pause; }
 		}
 
         #endregion
-
-        #region Object Caches
-
-        /// <summary>
-        /// The input cache contains references to physical inputs for faster access.
-        /// </summary>
-        private  BaseInputCache inputCache = null;
-        public BaseInputCache InputCache
-        {
-            get 
-            { 
-                if (inputCache == null)
-                {
-                    inputCache = CreateInputCache();
-                }
-                return this.inputCache; 
-            }
-        }
-
-        /// <summary>
-        /// The animation handling cache contains references to animation data containers for faster access.
-        /// </summary>
-        private BaseAnimationHandlingCache animationHandlingCache = null;
-        public BaseAnimationHandlingCache AnimationHandlingCache
-        {
-            get
-            {
-                if (animationHandlingCache == null)
-                {
-                    animationHandlingCache = CreateAnimationHandlingCache();
-                }
-
-                return this.animationHandlingCache;
-            }
-        }
-
-        #endregion
-
-        /// <summary>
-        /// Creates the input cache.
-        /// </summary>
-        /// <returns>The input cache.</returns>
-        protected virtual BaseInputCache CreateInputCache()
-        {
-            return new BaseInputCache();
-        }
-
-        /// <summary>
-        /// Creates the animation handling cache.
-        /// </summary>
-        /// <returns>The animation handling cache.</returns>
-        protected virtual BaseAnimationHandlingCache CreateAnimationHandlingCache()
-        {
-            return new BaseAnimationHandlingCache();
-        }
 
 		/// <summary>
 		/// Enters the default state of the object.
@@ -167,9 +100,8 @@ namespace BaseGameLogic.States
 
         protected virtual void Start () 
         {
-            RegisterAllEvents();
-
-            if(GameManagerInstance != null)
+            GameManagerExist = GameManagerInstance != null;
+            if(GameManagerExist)
             {
 			    GameManagerInstance.ObjectInitializationCallBack -= InitializeObject;
 			    GameManagerInstance.ObjectInitializationCallBack += InitializeObject;
@@ -184,7 +116,7 @@ namespace BaseGameLogic.States
             EnterDefaultState();
         }
 
-        protected bool ExecutModesFunction(StateModeUpdate update)
+        protected bool ExecuteModesFunction(StateModeUpdate update)
         {
             bool additive = true;
             if (CurrentState == null)
@@ -222,10 +154,7 @@ namespace BaseGameLogic.States
 
         protected virtual void OnDestroy()
         {
-            UnregisterAllEvents();
-            string name = this.gameObject.name;
-
-            if(GameManagerInstance != null)
+            if(GameManagerExist)
             {
                 GameManagerInstance.ObjectInitializationCallBack -= InitializeObject;
             }
@@ -236,7 +165,7 @@ namespace BaseGameLogic.States
 			if (IsGamePaused)
 				return;
 			
-			bool additive = ExecutModesFunction (StateModeUpdate.Normal); 
+			bool additive = ExecuteModesFunction (StateModeUpdate.Normal); 
 			if(CurrentState != null && additive)
                 CurrentState.OnUpdate();
         }
@@ -246,7 +175,7 @@ namespace BaseGameLogic.States
 			if (IsGamePaused)
 				return;
 			
-			bool additive = ExecutModesFunction (StateModeUpdate.Late); 
+			bool additive = ExecuteModesFunction (StateModeUpdate.Late); 
 			if(CurrentState != null && additive)
                 CurrentState.OnLateUpdate();
         }
@@ -256,7 +185,7 @@ namespace BaseGameLogic.States
 			if (IsGamePaused)
 				return;
 			
-			bool additive = ExecutModesFunction (StateModeUpdate.Fixed); 
+			bool additive = ExecuteModesFunction (StateModeUpdate.Fixed); 
 			if(CurrentState != null && additive)
                 CurrentState.OnFixedUpdate();
         }
@@ -351,15 +280,12 @@ namespace BaseGameLogic.States
                 CurrentState.Enter();
 
                 #if UNITY_EDITOR
-				string type = newState.GetType().ToString();
-				string [] nameSegments = type.Split('.');
-				string stateName = nameSegments[nameSegments.Length -1];
-				currentStateTypes.Insert(0, stateName);
+				currentStateTypes.Insert(0, newState.GetType().Name);
                 #endif    
             }
             else
             {
-                string typeName = newState.GetType().ToString();
+                string typeName = newState.GetType().Name;
                 Debug.LogErrorFormat("Conditions to enter the state type of {0} were not met.", typeName);
             }
         }

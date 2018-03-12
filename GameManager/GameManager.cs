@@ -5,7 +5,7 @@ using System.Collections;
 
 using BaseGameLogic.Singleton;
 using BaseGameLogic.Inputs;
-using BaseGameLogic.TimeManagment;
+using BaseGameLogic.TimeManagement;
 using BaseGameLogic.Events;
 using BaseGameLogic.Character;
 
@@ -13,7 +13,7 @@ namespace BaseGameLogic.Management
 {
 	public abstract class GameManager : Singleton<GameManager> 
 	{
-		public Action ObjectInitializationCallBack = null;
+		public event Action ObjectInitializationCallBack = null;
 
 		[SerializeField]
 		private GameStatusEnum _gameStatus = GameStatusEnum.Play;
@@ -37,11 +37,11 @@ namespace BaseGameLogic.Management
 		protected virtual void CreateManagersInstance()
 		{
 			CreateInstance<InputCollectorManager> (inputCollectorManagerPrefab);
-			CreateInstance<CharacterRegister>(characterRegisterPrefab);
-			CreateInstance<TimeManager>(timeManagerPrefab);
+			CreateInstance<CharacterRegister> (characterRegisterPrefab);
+			CreateInstance<TimeManager> (timeManagerPrefab);
 		}
 
-		protected virtual void InitalizeOtherObjects()
+		protected virtual void InitializeOtherObjects()
 		{
 			if (ObjectInitializationCallBack != null)
 			{
@@ -53,8 +53,9 @@ namespace BaseGameLogic.Management
 		{
 			if (prefab == null) 
 			{
-				// Throw exception. 
-				return null;
+                Type type = typeof(T);
+                Debug.LogWarningFormat("Reference for {0} is null. It's correct?", type.ToString());
+                return null;
 			}
 
 			GameObject instance = GameObject.Instantiate (prefab);
@@ -63,6 +64,7 @@ namespace BaseGameLogic.Management
 			instance.transform.localRotation = Quaternion.identity;
 
 			T componentInstance = instance.GetComponent<T> ();
+
 			return componentInstance;
 		}
 
@@ -83,7 +85,7 @@ namespace BaseGameLogic.Management
 			this.enabled = false;
             if(_gameStatus != GameStatusEnum.Loading)
             {
-			    InitalizeOtherObjects ();
+			    InitializeOtherObjects ();
             }
 		}
 

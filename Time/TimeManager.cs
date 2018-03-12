@@ -4,7 +4,7 @@ using System.Collections;
 
 using BaseGameLogic.Singleton;
 
-namespace BaseGameLogic.TimeManagment
+namespace BaseGameLogic.TimeManagement
 {
     /// <summary>
     /// Time manager.

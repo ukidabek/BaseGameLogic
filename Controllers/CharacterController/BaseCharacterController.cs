@@ -16,55 +16,7 @@ namespace BaseGameLogic.Character
     {
 		public virtual bool IsPlayer { get { return false; } }
 
-		#region Managers references
-
-		protected CharacterRegister CharacterRegisterInstance
-		{
-			get 
-			{ 
-				if(GameManagerInstance != null)
-					return GameManagerInstance.CharacterRegisterInstance;
-
-				return null;
-			}
-		}
-
-		#endregion
-
-		#region Components references
-
-		protected CharacterController characterController = null;
-		public CharacterController CharacterController 
-		{
-			get { return this.characterController; } 
-		}
-
-		protected NavMeshAgent characterNavMeshAgent = null;
-		public NavMeshAgent CharacterNavMeshAgent 
-		{
-			get { return this.characterNavMeshAgent; } 
-		}
-
-		#endregion
-        
-		/// <summary>
-        /// Character settings.
-        /// </summary>
-		[Header("Character settings & management.")]
-		[SerializeField]
-		private CharacterStatus characterStatus = null;
-		public CharacterStatus CharacterStatus 
-		{
-    		get 
-			{
-				if (characterStatus == null) 
-				{
-					characterStatus = CreateCharacterStatus ();
-				}
-
-				return this.characterStatus; 
-			}
-    	}
+		protected CharacterRegister CharacterRegisterInstance { get { return CharacterRegister.Instance; } }
 			
         protected virtual void Register()
         {
@@ -72,9 +24,13 @@ namespace BaseGameLogic.Character
             {
                 CharacterRegisterInstance.RegisterCharacter(this);
             }
-            else
+        }
+
+		protected virtual void Unregister()
+		{
+            if (CharacterRegisterInstance != null)
             {
-                // exception
+                CharacterRegisterInstance.UnregisterCharacter(this);
             }
         }
 
@@ -87,21 +43,8 @@ namespace BaseGameLogic.Character
                                                 
 		protected override void OnDestroy ()
     	{
-			if (CharacterRegisterInstance != null) 
-			{
-				CharacterRegisterInstance.UnregisterCharacter (this);
-			}
-			else
-			{
-				// exception
-			}
-				
-    		base.OnDestroy ();
+            Unregister();
+            base.OnDestroy ();
     	}
-
-		protected virtual CharacterStatus CreateCharacterStatus()
-		{
-			return new CharacterStatus ();
-		}
     }
 }

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace BaseGameLogic.TimeManagment
+namespace BaseGameLogic.TimeManagement
 {
     public enum TimeManagerModeEnum 
     {

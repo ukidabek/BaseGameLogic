@@ -33,15 +33,11 @@ namespace BaseGameLogic.Character
 		{
 			BasePlayerCharacterController otherPlayer = obj as BasePlayerCharacterController;
 
-			if (PlayerNumber < otherPlayer.PlayerNumber) 
-			{
+			if (PlayerNumber < otherPlayer.PlayerNumber)
 				return 1;
-			}
 
-			if (PlayerNumber > otherPlayer.PlayerNumber) 
-			{
+			if (PlayerNumber > otherPlayer.PlayerNumber)
 				return -1;
-			}
 
 			return 0;
 		}

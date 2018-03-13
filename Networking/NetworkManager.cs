@@ -20,7 +20,7 @@ namespace BaseGameLogic.Networking
         [SerializeField, Header("Network settings.")]
         protected NetworkManagerSettings _settings = new NetworkManagerSettings();
 
-        public bool IsSetver { get { return _settings.ManagerType == NetworkManagerTypeEnum.Server; } }
+        public bool IsSever { get { return _settings.ManagerType == NetworkManagerTypeEnum.Server; } }
 
         public NetworkManagerSettings Settings { get { return _settings; } }
 
@@ -172,7 +172,7 @@ namespace BaseGameLogic.Networking
 
         protected virtual void ClientConnected(int connectionId)
         {
-            if(ClientConnectedCallback != null && IsSetver)
+            if(ClientConnectedCallback != null && IsSever)
             {
                 ClientConnectedCallback(connectionId);
             }
@@ -180,7 +180,7 @@ namespace BaseGameLogic.Networking
 
         protected virtual void ClientDisconnected(int connectionID)
         {
-            if (ClientDisconnectedCallback != null && IsSetver)
+            if (ClientDisconnectedCallback != null && IsSever)
             {
                 ClientDisconnectedCallback(connectionID);
             }

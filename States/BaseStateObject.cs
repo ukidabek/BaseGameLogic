@@ -53,8 +53,7 @@ namespace BaseGameLogic.States
         {
             get 
             {
-                if (states.Count == 0)
-                    return null;
+                if (states.Count == 0) return null;
 
                 return states.Peek(); 
             }

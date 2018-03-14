@@ -16,7 +16,7 @@ namespace BaseGameLogic.Networking
         private Type[] messageSenderTypes = null;
         private Type[] messageHandlerTypes = null;
 
-        private GenericMenu messageSendeContextMenu = new GenericMenu();
+        private GenericMenu messageSenderContextMenu = new GenericMenu();
         private GenericMenu messageHandlerContextMenu = new GenericMenu();
 
         private void OnEnable()
@@ -30,7 +30,7 @@ namespace BaseGameLogic.Networking
             for (int i = 0; i < messageSenderTypes.Length; i++)
             {
                 content = new GUIContent(messageSenderTypes[i].Name);
-                messageSendeContextMenu.AddItem(content, false, AddMessageSender, i);
+                messageSenderContextMenu.AddItem(content, false, AddMessageSender, i);
 
             }
 
@@ -53,7 +53,7 @@ namespace BaseGameLogic.Networking
             {
                 if (GUILayout.Button("Add message sender"))
                 {
-                    messageSendeContextMenu.ShowAsContext();
+                    messageSenderContextMenu.ShowAsContext();
                 }
 
                 if (GUILayout.Button("Add message handler"))

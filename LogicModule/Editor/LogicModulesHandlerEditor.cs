@@ -12,30 +12,22 @@ namespace BaseGameLogic.LogicModule
     {
         private LogicModulesHandler _logicModulesHandler = null;
         private Type[] _logicModulesTypes = null;
-
         private GenericMenu _addModuleMenu = null;
-        private GenericMenu _addModuleToChildMenu = new GenericMenu();
-
-        private List<Transform> _childTransformList = new List<Transform>();
+        private GenericMenu _addModuleToChildMenu = null;
         
         protected virtual void OnEnable()
         {
             _logicModulesHandler = target as LogicModulesHandler;
             _logicModulesTypes = AssemblyExtension.GetDerivedTypes<BaseLogicModule>();
 
-            _addModuleMenu = GenericMenuExtension.GenerateMenuFormTypes(_logicModulesTypes, AddModule);
+            _addModuleMenu = GenericMenuExtension.GenerateMenuFormTypes(
+                _logicModulesTypes,
+                AddModule);
 
-            GUIContent content = null;
-            for (int i = 0; i < _logicModulesHandler.transform.childCount; i++)
-            {
-                GameObject gameObject = _logicModulesHandler.transform.GetChild(i).gameObject;
-                for (int j = 0; j < _logicModulesTypes.Length; j++)
-                {
-                    content = new GUIContent(string.Format("{0}/{1}", gameObject.name, _logicModulesTypes[j].Name));
-                    GameObjectModuleTypePair pair = new GameObjectModuleTypePair(gameObject, _logicModulesTypes[j]);
-                    _addModuleToChildMenu.AddItem(content, false, ShowAddMenuForChild, pair);
-                }
-            }
+            _addModuleToChildMenu = GenericMenuExtension.GenerateMenuFromTypesToObject(
+                _logicModulesHandler.transform.GetChildGameObjects(), 
+                _logicModulesTypes, 
+                AddModuleToChild);
         }
 
         private void FindAllLogicModule(GameObject gameObject)
@@ -80,7 +72,7 @@ namespace BaseGameLogic.LogicModule
             }
         }
 
-        private void ShowAddMenuForChild(object obj)
+        private void AddModuleToChild(object obj)
         {
             GameObjectModuleTypePair pair = obj as GameObjectModuleTypePair;
             AddModule(pair.Type, pair.GameObject);
@@ -100,33 +92,18 @@ namespace BaseGameLogic.LogicModule
 
             EditorGUILayout.BeginHorizontal();
             {
-                if(GUILayout.Button("Add logic module"))
+                if (GUILayout.Button("Add logic"))
                 {
                     _addModuleMenu.ShowAsContext();
                 }
-
                 if (GUILayout.Button("Add logic to child"))
                 {
                     _addModuleToChildMenu.ShowAsContext();
                 }
-
             }
             EditorGUILayout.EndHorizontal();
 
             GUI.enabled = guiEnabled;
         }
     }
-
-    internal class GameObjectModuleTypePair
-    {
-        public GameObject GameObject = null;
-        public Type Type = null;
-
-        public GameObjectModuleTypePair(GameObject gameObject, Type type)
-        {
-            GameObject = gameObject;
-            Type = type;
-        }
-    }
-
 }

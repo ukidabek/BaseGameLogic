@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public static class TransformExtension
 {
@@ -33,5 +34,29 @@ public static class TransformExtension
     public static float Distance(this Transform transform, Transform _transform)
     {
         return Vector3.Distance(transform.position, _transform.position);
+    }
+
+    public static Transform[] GetChildTransforms(this Transform transform)
+    {
+        List<Transform> transformList = new List<Transform>();
+
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            transformList.Add(transform.GetChild(i));
+        }
+
+        return transformList.ToArray();
+    }
+
+    public static GameObject[] GetChildGameObjects(this Transform transform)
+    {
+        List<GameObject> transformList = new List<GameObject>();
+
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            transformList.Add(transform.GetChild(i).gameObject);
+        }
+
+        return transformList.ToArray();
     }
 }

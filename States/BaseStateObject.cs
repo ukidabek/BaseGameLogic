@@ -38,8 +38,8 @@ namespace BaseGameLogic.States
         protected List<BaseStateModeCreator> stateModesCreators = new List<BaseStateModeCreator>();
 
         [SerializeField]
-        protected LogicModulesContainer logicModulesContainer = new LogicModulesContainer();
-        public LogicModulesContainer LogicModulesContainer { get { return logicModulesContainer; } }
+        private LogicModulesHandler _logicModulesHandler = null;
+        public LogicModulesHandler LogicModulesHandler { get { return _logicModulesHandler; } }
 
         /// <summary>
         /// Stack of states.
@@ -79,9 +79,9 @@ namespace BaseGameLogic.States
 
         #endregion
 
-		/// <summary>
-		/// Enters the default state of the object.
-		/// </summary>
+        /// <summary>
+        /// Enters the default state of the object.
+        /// </summary>
         protected virtual void EnterDefaultState()
         {
             if (defaultStateCreator == null)
@@ -96,6 +96,8 @@ namespace BaseGameLogic.States
                 this.EnterState(defaultState);
             }
         }
+
+        protected virtual void Awake() { }
 
         protected virtual void Start () 
         {
@@ -148,8 +150,6 @@ namespace BaseGameLogic.States
 		}
 
         #region MonoBehaviour methods
-
-        protected virtual void Awake() {}
 
         protected virtual void OnDestroy()
         {
@@ -302,8 +302,17 @@ namespace BaseGameLogic.States
             #endif    
         }
 
-        public virtual void RegisterAllEvents() {}
+        #if UNITY_EDITOR
+        public void AddLogicModuleHandler()
+        {
+            _logicModulesHandler = gameObject.AddComponent<LogicModulesHandler>();
+        }
 
-        public virtual void UnregisterAllEvents() {}
+        public void RemoveLogicModuleHandler()
+        {
+            DestroyImmediate(_logicModulesHandler);
+        }
+
+        #endif
     }
 }

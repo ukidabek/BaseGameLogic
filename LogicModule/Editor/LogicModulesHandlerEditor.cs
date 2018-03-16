@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEditor;
+using UnityEditorInternal;
 
 using System;
 
@@ -14,20 +15,35 @@ namespace BaseGameLogic.LogicModule
         private Type[] _logicModulesTypes = null;
         private GenericMenu _addModuleMenu = null;
         private GenericMenu _addModuleToChildMenu = null;
-        
+
+        private ReorderableList list = null;
+
         protected virtual void OnEnable()
         {
             _logicModulesHandler = target as LogicModulesHandler;
             _logicModulesTypes = AssemblyExtension.GetDerivedTypes<BaseLogicModule>();
 
-            _addModuleMenu = GenericMenuExtension.GenerateMenuFormTypes(
-                _logicModulesTypes,
-                AddModule);
+            _addModuleMenu = GenericMenuExtension.GenerateMenuFormTypes(_logicModulesTypes, AddModule);
+
+            List<GameObject> _gameObjectList = new List<GameObject>();
+            _gameObjectList.Add(_logicModulesHandler.gameObject);
+            _gameObjectList.AddRange(_logicModulesHandler.transform.GetChildGameObjects());
+            _gameObjectList.Add(null);
 
             _addModuleToChildMenu = GenericMenuExtension.GenerateMenuFromTypesToObject(
-                _logicModulesHandler.transform.GetChildGameObjects(), 
+                _gameObjectList.ToArray(), 
                 _logicModulesTypes, 
                 AddModuleToChild);
+
+            list = new ReorderableList(
+                serializedObject,
+                serializedObject.FindProperty("logicModulesContainer").FindPropertyRelative("_modulesList"),
+                true, true, true, true);
+
+            list.drawHeaderCallback = DrawHeader;
+            list.drawElementCallback = DrawListElement;
+            list.onRemoveCallback = RemoveElement;
+            list.onAddCallback = AddElement;
         }
 
         private void FindAllLogicModule(GameObject gameObject)
@@ -60,6 +76,12 @@ namespace BaseGameLogic.LogicModule
 
         private void AddModule(Type moduleType, GameObject targetObject)
         {
+            if(targetObject == null)
+            {
+                targetObject = new GameObject();
+                targetObject.transform.SetParent(_logicModulesHandler.transform, false);
+            } 
+
             BaseLogicModule module = targetObject.AddComponent(moduleType) as BaseLogicModule;
             try
             {
@@ -78,30 +100,57 @@ namespace BaseGameLogic.LogicModule
             AddModule(pair.Type, pair.GameObject);
         }
 
+        private void DrawListElement(Rect rect, int i, bool isActive, bool isFocused)
+        {
+            float buttonSize = 20;
+            rect.y += 2;
+            Rect buttonRect = new Rect(rect.x, rect.y, buttonSize, EditorGUIUtility.singleLineHeight);
+
+            SerializedProperty element = list.serializedProperty.GetArrayElementAtIndex(i);
+            Rect elementRect = new Rect(rect.x + 2, rect.y, rect.width, EditorGUIUtility.singleLineHeight);
+
+            EditorGUI.PropertyField(elementRect, element, GUIContent.none);
+        }
+
+        private void AddElement(ReorderableList list)
+        {
+            _addModuleToChildMenu.ShowAsContext();
+        }
+
+        private void RemoveElement(ReorderableList list)
+        {
+            SerializedProperty element = list.serializedProperty.GetArrayElementAtIndex(list.index);
+            BaseLogicModule module = element.objectReferenceValue as BaseLogicModule;
+
+            if(module != null)
+            {
+                DestroyImmediate(module);
+                ReorderableList.defaultBehaviours.DoRemoveButton(list);
+            }
+
+            ReorderableList.defaultBehaviours.DoRemoveButton(list);
+        }
+
+        private void DrawHeader(Rect rect)
+        {
+            EditorGUI.LabelField(rect, "Logic modules");
+        }
+
         public override void OnInspectorGUI()
         {
+            EditorGUILayout.BeginVertical();
             base.OnInspectorGUI();
+            EditorGUILayout.EndVertical();
+
+            serializedObject.Update();
+            list.DoLayoutList();
+            serializedObject.ApplyModifiedProperties();
 
             bool guiEnabled = GUI.enabled;
             GUI.enabled = !Application.isPlaying;
 
             if (GUILayout.Button("Get all logic modules"))
-            {
                 FindAllLogicModule(_logicModulesHandler.gameObject);
-            }
-
-            EditorGUILayout.BeginHorizontal();
-            {
-                if (GUILayout.Button("Add logic"))
-                {
-                    _addModuleMenu.ShowAsContext();
-                }
-                if (GUILayout.Button("Add logic to child"))
-                {
-                    _addModuleToChildMenu.ShowAsContext();
-                }
-            }
-            EditorGUILayout.EndHorizontal();
 
             GUI.enabled = guiEnabled;
         }

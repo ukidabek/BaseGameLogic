@@ -20,6 +20,7 @@ namespace BaseGameLogic.LogicModule
                 throw new NullReferenceException();
 
             BaseLogicModule onListModule = GetModule(module.GetType());
+
             if (onListModule != null)
                 if (onListModule != module)
                     throw new LogicModuleOnListException(module);
@@ -33,7 +34,7 @@ namespace BaseGameLogic.LogicModule
         {
             for (int i = 0; i < _modulesList.Count; i++)
             {
-                if (_modulesList[i].GetType() == type)
+                if (_modulesList[i] != null && _modulesList[i].GetType() == type)
                     return _modulesList[i];
             }
 

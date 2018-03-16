@@ -6,7 +6,7 @@ namespace BaseGameLogic.LogicModule
 {
     public class LogicModulesHandler : MonoBehaviour
     {
-        [SerializeField]
+        [SerializeField, HideInInspector]
         protected LogicModulesContainer logicModulesContainer = new LogicModulesContainer();
         public LogicModulesContainer LogicModulesContainer { get { return logicModulesContainer; } }
 

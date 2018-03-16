@@ -19,7 +19,7 @@ public static class GenericMenuExtension
         return menu;
     }
 
-    public static GenericMenu GenerateMenuFromTypesToObject(GameObject[] gameObjects, Type[] types, GenericMenu.MenuFunction2 function)
+    public static GenericMenu GenerateMenuFromTypesToObject(GameObject[] gameObjects, Type[] types, GenericMenu.MenuFunction2 function, bool on = false)
     {
         GenericMenu menu = new GenericMenu();
         GUIContent content = null;
@@ -27,9 +27,9 @@ public static class GenericMenuExtension
         {
             for (int j = 0; j < types.Length; j++)
             {
-                content = new GUIContent(string.Format("{0}/{1}", gameObjects[i].name, types[j].Name));
+                content = new GUIContent(string.Format("{0}/{1}", gameObjects[i] == null ? "New object" : gameObjects[i].name, types[j].Name));
                 GameObjectModuleTypePair pair = new GameObjectModuleTypePair(gameObjects[i], types[j]);
-                menu.AddItem(content, false, function, pair);
+                menu.AddItem(content, on, function, pair);
             }
         }
 

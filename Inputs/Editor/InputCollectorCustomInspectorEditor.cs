@@ -7,10 +7,10 @@ using System.Collections;
 
 namespace BaseGameLogic.Inputs
 {
-    [CustomEditor(typeof(InputCollector), true)]
+    [CustomEditor(typeof(BaseInputCollector), true)]
     public class InputCollectorCustomInspectorEditor : Editor 
     {
-		protected InputCollector inputCollector = null;
+		protected BaseInputCollector inputCollector = null;
 
         private ReorderableList list = null;
 
@@ -19,7 +19,7 @@ namespace BaseGameLogic.Inputs
 
         private void OnEnable()
         {
-            inputCollector = target as InputCollector;
+            inputCollector = target as BaseInputCollector;
 
             list = new ReorderableList(
                 serializedObject,
@@ -88,6 +88,5 @@ namespace BaseGameLogic.Inputs
         }
 
         #endregion
-
     }
 }

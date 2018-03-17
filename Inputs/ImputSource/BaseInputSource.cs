@@ -19,11 +19,11 @@ namespace BaseGameLogic.Inputs
 
 		[SerializeField]
         [Tooltip("The reference to input collector that collect input from this source.")]
-		private InputCollector _owner = null;
+		private BaseInputCollector _owner = null;
         /// <summary>
         /// The reference to input collector that collect input from this source.
         /// </summary>
-		public InputCollector Owner 
+		public BaseInputCollector Owner 
 		{ 
 			get { return _owner; } 
 			set { _owner = value; } 

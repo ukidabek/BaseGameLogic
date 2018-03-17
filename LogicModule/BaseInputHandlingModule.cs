@@ -17,8 +17,8 @@ namespace BaseGameLogic.LogicModule
         protected T _currentinputSourceDefinition = null;
 
         [SerializeField]
-        protected InputCollector inputCollector = null;
-        public InputCollector InputCollector
+        protected BaseInputCollector inputCollector = null;
+        public BaseInputCollector InputCollector
         {
             get { return this.inputCollector; }
             protected set { inputCollector = value; }
@@ -33,9 +33,9 @@ namespace BaseGameLogic.LogicModule
 
         protected override void Start()
         {
-            if (InputCollectorManager.Instance != null)
+            if (BaseInputCollectorManager.Instance != null)
             {
-                InputCollector = InputCollectorManager.Instance.GetInputCollector(_playerController.PlayerNumber);
+                InputCollector = BaseInputCollectorManager.Instance.GetInputCollector(_playerController.PlayerNumber);
                 _currentinputSourceDefinition = ConvertToInputSourceDefinition(InputCollector.CurrentInputSourceInstance);
 
                 InputCollector.InputSourceChanged -= InputSourceChanged;

@@ -8,7 +8,7 @@ using BaseGameLogic.Management;
 
 namespace BaseGameLogic.Inputs
 {
-    public abstract class InputCollector : MonoBehaviour 
+    public abstract class BaseInputCollector : MonoBehaviour 
     {
         private const string Input_KeyCode_Error_Message = "Input is not assigned to KeyCode!: Input Name {0} {1}";
         private const string No_Input_Sources_Error_Message = "No input sources! Add input sources!";
@@ -20,7 +20,11 @@ namespace BaseGameLogic.Inputs
         /// <summary>
         /// If more the one local play is used to bound InputCollector to HellspawnPlayerController  by player number.
         /// </summary>
-        public int PlayerNumber { get { return this._playerNumber; } }
+        public int PlayerNumber 
+		{ 
+			get { return this._playerNumber; }
+            set { this._playerNumber = value; }
+		}
 
         [Header("Debug display & options.")]
         public Action InputSourceInstanceChanged = null;

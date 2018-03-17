@@ -13,8 +13,7 @@ public static class AssemblyExtension
     {
         Type baseType = typeof(T);
         Assembly assembly = baseType.Assembly;
-        Type[] types = assembly.GetTypes().Where(type => (type.IsSubclassOf(baseType) && !type.IsAbstract)).ToArray();
 
-        return types;
+        return assembly.GetTypes().Where(type => (type.IsSubclassOf(baseType) && !type.IsAbstract)).ToArray();
     }
 }

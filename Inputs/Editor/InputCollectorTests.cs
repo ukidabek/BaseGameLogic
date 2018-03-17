@@ -69,7 +69,7 @@ namespace BaseGameLogic.Inputs
         }
     }
 
-    internal class TestInputCollector : InputCollector {}
+    internal class TestInputCollector : BaseInputCollector {}
     internal class AInputSource : BaseInputSource {}
     internal class BInputSource : BaseInputSource {}
 

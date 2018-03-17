@@ -19,9 +19,9 @@ namespace BaseGameLogic.Inputs
 			{
 				if (baseInputSource == null) 
 				{
-					InputCollector[] InputCollectors = GameObject.FindObjectsOfType<InputCollector> ();
+					BaseInputCollector[] InputCollectors = GameObject.FindObjectsOfType<BaseInputCollector> ();
 
-					foreach (InputCollector collector in InputCollectors) 
+					foreach (BaseInputCollector collector in InputCollectors) 
 					{
 						if (collector.GetInstanceID () == inputCollectorInstanceID) 
 						{
@@ -52,7 +52,7 @@ namespace BaseGameLogic.Inputs
 			}
 		}
 
-		public InputSourceEditor (InputCollector inputCollector, int inputSourceIndex)
+		public InputSourceEditor (BaseInputCollector inputCollector, int inputSourceIndex)
 		{
 			this.inputCollectorInstanceID = inputCollector.GetInstanceID ();
 			this.inputSourceIndex = inputSourceIndex;

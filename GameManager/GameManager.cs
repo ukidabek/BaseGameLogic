@@ -21,7 +21,7 @@ namespace BaseGameLogic.Management
 
 		[SerializeField]
 		private GameObject inputCollectorManagerPrefab = null;
-		public InputCollectorManager InputCollectorManager { get { return InputCollectorManager.Instance; } }
+		public BaseInputCollectorManager InputCollectorManager { get { return BaseInputCollectorManager.Instance; } }
 
         [SerializeField]
 		private GameObject characterRegisterPrefab = null;
@@ -36,7 +36,7 @@ namespace BaseGameLogic.Management
 
 		protected virtual void CreateManagersInstance()
 		{
-			CreateInstance<InputCollectorManager> (inputCollectorManagerPrefab);
+			CreateInstance<BaseInputCollectorManager> (inputCollectorManagerPrefab);
 			CreateInstance<CharacterRegister> (characterRegisterPrefab);
 			CreateInstance<TimeManager> (timeManagerPrefab);
 		}

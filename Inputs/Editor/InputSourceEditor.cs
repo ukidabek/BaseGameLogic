@@ -25,7 +25,7 @@ namespace BaseGameLogic.Inputs
 					{
 						if (collector.GetInstanceID () == inputCollectorInstanceID) 
 						{
-							baseInputSource = collector.InputSources [inputSourceIndex];
+							baseInputSource = collector[inputSourceIndex];
 						}
 					}
 				}
@@ -56,7 +56,7 @@ namespace BaseGameLogic.Inputs
 		{
 			this.inputCollectorInstanceID = inputCollector.GetInstanceID ();
 			this.inputSourceIndex = inputSourceIndex;
-			this.baseInputSource = inputCollector.InputSources [inputSourceIndex];
+			this.baseInputSource = inputCollector[inputSourceIndex];
 			this.Show ();
 		}
 

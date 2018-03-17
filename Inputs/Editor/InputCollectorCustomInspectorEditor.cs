@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using UnityEditorInternal;
 
+using System;
 using System.Collections;
 
 namespace BaseGameLogic.Inputs
@@ -10,75 +12,82 @@ namespace BaseGameLogic.Inputs
     {
 		protected InputCollector inputCollector = null;
 
+        private ReorderableList list = null;
+
+        private Type[] _inputSourcesTypes = null;
+        private GenericMenu _inputSourcesMenu = null;
+
         private void OnEnable()
         {
             inputCollector = target as InputCollector;
+
+            list = new ReorderableList(
+                serializedObject,
+                serializedObject.FindProperty("inputSources"),
+                true, true, true, true);
+
+            list.drawHeaderCallback = DrawHeader;
+            list.drawElementCallback = DrawListElement;
+            list.onAddCallback = AddElement;
+            list.onRemoveCallback = RemoveElement;
+            
+            _inputSourcesTypes = AssemblyExtension.GetDerivedTypes<BaseInputSource>();
+            _inputSourcesMenu = GenericMenuExtension.GenerateMenuFormTypes(_inputSourcesTypes, AddNewSource);
         }
 
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
-            for (int i = 0; i < inputCollector.InputSources.Count; i++)
-            {
-                if (inputCollector.InputSources[i] == null)
-                {
-                    inputCollector.InputSources.RemoveAt(i);
-                    --i;
-                    continue;
-                }
 
-                EditorGUILayout.BeginHorizontal();
-                {
-                    EditorGUILayout.LabelField(inputCollector.InputSources[i].GetType().ToString());
-                    if (GUILayout.Button("Edit"))
-                    {
-                        new InputSourceEditor(inputCollector, i);
-                    }
+            serializedObject.Update();
+            list.DoLayoutList();
+            serializedObject.ApplyModifiedProperties();
 
-                    if (GUILayout.Button("Remove"))
-                    {
-                        BaseInputSource source = inputCollector.InputSources[i];
-                        inputCollector.InputSources.Remove(source);
-                        GameObject.DestroyImmediate(source, true);
-                    }
-                }
-                EditorGUILayout.EndHorizontal();
-            }
-
-
-//            EditorGUILayout.BeginHorizontal();
-//            {
-//                inputSourceEnum = (InputSourceEnum)EditorGUILayout.EnumPopup(inputSourceEnum);
-//                if (GUILayout.Button("Add input source."))
-//                {
-//                    CreateInputSource(inputSourceEnum);
-//                }
-//            }
-//            EditorGUILayout.EndHorizontal();
-
-			if (GUILayout.Button("Check imputs assign"))
+			if (GUILayout.Button("Check inputs assign"))
 			{
-				inputCollector.CheckInpunts ();
+				inputCollector.CheckInputs ();
 			}
         }
-			
 
-		//protected virtual void CreateInputSource(InputSourceEnum inputSourceEnum) 
-  //      {
-  //          if (inputCollector == null)
-  //          {
-  //              GameObject inputSourcesContainerObject = new GameObject();
-  //              inputCollector.inputSourcesContainerObject = inputSourcesContainerObject;
-  //              inputSourcesContainerObject.transform.SetParent(inputCollector.transform);
-  //              inputSourcesContainerObject.transform.localPosition = Vector3.zero;
-  //          }
+        private void AddNewSource(object obj)
+        {
+            inputCollector.AddInputSource(_inputSourcesTypes[(int)obj]);
+        }
 
-  //          switch (inputSourceEnum)
-  //          {
-  //              case InputSourceEnum.KeyboardAndMouse:
-                    
-  //                  break;
-  //          }
-  //      }
+        #region Reorderable list handling
+
+        private void DrawListElement(Rect rect, int i, bool isActive, bool isFocused)
+        {
+            float editButtonWidth = 50f;
+            SerializedProperty element = list.serializedProperty.GetArrayElementAtIndex(i);
+
+            Rect elementRect = new Rect(rect.x + 2, rect.y + 2, rect.width - editButtonWidth - 2, EditorGUIUtility.singleLineHeight);
+            Rect editButtonRect = new Rect(rect.x + 2 + rect.width - editButtonWidth, rect.y + 2, editButtonWidth, EditorGUIUtility.singleLineHeight);
+            
+            EditorGUI.PropertyField(elementRect, element, GUIContent.none);
+            if(GUI.Button(editButtonRect, "Edit"))
+                new InputSourceEditor(inputCollector, i);
+
+        }
+
+        private void AddElement(ReorderableList list) 
+        {
+            _inputSourcesMenu.ShowAsContext();
+        }
+
+        private void RemoveElement(ReorderableList list) 
+        {
+            inputCollector.RemoveAt(list.index);
+            ReorderableList.defaultBehaviours.DoRemoveButton(list);
+            ReorderableList.defaultBehaviours.DoRemoveButton(list);
+        }
+
+        private void DrawHeader(Rect rect)
+        {
+            EditorGUI.LabelField(rect, "Input sources");
+        }
+
+        #endregion
+
     }
 }

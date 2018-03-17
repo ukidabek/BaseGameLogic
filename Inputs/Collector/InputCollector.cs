@@ -20,13 +20,9 @@ namespace BaseGameLogic.Inputs
         /// <summary>
         /// If more the one local play is used to bound InputCollector to HellspawnPlayerController  by player number.
         /// </summary>
-        public int PlayerNumber 
-		{
-    		get { return this._playerNumber; }
-    	}
+        public int PlayerNumber { get { return this._playerNumber; } }
 
         [Header("Debug display & options.")]
-
         public Action InputSourceInstanceChanged = null;
 
 		private BaseInputSource _currentInputSourceInstance = null;
@@ -51,25 +47,27 @@ namespace BaseGameLogic.Inputs
 
         public event Action<BaseInputSource> InputSourceChanged = null;
 
-        [Header("Input sources managment.")]
-        [SerializeField]
+        [SerializeField, HideInInspector]
         private List<BaseInputSource> inputSources = new List<BaseInputSource>();
         /// <summary>
         /// List of InputSources from which InputCollector will collect input.
         /// </summary>
-        public List<BaseInputSource> InputSources 
-		{ 
-            get { return this.inputSources; } 
+        // public List<BaseInputSource> InputSources { get { return this.inputSources; } }
+
+        public BaseInputSource this[int i]
+        {
+            get { return inputSources[i]; }
         }
-			
+
+		public int Count { get { return inputSources.Count; } }
+
         /// <summary>
         /// Returns true if GamePad if connected.
         /// </summary>
         /// <returns></returns>
-		public bool IsPadConneted ()
+		public bool IsPadConnected ()
 		{
-			if (Input.GetJoystickNames().Length == 0 || 
-				Input.GetJoystickNames()[0] == "")
+			if (Input.GetJoystickNames().Length == 0 || string.IsNullOrEmpty(Input.GetJoystickNames()[0]))
 			{
 				return false;
 			}
@@ -115,24 +113,18 @@ namespace BaseGameLogic.Inputs
         /// <summary>
         /// Check the correctness of the input configuration.
         /// </summary>
-		public void CheckInpunts ()
+		public void CheckInputs ()
 		{
-			for (int i = 0; i < InputSources.Count; i++) 
+			for (int i = 0; i < Count; i++) 
 			{
-				BaseInputSource source = InputSources [i];
-				int sourcePhysicalInputsCount = source.PhysicalInputs.Count;
-				for (int j = 0; j < sourcePhysicalInputsCount; j++) 
+				for (int j = 0; j < this[i].PhysicalInputs.Count; j++) 
 				{
-					PhysicalInput input = source.PhysicalInputs [j];
+					PhysicalInput input = this[i].PhysicalInputs [j];
 					if (input is ButtonInput) 
 					{
-						ButtonInput tmpInputContainer = input as ButtonInput;
-						if (tmpInputContainer.keyCode == KeyCode.None) 
+						if ((input as ButtonInput).keyCode == KeyCode.None) 
 						{
-							Debug.LogErrorFormat (
-								Input_KeyCode_Error_Message, 
-								source.GetType(),
-								input.InputName);
+							Debug.LogErrorFormat (Input_KeyCode_Error_Message, this[i].GetType(), input.InputName);
 						}
 					}
 				}
@@ -149,14 +141,14 @@ namespace BaseGameLogic.Inputs
 			
 			bool enablePause = CurrentInputSourceInstance.PauseButtonDown;
 			bool gameManagerExist = GameManager.Instance != null;
-			bool gameIsPlaing = GameManager.Instance.GameStatus == GameStatusEnum.Play;
+			bool gameIsPlaying = GameManager.Instance.GameStatus == GameStatusEnum.Play;
 
-			if (enablePause && gameManagerExist && gameIsPlaing) 
+			if (enablePause && gameManagerExist && gameIsPlaying) 
 			{
 				GameManager.Instance.PauseGame ();
 			}
 
-			if (enablePause && gameManagerExist && !gameIsPlaing) 
+			if (enablePause && gameManagerExist && !gameIsPlaying) 
 			{
 				GameManager.Instance.ResumeGame ();
 			}
@@ -164,14 +156,14 @@ namespace BaseGameLogic.Inputs
 
 		protected virtual void Awake()
 		{
-			for (int i = 0; i < InputSources.Count; i++) 
+			for (int i = 0; i < Count; i++) 
 			{
-				InputSources [i].Owner = this;
+                this[i].Owner = this;
 			}
 
             if (inputSources.Count > 0)
             {
-                SelectCurrentInputSourceInstance(InputSources[0]);
+                SelectCurrentInputSourceInstance(this[0]);
             }
             else
             {
@@ -185,5 +177,45 @@ namespace BaseGameLogic.Inputs
 			CollectInputs ();
 			HandleGamePause ();
         }
+
+#if UNITY_EDITOR
+		private GameObject CreateInputSourceHolder(string name)
+		{
+            GameObject gameObject = new GameObject();
+            gameObject.name = name;
+            gameObject.transform.SetParent(this.transform, false);
+
+            return gameObject;
+        }
+		public void AddInputSource(Type inputSourceType)
+		{
+            if(inputSourceType.IsSubclassOf(typeof(BaseInputSource)))
+			{
+				GameObject gameObject = CreateInputSourceHolder(inputSourceType.Name);
+				BaseInputSource source = gameObject.AddComponent(inputSourceType) as BaseInputSource;
+
+				inputSources.Add(source);
+			}
+			else
+			{
+                throw new TypeIsNotInputSourceException();
+            }
+        }
+
+		public void AddInputSource<T>() where T : BaseInputSource
+		{
+            GameObject gameObject = CreateInputSourceHolder(typeof(T).Name);
+            T source = gameObject.AddComponent<T>();
+
+            inputSources.Add(source);
+        }
+
+		public void RemoveAt(int index)
+		{
+			if(this[index] != null)
+				DestroyImmediate(this[index].gameObject);
+            inputSources.RemoveAt(index);
+        }
+#endif
     }
 }

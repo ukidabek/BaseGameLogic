@@ -119,13 +119,13 @@ namespace BaseGameLogic.Inputs
 
 		protected virtual void Start()
 		{
-			if (!Owner.InputSources.Contains (this)) 
-			{
-				if (this != null) 
-				{
-					Owner.InputSources.Add (this);
-				} 
-			}
+			// if (!Owner.InputSources.Contains (this)) 
+			// {
+			// 	if (this != null) 
+			// 	{
+			// 		Owner.InputSources.Add (this);
+			// 	} 
+			// }
 		}
 
         /// <summary>

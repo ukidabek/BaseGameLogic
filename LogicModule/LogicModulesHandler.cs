@@ -24,6 +24,5 @@ namespace BaseGameLogic.LogicModule
         {
             return LogicModulesContainer.GetModule(type);
         }
-
     }
 }

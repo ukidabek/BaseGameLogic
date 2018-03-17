@@ -12,18 +12,16 @@ namespace BaseGameLogic.LogicModule
     public class LogicModulesHandlerEditor: Editor
     {
         private LogicModulesHandler _logicModulesHandler = null;
-        private Type[] _logicModulesTypes = null;
-        private GenericMenu _addModuleMenu = null;
-        private GenericMenu _addModuleToChildMenu = null;
-
         private ReorderableList list = null;
+
+        private Type[] _logicModulesTypes = null;
+
+        private GenericMenu _addModuleToChildMenu = null;
 
         protected virtual void OnEnable()
         {
             _logicModulesHandler = target as LogicModulesHandler;
             _logicModulesTypes = AssemblyExtension.GetDerivedTypes<BaseLogicModule>();
-
-            _addModuleMenu = GenericMenuExtension.GenerateMenuFormTypes(_logicModulesTypes, AddModule);
 
             List<GameObject> _gameObjectList = new List<GameObject>();
             _gameObjectList.Add(_logicModulesHandler.gameObject);
@@ -100,14 +98,26 @@ namespace BaseGameLogic.LogicModule
             AddModule(pair.Type, pair.GameObject);
         }
 
+        public override void OnInspectorGUI()
+        {
+            bool guiEnabled = GUI.enabled;
+            GUI.enabled = !Application.isPlaying;
+
+            base.OnInspectorGUI();
+
+            serializedObject.Update();
+            list.DoLayoutList();
+            serializedObject.ApplyModifiedProperties();
+            
+            GUI.enabled = guiEnabled;
+        }
+
+        #region Reorderable list handling
+
         private void DrawListElement(Rect rect, int i, bool isActive, bool isFocused)
         {
-            float buttonSize = 20;
-            rect.y += 2;
-            Rect buttonRect = new Rect(rect.x, rect.y, buttonSize, EditorGUIUtility.singleLineHeight);
-
             SerializedProperty element = list.serializedProperty.GetArrayElementAtIndex(i);
-            Rect elementRect = new Rect(rect.x + 2, rect.y, rect.width, EditorGUIUtility.singleLineHeight);
+            Rect elementRect = new Rect(rect.x + 2, rect.y + 2, rect.width, EditorGUIUtility.singleLineHeight);
 
             EditorGUI.PropertyField(elementRect, element, GUIContent.none);
         }
@@ -133,26 +143,15 @@ namespace BaseGameLogic.LogicModule
 
         private void DrawHeader(Rect rect)
         {
-            EditorGUI.LabelField(rect, "Logic modules");
-        }
-
-        public override void OnInspectorGUI()
-        {
-            EditorGUILayout.BeginVertical();
-            base.OnInspectorGUI();
-            EditorGUILayout.EndVertical();
-
-            serializedObject.Update();
-            list.DoLayoutList();
-            serializedObject.ApplyModifiedProperties();
-
             bool guiEnabled = GUI.enabled;
             GUI.enabled = !Application.isPlaying;
 
-            if (GUILayout.Button("Get all logic modules"))
+            if(GUI.Button(rect, "Get all logic modules"))
                 FindAllLogicModule(_logicModulesHandler.gameObject);
 
             GUI.enabled = guiEnabled;
         }
+
+        #endregion
     }
 }

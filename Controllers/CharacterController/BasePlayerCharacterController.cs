@@ -41,11 +41,5 @@ namespace BaseGameLogic.Character
 
 			return 0;
 		}
-
-		protected override void Start ()
-		{
-			base.Start ();
-
-		}
     }
 }

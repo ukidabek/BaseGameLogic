@@ -25,7 +25,11 @@ namespace BaseGameLogic.States
             if(_baseStateObject.LogicModulesHandler == null)
             {
                 if(GUILayout.Button("Add logic module"))
-                    _baseStateObject.AddLogicModuleHandler();
+                {
+                    _baseStateObject.GetLogicModuleHandler();
+                    if(_baseStateObject.LogicModulesHandler == null)
+                        _baseStateObject.AddLogicModuleHandler();
+                }
             }
             else
             {

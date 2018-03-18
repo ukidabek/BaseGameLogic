@@ -1,10 +1,10 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 using System;
 
 namespace BaseGameLogic.LogicModule
 {
-    public class LogicModulesHandler : MonoBehaviour
+    public abstract class BaseLogicModulesHandler : MonoBehaviour
     {
         [SerializeField, HideInInspector]
         protected LogicModulesContainer logicModulesContainer = new LogicModulesContainer();

@@ -5,13 +5,16 @@ using UnityEditor.AnimatedValues;
 using System.Collections;
 using System.Collections.Generic;
 
+using BaseGameLogic.States;
+
 namespace BaseGameLogic.Character
 {
     [CustomEditor(typeof(BaseCharacterController), true)]
-    public class BaseCharacterControllerCustomInspector : Editor 
+    public class BaseCharacterControllerCustomInspector : BaseStateObjectCustomInspector 
     {
-        public void OnEnable()
+        protected override void OnEnable()
         {
+            base.OnEnable();
         }
 
         public override void OnInspectorGUI()

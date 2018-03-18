@@ -25,9 +25,6 @@ namespace BaseGameLogic.Inputs
 		{
             base.Awake();
 
-            // Collecting InputCollector instances. 
-            // _inputCollectors = GetComponentsInChildren<BaseInputCollector>();
-
             // Creating dictionary from collected InputCollectors.
             for (int i = 0; i < _inputCollectors.Count; i++) 
 			{
@@ -67,7 +64,7 @@ namespace BaseGameLogic.Inputs
                 _inputCollectors.Add(gameObject.AddComponent(types[0]) as BaseInputCollector);
                 int lastIndex = _inputCollectors.Count - 1;
                 _inputCollectors[lastIndex].PlayerNumber = lastIndex;
-                _inputCollectors[lastIndex].gameObject.name = string.Format("Player {0}", lastIndex)
+                _inputCollectors[lastIndex].gameObject.name = string.Format("Player {0}", lastIndex);
             }
             else
             {

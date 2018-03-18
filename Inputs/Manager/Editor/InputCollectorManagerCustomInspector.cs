@@ -85,6 +85,5 @@ namespace BaseGameLogic.Inputs
         }
 
         #endregion
-
     }
 }

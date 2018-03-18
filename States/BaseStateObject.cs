@@ -171,8 +171,7 @@ namespace BaseGameLogic.States
 
         protected virtual void LateUpdate()
         {
-			if (IsGamePaused)
-				return;
+			if (IsGamePaused) return;
 			
 			bool additive = ExecuteModesFunction (StateModeUpdate.Late); 
 			if(CurrentState != null && additive)
@@ -181,8 +180,7 @@ namespace BaseGameLogic.States
 
         protected virtual void FixedUpdate()
         {
-			if (IsGamePaused)
-				return;
+			if (IsGamePaused) return;
 			
 			bool additive = ExecuteModesFunction (StateModeUpdate.Fixed); 
 			if(CurrentState != null && additive)
@@ -203,8 +201,7 @@ namespace BaseGameLogic.States
 
         public virtual void OnAnimatorIK(int layerIndex)
         {
-            if (IsGamePaused)
-                return;
+            if (IsGamePaused) return;
 
             if (CurrentState != null)
                 CurrentState.OnAnimatorIK(layerIndex);
@@ -250,8 +247,7 @@ namespace BaseGameLogic.States
         {
             foreach (BaseStateModeCreator creator in stateModesCreators)
             {
-                if (creator != null &&
-                    creator.ProductName.Equals(stateModeName))
+                if (creator != null && creator.ProductName.Equals(stateModeName))
                     return creator;
             }
 
@@ -307,6 +303,7 @@ namespace BaseGameLogic.States
         {
             _logicModulesHandler = gameObject.GetComponent<BaseLogicModulesHandler>();
         }
+
         public void AddLogicModuleHandler()
         {
             Type[] types = AssemblyExtension.GetDerivedTypes<BaseLogicModulesHandler>();

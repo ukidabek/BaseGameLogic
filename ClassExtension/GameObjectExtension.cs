@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public static class GameObjectExtension
 {
@@ -69,4 +70,35 @@ public static class GameObjectExtension
 
         return component;
     }
+
+    #if UNITY_EDITOR
+
+    /// <summary>
+    /// Create object and add to it component of type "T", and return that instance. 
+    /// </summary>
+    /// <returns>Reference to component.</returns>
+    public static T CreateInstanceOfAbstractType<T>() where T: MonoBehaviour
+    {
+        Type providerType = typeof(T);
+        if(!providerType.IsAbstract)
+        {
+            Debug.LogErrorFormat("Provided type {0} is not abstract.", providerType.Name);
+            return null;
+        }
+
+        Type[] types = AssemblyExtension.GetDerivedTypes<T>();
+        if (types != null && types.Length > 0)
+        {
+            GameObject gameObject = new GameObject();
+            gameObject.name = types[0].Name;
+            return gameObject.AddComponent(types[0]) as T;
+        }
+        else
+        {
+            Debug.LogErrorFormat("There is no class that extends abstract class {0}.", typeof(T).Name);
+        }
+
+        return null;
+    }
+    #endif
 }

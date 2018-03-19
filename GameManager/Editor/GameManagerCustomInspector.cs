@@ -10,7 +10,13 @@ namespace BaseGameLogic
 	[CustomEditor(typeof(GameManager), true)]
 	public class GameManagerCustomInspector : Editor 
 	{
-		private GameManager _gameManagerInstance = null;
+        [MenuItem("BaseGameLogic/GameManager")]
+        public static GameManager CreateInputCollectorManager()
+        {
+            return GameObjectExtension.CreateInstanceOfAbstractType<GameManager>();
+        }
+
+        private GameManager _gameManagerInstance = null;
 
 		private void OnEnable()
 		{

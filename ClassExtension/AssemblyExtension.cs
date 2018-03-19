@@ -11,9 +11,11 @@ public static class AssemblyExtension
     /// <returns>List of derived types.</returns>
     public static Type[] GetDerivedTypes<T>()
     {
-        Type baseType = typeof(T);
-        Assembly assembly = baseType.Assembly;
+        return GetDerivedTypes(typeof(T));
+    }
 
-        return assembly.GetTypes().Where(type => (type.IsSubclassOf(baseType) && !type.IsAbstract)).ToArray();
+    public static Type[] GetDerivedTypes(Type baseType)
+    {
+        return baseType.Assembly.GetTypes().Where(type => (type.IsSubclassOf(baseType) && !type.IsAbstract)).ToArray();
     }
 }

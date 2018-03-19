@@ -14,19 +14,7 @@ namespace BaseGameLogic.Inputs
         [MenuItem("BaseGameLogic/Inputs/Create InputCollectorManager")]
         public static BaseInputCollectorManager CreateInputCollectorManager()
         {
-            Type[] types = AssemblyExtension.GetDerivedTypes<BaseInputCollectorManager>();
-            if (types != null && types.Length > 0)
-            {
-                GameObject gameObject = new GameObject();
-                gameObject.name = "BaseInputCollectorManager";
-                return gameObject.AddComponent(types[0]) as BaseInputCollectorManager;
-            }
-            else
-            {
-                Debug.LogError("There is no class that extends abstract class BaseInputCollectorManager.");
-            }
-
-            return null;
+            return GameObjectExtension.CreateInstanceOfAbstractType<BaseInputCollectorManager>();
         }
 
         private BaseInputCollectorManager inputCollectorManager = null;

@@ -8,10 +8,12 @@ using BaseGameLogic.Inputs;
 using BaseGameLogic.TimeManagement;
 using BaseGameLogic.Events;
 using BaseGameLogic.Character;
+using System.Reflection;
+using System.Collections.Generic;
 
 namespace BaseGameLogic.Management
 {
-	public abstract class GameManager : Singleton<GameManager> 
+	public abstract class BaseGameManager : Singleton<BaseGameManager> 
 	{
 		public event Action ObjectInitializationCallBack = null;
 
@@ -19,26 +21,34 @@ namespace BaseGameLogic.Management
 		private GameStatusEnum _gameStatus = GameStatusEnum.Play;
 		public GameStatusEnum GameStatus { get { return this._gameStatus; } }
 
-		[SerializeField]
+		[SerializeField, Manager]
 		private GameObject inputCollectorManagerPrefab = null;
 		public BaseInputCollectorManager InputCollectorManager { get { return BaseInputCollectorManager.Instance; } }
 
-        [SerializeField]
+        [SerializeField, Manager]
 		private GameObject characterRegisterPrefab = null;
-		public CharacterRegister CharacterRegisterInstance { get { return CharacterRegister.Instance; } }
+		public BaseCharacterRegister CharacterRegisterInstance { get { return BaseCharacterRegister.Instance; } }
 
-        [SerializeField]
+        [SerializeField, Manager]
 		private GameObject timeManagerPrefab = null;
-		public TimeManager TimeManagerInstance { get { return TimeManager.Instance; } }
+		public BaseTimeManager TimeManagerInstance { get { return BaseTimeManager.Instance; } }
 
-        [Obsolete("EventManager is now separate singleton. Use directly singleton reference.")]
-        public EventManager EventManagerInstance { get { return EventManager.Instance; } }
+		private List<FieldInfo> GetAllManagerPrefabFields(Type type)
+		{
+            List<FieldInfo> fields = new List<FieldInfo>();
+            if(type == typeof(MonoBehaviour)) return fields;
+
+            fields.AddRange(type.GetAllFieldsWithAttribute<ManagerAttribute>());
+            fields.AddRange(GetAllManagerPrefabFields(type.BaseType));
+
+            return fields;
+        }
 
 		protected virtual void CreateManagersInstance()
 		{
-			CreateInstance<BaseInputCollectorManager> (inputCollectorManagerPrefab);
-			CreateInstance<CharacterRegister> (characterRegisterPrefab);
-			CreateInstance<TimeManager> (timeManagerPrefab);
+            List<FieldInfo> managersPrefabFields = GetAllManagerPrefabFields(this.GetType());
+            foreach (FieldInfo managerPrefabField in managersPrefabFields)
+                (managerPrefabField.GetValue(this) as GameObject).CreateInstance(transform);
 		}
 
 		protected virtual void InitializeOtherObjects()
@@ -47,25 +57,6 @@ namespace BaseGameLogic.Management
 			{
 				ObjectInitializationCallBack ();
 			}
-		}
-
-		protected T CreateInstance<T>(GameObject prefab) where T: MonoBehaviour
-		{
-			if (prefab == null) 
-			{
-                Type type = typeof(T);
-                Debug.LogWarningFormat("Reference for {0} is null. It's correct?", type.ToString());
-                return null;
-			}
-
-			GameObject instance = GameObject.Instantiate (prefab);
-			instance.transform.SetParent (this.transform);
-			instance.transform.localPosition = Vector3.zero;
-			instance.transform.localRotation = Quaternion.identity;
-
-			T componentInstance = instance.GetComponent<T> ();
-
-			return componentInstance;
 		}
 
 		protected override void Awake()

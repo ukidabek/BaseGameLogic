@@ -18,4 +18,15 @@ public static class AssemblyExtension
     {
         return baseType.Assembly.GetTypes().Where(type => (type.IsSubclassOf(baseType) && !type.IsAbstract)).ToArray();
     }
+
+    public static FieldInfo[] GetAllFieldsWithAttribute<T>(this Type type)
+    {
+        return GetAllFieldsWithAttribute(type, typeof(T));
+    }
+
+    public static FieldInfo[] GetAllFieldsWithAttribute(Type inType, Type attributeType)
+    {
+        return inType.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance).Where(
+            field => field.GetCustomAttributes(false).Any(attribute => attribute.GetType() == attributeType)).ToArray();
+    }
 }

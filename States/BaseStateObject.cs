@@ -64,9 +64,9 @@ namespace BaseGameLogic.States
         #region Managers references
 
         protected bool GameManagerExist {get; private set; }
-        protected GameManager GameManagerInstance 
+        protected BaseGameManager GameManagerInstance 
 		{
-			get { return GameManager.Instance; }
+			get { return BaseGameManager.Instance; }
 		}
 
         /// <summary>

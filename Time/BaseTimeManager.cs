@@ -10,7 +10,7 @@ namespace BaseGameLogic.TimeManagement
     /// Time manager.
     /// The purpose of this class is a time management.
     /// </summary>
-    public abstract class TimeManager : Singleton<TimeManager>
+    public abstract class BaseTimeManager : Singleton<BaseTimeManager>
     {
         private const float _maximumDeltaTimeFactor = 3;
 

@@ -16,7 +16,7 @@ namespace BaseGameLogic.Character
     {
 		public virtual bool IsPlayer { get { return false; } }
 
-		protected CharacterRegister CharacterRegisterInstance { get { return CharacterRegister.Instance; } }
+		protected BaseCharacterRegister CharacterRegisterInstance { get { return BaseCharacterRegister.Instance; } }
 			
         protected virtual void Register()
         {

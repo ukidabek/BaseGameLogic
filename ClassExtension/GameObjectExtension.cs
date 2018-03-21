@@ -25,23 +25,43 @@ public static class GameObjectExtension
         return component;
     }
 
+    public static GameObject CreateInstance(this GameObject gameObject, Transform parrent = null, string objectName = "")
+    {
+        GameObject newObject = gameObject.CreateInstance(gameObject, parrent, objectName);
+        return newObject;
+    }
+
+    /// <summary>
+    /// Create instance of prefab, and return gameObject.
+    /// </summary>
+    /// <param name="prefab">Prefab reference</param>
+    /// <param name="parrent">Parent object transform</param>
+    /// <param name="objectName">Object name</param>
+    /// <returns>Created object</returns>
+    public static GameObject CreateInstance(this GameObject gameObject, GameObject prefab, Transform parrent = null, string objectName = "")
+    {
+        GameObject newObject = GameObject.Instantiate(prefab);
+
+        newObject.transform.SetParent(parrent);
+        newObject.transform.Reset();
+        newObject.name = !string.IsNullOrEmpty(objectName) ? objectName : newObject.name;
+
+        return newObject;
+    }
+
     /// <summary>
     /// Create instance of prefab, and return component.
     /// </summary>
     /// <typeparam name="T">Type of component to return.</typeparam>
     /// <param name="prefab">Prefab reference</param>
-    /// <param name="parrent">Parent object</param>
+    /// <param name="parrent">Parent object transform</param>
     /// <param name="objectName">Object name</param>
     /// <returns>Reference to component.</returns>
-    public static T CreateInstance<T>(GameObject prefab, Transform parrent = null, string objectName = "") where T : Component
+    public static T CreateInstance<T>(this GameObject gameObject, GameObject prefab, Transform parrent = null, string objectName = "") where T : Component
     {
-        GameObject newObject = GameObject.Instantiate(prefab);
-        newObject.name = !string.IsNullOrEmpty(objectName) ? objectName : newObject.name;
+        GameObject newObject = gameObject.CreateInstance(prefab, parrent, objectName);
+
         T newComponent = newObject.GetComponent<T>();
-
-        newObject.transform.SetParent(parrent);
-
-        newObject.transform.Reset();
 
         return newComponent;
     }
@@ -53,7 +73,7 @@ public static class GameObjectExtension
     /// <param name="parent">Parent object.</param>
     /// <param name="objectName">Name of the new object.</param>
     /// <returns>Reference to added component.</returns>
-    public static T CreateObjectWithComponent<T>(Transform parent = null, string objectName = "") where T : Component
+    public static T CreateObjectWithComponent<T>(this GameObject gameObject, Transform parent = null, string objectName = "") where T : Component
     {
         GameObject newGameObject = new GameObject();
 
@@ -89,9 +109,9 @@ public static class GameObjectExtension
         Type[] types = AssemblyExtension.GetDerivedTypes<T>();
         if (types != null && types.Length > 0)
         {
-            GameObject gameObject = new GameObject();
-            gameObject.name = types[0].Name;
-            return gameObject.AddComponent(types[0]) as T;
+            GameObject newGameObject = new GameObject();
+            newGameObject.name = types[0].Name;
+            return newGameObject.AddComponent(types[0]) as T;
         }
         else
         {

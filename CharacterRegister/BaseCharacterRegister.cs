@@ -7,7 +7,7 @@ using BaseGameLogic.Singleton;
 
 namespace BaseGameLogic.Character
 {
-	public class CharacterRegister : Singleton<CharacterRegister>
+	public abstract class BaseCharacterRegister : Singleton<BaseCharacterRegister>
     {
         #if UNITY_EDITOR
         /// <summary>

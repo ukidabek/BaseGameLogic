@@ -7,22 +7,22 @@ using BaseGameLogic.Management;
 
 namespace BaseGameLogic
 {
-	[CustomEditor(typeof(GameManager), true)]
+	[CustomEditor(typeof(BaseGameManager), true)]
 	public class GameManagerCustomInspector : Editor 
 	{
         [MenuItem("BaseGameLogic/GameManager")]
-        public static GameManager CreateInputCollectorManager()
+        public static BaseGameManager CreateInputCollectorManager()
         {
-            return GameObjectExtension.CreateInstanceOfAbstractType<GameManager>();
+            return GameObjectExtension.CreateInstanceOfAbstractType<BaseGameManager>();
         }
 
-        private GameManager _gameManagerInstance = null;
+        private BaseGameManager _gameManagerInstance = null;
 
 		private void OnEnable()
 		{
-			if (target is GameManager) 
+			if (target is BaseGameManager) 
 			{
-				_gameManagerInstance = target as GameManager;
+				_gameManagerInstance = target as BaseGameManager;
 			}
 		}
 

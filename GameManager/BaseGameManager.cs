@@ -21,32 +21,25 @@ namespace BaseGameLogic.Management
 		private GameStatusEnum _gameStatus = GameStatusEnum.Play;
 		public GameStatusEnum GameStatus { get { return this._gameStatus; } }
 
-		[SerializeField, Manager]
+		[SerializeField, Manager(true, typeof(BaseInputCollectorManager))]
 		private GameObject inputCollectorManagerPrefab = null;
+        public GameObject InputCollectorManagerPrefab { get { return inputCollectorManagerPrefab; } }
 		public BaseInputCollectorManager InputCollectorManager { get { return BaseInputCollectorManager.Instance; } }
 
-        [SerializeField, Manager]
+        [SerializeField, Manager(false, typeof(BaseCharacterRegister))]
 		private GameObject characterRegisterPrefab = null;
+        public GameObject CharacterRegisterPrefab { get { return characterRegisterPrefab; } }
 		public BaseCharacterRegister CharacterRegisterInstance { get { return BaseCharacterRegister.Instance; } }
 
-        [SerializeField, Manager]
+        [SerializeField, Manager(true, typeof(BaseTimeManager))]
 		private GameObject timeManagerPrefab = null;
+        public GameObject TimeManagerPrefab { get { return timeManagerPrefab; } }
 		public BaseTimeManager TimeManagerInstance { get { return BaseTimeManager.Instance; } }
 
-		private List<FieldInfo> GetAllManagerPrefabFields(Type type)
+
+        protected virtual void CreateManagersInstance()
 		{
-            List<FieldInfo> fields = new List<FieldInfo>();
-            if(type == typeof(MonoBehaviour)) return fields;
-
-            fields.AddRange(type.GetAllFieldsWithAttribute<ManagerAttribute>());
-            fields.AddRange(GetAllManagerPrefabFields(type.BaseType));
-
-            return fields;
-        }
-
-		protected virtual void CreateManagersInstance()
-		{
-            List<FieldInfo> managersPrefabFields = GetAllManagerPrefabFields(this.GetType());
+            List<FieldInfo> managersPrefabFields = AssemblyExtension.GetAllFieldsWithAttribute(this.GetType(), typeof(ManagerAttribute), true);
             foreach (FieldInfo managerPrefabField in managersPrefabFields)
                 (managerPrefabField.GetValue(this) as GameObject).CreateInstance(transform);
 		}

@@ -15,9 +15,9 @@ namespace BaseGameLogic.Networking
 
     public abstract class BaseMessageSender : MonoBehaviour
     {
-        protected NetworkManager NetworkManagerInstance
+        protected BaseNetworkManager NetworkManagerInstance
         {
-            get { return NetworkManager.Instance; }
+            get { return BaseNetworkManager.Instance; }
         }
 
         [SerializeField]

@@ -9,10 +9,10 @@ using System.Reflection;
 
 namespace BaseGameLogic.Networking
 {
-    [CustomEditor(typeof(NetworkManager), true)]
+    [CustomEditor(typeof(BaseNetworkManager), true)]
     public class NetworkManagerCustomInspector : Editor
     {
-        private NetworkManager manager = null;
+        private BaseNetworkManager manager = null;
         private Type[] messageSenderTypes = null;
         private Type[] messageHandlerTypes = null;
 
@@ -21,7 +21,7 @@ namespace BaseGameLogic.Networking
 
         private void OnEnable()
         {
-            manager = target as NetworkManager;
+            manager = target as BaseNetworkManager;
 
             messageSenderTypes = AssemblyExtension.GetDerivedTypes<BaseMessageSender>();
             messageHandlerTypes = AssemblyExtension.GetDerivedTypes<BaseMessageHandler>();

@@ -15,7 +15,7 @@ using BaseGameLogic.SceneManagement;
 
 namespace BaseGameLogic.Networking
 {
-    public abstract class NetworkManager : Singleton<NetworkManager>
+    public abstract class BaseNetworkManager : Singleton<BaseNetworkManager>
     {
         [SerializeField, Header("Network settings.")]
         protected NetworkManagerSettings _settings = new NetworkManagerSettings();

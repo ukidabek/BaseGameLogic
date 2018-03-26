@@ -71,13 +71,13 @@ namespace BaseGameLogic.SceneManagement
 
         protected override void Start()
         {
-            NetworkManager.Instance.LoadGameCallback -= LoadGame;
-            NetworkManager.Instance.LoadGameCallback += LoadGame;
+            BaseNetworkManager.Instance.LoadGameCallback -= LoadGame;
+            BaseNetworkManager.Instance.LoadGameCallback += LoadGame;
         }
 
         private void OnDestroy()
         {
-            NetworkManager.Instance.LoadGameCallback -= LoadGame;
+            BaseNetworkManager.Instance.LoadGameCallback -= LoadGame;
         }
 
         private void Update()

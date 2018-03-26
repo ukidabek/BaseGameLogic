@@ -7,15 +7,15 @@ using System.Collections.Generic;
 
 namespace BaseGameLogic.SceneManagement
 {
-    [CustomEditor(typeof(SceneSet), true)]
+    [CustomEditor(typeof(BaseSceneSet), true)]
     public class SceneSetCustomInspector : Editor
     {
-        private SceneSet _item = null;
+        private BaseSceneSet _item = null;
         private Object scene = null;
 
         private void OnEnable()
         {
-            _item = target as SceneSet;
+            _item = target as BaseSceneSet;
         }
 
         public override void OnInspectorGUI()

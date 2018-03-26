@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace BaseGameLogic.SceneManagement
 {
-    public abstract class SceneSet : ScriptableObject
+    public abstract class BaseSceneSet : ScriptableObject
     {
         [SerializeField]
         private List<SceneInfo> _sceneInfoList = new List<SceneInfo>();

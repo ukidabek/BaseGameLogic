@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace BaseGameLogic.SceneManagement
 {
-    public abstract class LoadingScreenCanvas : MonoBehaviour
+    public abstract class BaseLoadingScreenCanvas : MonoBehaviour
     {
         [SerializeField]
         private RectTransform _loadingGizmo = null;

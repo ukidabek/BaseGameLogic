@@ -12,13 +12,13 @@ using BaseGameLogic.Networking;
 
 namespace BaseGameLogic.SceneManagement
 {
-    public abstract class SaveLoadManager : Singleton<SaveLoadManager>
+    public abstract class BaseSaveLoadManager : Singleton<BaseSaveLoadManager>
     {
         [SerializeField]
         private Camera _loadingScreenCamera = null;
 
         [SerializeField]
-        private LoadingScreenCanvas _loadingScreenCanvas = null;
+        private BaseLoadingScreenCanvas _loadingScreenCanvas = null;
 
         public event Action GameLoadedEvent = null;
 
@@ -26,8 +26,8 @@ namespace BaseGameLogic.SceneManagement
         public int MapToLoadIndex = 0; 
 
         [SerializeField]
-        private List<SceneSet> _sceneSetList = new List<SceneSet>();
-        public SceneSet SceneSet { get { return _sceneSetList[MapToLoadIndex]; } }
+        private List<BaseSceneSet> _sceneSetList = new List<BaseSceneSet>();
+        public BaseSceneSet SceneSet { get { return _sceneSetList[MapToLoadIndex]; } }
 
         public bool LoadGameSave = false;
 

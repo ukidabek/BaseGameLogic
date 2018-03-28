@@ -8,9 +8,9 @@ namespace BaseGameLogic.SceneManagement
     public class SaveLoadManagerEditor : Editor
     {
         [MenuItem("BaseGameLogic/SaveLoad/Create SaveLoadManager")]
-        public static BaseSaveLoadManager CreateSaveLoadManager()
+        public static BaseSceneLoadManager CreateSaveLoadManager()
 		{
-            return GameObjectExtension.CreateInstanceOfAbstractType<BaseSaveLoadManager>();
+            return GameObjectExtension.CreateInstanceOfAbstractType<BaseSceneLoadManager>();
         }
     }
 }

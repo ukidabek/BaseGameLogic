@@ -12,24 +12,14 @@ using BaseGameLogic.Networking;
 
 namespace BaseGameLogic.SceneManagement
 {
-    public abstract class BaseSaveLoadManager : Singleton<BaseSaveLoadManager>
+    public abstract class BaseSceneLoadManager : Singleton<BaseSceneLoadManager>
     {
-        [SerializeField]
-        private Camera _loadingScreenCamera = null;
-
-        [SerializeField]
-        private BaseLoadingScreenCanvas _loadingScreenCanvas = null;
-
-        public event Action GameLoadedEvent = null;
-
         [Space]
         public int MapToLoadIndex = 0; 
 
         [SerializeField]
         private List<BaseSceneSet> _sceneSetList = new List<BaseSceneSet>();
         public BaseSceneSet SceneSet { get { return _sceneSetList[MapToLoadIndex]; } }
-
-        public bool LoadGameSave = false;
 
         private int CurrentLoadingSceneIndex = 0;
 
@@ -40,9 +30,7 @@ namespace BaseGameLogic.SceneManagement
             get
             {
                 if(SceneSet == null)
-                {
                     return -1;
-                }
 
                 return SceneSet.SceneInfoList.Count;
             }
@@ -50,35 +38,11 @@ namespace BaseGameLogic.SceneManagement
 
         [SerializeField, Range(0f, 1f)]
         private float _loadingProgress = 0;
-
-        [SerializeField]
         private float _progressPerScene = 0;
 
-        protected override void Awake()
-        {
-            base.Awake();
-
-            if (_loadingScreenCanvas != null)
-            {
-                _loadingScreenCanvas.gameObject.SetActive(false);
-            }
-
-            if (_loadingScreenCamera != null)
-            {
-                _loadingScreenCamera.gameObject.SetActive(false);
-            }
-        }
-
-        protected override void Start()
-        {
-            BaseNetworkManager.Instance.LoadGameCallback -= LoadGame;
-            BaseNetworkManager.Instance.LoadGameCallback += LoadGame;
-        }
-
-        private void OnDestroy()
-        {
-            BaseNetworkManager.Instance.LoadGameCallback -= LoadGame;
-        }
+        public UnityEvent LoadingStart = new UnityEvent();
+        public LoadingProgressUpdate LoadingProgressUpdate = new LoadingProgressUpdate();
+        public UnityEvent LoadingEnd = new UnityEvent();
 
         private void Update()
         {
@@ -86,30 +50,12 @@ namespace BaseGameLogic.SceneManagement
             {
                 if(_loadOperation.isDone)
                 {
-                    if(_loadingScreenCanvas != null)
-                    {
-                        _loadingScreenCanvas.LoadingProgress = _loadingProgress + (_progressPerScene * _loadOperation.progress);
-                    }
+                    LoadingProgressUpdate.Invoke(_loadingProgress + (_progressPerScene * _loadOperation.progress));
 
                     if(CurrentLoadingSceneIndex == SceneToLoadCount - 1)
                     {
-                        gameObject.SetActive(false);
-
-                        if (_loadingScreenCanvas != null)
-                        {
-                            _loadingScreenCanvas.gameObject.SetActive(false);
-                        }
-
-                        if(_loadingScreenCamera != null)
-                        {
-                            _loadingScreenCamera.gameObject.SetActive(false);
-                        }
-
-                        if(GameLoadedEvent != null)
-                        {
-                            GameLoadedEvent();
-                        }
-
+                        enabled = false;
+                        LoadingEnd.Invoke();
                         CurrentLoadingSceneIndex = 0;
                     }
                     else
@@ -122,23 +68,13 @@ namespace BaseGameLogic.SceneManagement
             }
         }
 
-        public void LoadGame()
+        public void LoadLevel()
         {
-            this.gameObject.SetActive(true);
+            enabled = true;
             CurrentLoadingSceneIndex = 0;
 
             _progressPerScene = 1f / SceneToLoadCount;
-
-            if (_loadingScreenCanvas != null)
-            {
-                _loadingScreenCanvas.gameObject.SetActive(true);
-            }
-
-            if (_loadingScreenCamera != null)
-            {
-                _loadingScreenCamera.gameObject.SetActive(true);
-            }
-
+            LoadingStart.Invoke();
             StartSceneLoading();
         }
 
@@ -148,7 +84,8 @@ namespace BaseGameLogic.SceneManagement
             LoadSceneMode mode = CurrentLoadingSceneIndex == 0 ? LoadSceneMode.Single : LoadSceneMode.Additive;
             _loadOperation = SceneManager.LoadSceneAsync(sceneName, mode);
         }
-
-        public void SaveGame() {}
     }
+
+    [Serializable]
+    public sealed class LoadingProgressUpdate : UnityEvent<float> {}
 }

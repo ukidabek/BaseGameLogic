@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Networking;
 using UnityEngine.Networking.Types;
 using UnityEngine.Networking.Match;
@@ -46,7 +47,7 @@ namespace BaseGameLogic.Networking
 
         protected int port = 0;
         protected byte error = 0;
-        protected string adres = string.Empty;
+        protected string address = string.Empty;
         protected int connectionID = 0;
         protected int recHostId;
         protected int channelID;
@@ -73,9 +74,9 @@ namespace BaseGameLogic.Networking
         [SerializeField]
         protected List<BaseNetworkUpdater> _networkUpdaterList = new List<BaseNetworkUpdater>();
 
-        public event Action<int> ClientConnectedCallback = null;
-        public event Action<int> ClientDisconnectedCallback = null;
-        public event Action LoadGameCallback = null;
+        public ConnectionEvent ClientConnectedCallback = new ConnectionEvent();
+        public ConnectionEvent ClientDisconnectedCallback = new ConnectionEvent();
+        public UnityEvent LoadGameCallback = new UnityEvent();
 
         protected virtual void Initialize()
         {
@@ -101,6 +102,11 @@ namespace BaseGameLogic.Networking
         public virtual void StartSession()
         {
             CreateMatch();
+        }
+
+        public virtual void StartGame()
+        {
+            LoadGameCallback.Invoke();
         }
 
         public virtual void JoinSession()
@@ -172,18 +178,15 @@ namespace BaseGameLogic.Networking
 
         protected virtual void ClientConnected(int connectionId)
         {
-            if(ClientConnectedCallback != null && IsSever)
-            {
-                ClientConnectedCallback(connectionId);
-            }
+            if(IsSever)
+                ClientConnectedCallback.Invoke(connectionId);
         }
 
         protected virtual void ClientDisconnected(int connectionID)
         {
-            if (ClientDisconnectedCallback != null && IsSever)
-            {
-                ClientDisconnectedCallback(connectionID);
-            }
+            if (IsSever)
+                ClientDisconnectedCallback.Invoke(connectionID);
+            
         }
 
         protected virtual void HandleConnection()
@@ -194,7 +197,7 @@ namespace BaseGameLogic.Networking
             NetworkTransport.GetConnectionInfo(
                 hostID,
                 connectionID,
-                out adres,
+                out address,
                 out port,
                 out networkID,
                 out node,
@@ -202,7 +205,7 @@ namespace BaseGameLogic.Networking
 
             string log = string.Format(
                 NetworkManagerLogs.NEW_CONNECTION_APPEARED,
-                NetworkUtility.GetIPAdress(adres),
+                NetworkUtility.GetIPAdress(address),
                 port,
                 System.DateTime.Now.ToString());
 
@@ -211,7 +214,7 @@ namespace BaseGameLogic.Networking
             NetworkError networkError = NetworkUtility.GetNetworkError(error);
             if (networkError == NetworkError.Ok)
             {
-                newPear = new ConnectionInfo(connectionID, adres, port);
+                newPear = new ConnectionInfo(connectionID, address, port);
 
                 log = string.Format(
                     NetworkManagerLogs.CONNECTING_TO_PEER_SUCCEEDED,
@@ -566,13 +569,7 @@ namespace BaseGameLogic.Networking
             int index = _networkUpdaterList.IndexOf(updater);
             _networkUpdaterList.RemoveAt(index);
         }
-
-        public virtual void StartGame()
-        {
-            if(LoadGameCallback != null)
-            {
-                LoadGameCallback();
-            }
-        }
     }
+
+    [Serializable] public sealed class ConnectionEvent : UnityEvent<int> {}
 }

@@ -17,7 +17,7 @@ namespace BaseGameLogic.SceneManagement
         [Space]
         public int MapToLoadIndex = 0; 
 
-        [SerializeField]
+        [SerializeField, HideInInspector]
         private List<BaseSceneSet> _sceneSetList = new List<BaseSceneSet>();
         public BaseSceneSet SceneSet { get { return _sceneSetList[MapToLoadIndex]; } }
 

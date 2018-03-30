@@ -24,22 +24,13 @@ namespace BaseGameLogic.SceneManagement
 
         [SerializeField, HideInInspector]
         private List<BaseSceneSet> _sceneSetList = new List<BaseSceneSet>();
-        public BaseSceneSet SceneSet { get { return _sceneSetList[MapToLoadIndex]; } }
+        public BaseSceneSet SelectedSceneSet { get { return _sceneSetList[MapToLoadIndex]; } }
 
         private int CurrentLoadingSceneIndex = 0;
 
         private AsyncOperation _loadOperation = null;
 
-        public int SceneToLoadCount
-        {
-            get
-            {
-                if(SceneSet == null)
-                    return -1;
-
-                return SceneSet.Count;
-            }
-        }
+        public int SceneToLoadCount { get { return SelectedSceneSet.Count; } }
 
         [SerializeField, Range(0f, 1f)]
         private float _loadingProgress = 0;
@@ -82,7 +73,7 @@ namespace BaseGameLogic.SceneManagement
 
         public void StartSceneLoading()
         {
-            string sceneName = SceneSet[CurrentLoadingSceneIndex].SceneName;
+            string sceneName = SelectedSceneSet[CurrentLoadingSceneIndex].SceneName;
             LoadSceneMode mode = CurrentLoadingSceneIndex == 0 ? LoadSceneMode.Single : LoadSceneMode.Additive;
             _loadOperation = SceneManager.LoadSceneAsync(sceneName, mode);
         }

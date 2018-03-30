@@ -22,7 +22,8 @@ namespace BaseGameLogic.SceneManagement
         private void OnEnable() 
         {
             _manager = target as BaseSceneLoadManager;
-            list = new ReorderableList(serializedObject, serializedObject.FindProperty("_sceneSetList"), true, true, true, true);
+            list = new ReorderableList(serializedObject, serializedObject.FindProperty("_sceneSetList"), 
+                true, true, true, true);
             list.drawElementCallback = DrawElement;
             list.drawHeaderCallback = DrawHeader;
         }
@@ -43,14 +44,18 @@ namespace BaseGameLogic.SceneManagement
 
         private void DrawHeader(Rect rect)
         {
-            EditorGUI.LabelField(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), "Scene Sets List");
+            EditorGUI.LabelField(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),   
+            "Scene Sets List");
         }
 
         private void DrawElement(Rect rect, int index, bool isActive, bool isFocused)
         {
-            rect.height = EditorGUIUtility.singleLineHeight;
-            EditorGUI.LabelField(new Rect(rect.x, rect.y, 20, EditorGUIUtility.singleLineHeight), index.ToString());
-            EditorGUI.PropertyField(new Rect(rect.x + 20, rect.y, rect.width - 20, EditorGUIUtility.singleLineHeight), list.serializedProperty.GetArrayElementAtIndex(index), GUIContent.none);
+            float labelWidth = 15;
+            rect.height = isActive ? 30 : EditorGUIUtility.singleLineHeight;
+            var element = list.serializedProperty.GetArrayElementAtIndex(index);
+            rect.y += 2;
+            EditorGUI.LabelField(new Rect(rect.x, rect.y, labelWidth, EditorGUIUtility.singleLineHeight), index.ToString());
+            EditorGUI.PropertyField(new Rect(rect.x + labelWidth, rect.y, rect.width - labelWidth, EditorGUIUtility.singleLineHeight), element, GUIContent.none);
         }
     }
 }

@@ -1,9 +1,12 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
+
+using Object = UnityEngine.Object;
 
 using System;
 using System.Collections;
 
-namespace BaseGameLogic.Events
+namespace BaseGameLogic.Animation
 {
     /// <summary>
     /// Animation events broadcaster.
@@ -13,10 +16,14 @@ namespace BaseGameLogic.Events
     {
         #region Animation callbacks actions
 
-        public Action animationStartCallbackAction;
-        public Action onAnimationCallbackAction;
-        public Action<string> onAnimationCallbackWithIDAction;
-        public Action animationEndCallbackAction;
+        public UnityEvent OnAnimationStart = new UnityEvent();
+        public UnityEvent OnAnimationPlay = new UnityEvent();
+        public StringUnityEvent OnAnimationPlayWithString = new StringUnityEvent();
+        public IntUnityEvent OnAnimationPlayWithInt = new IntUnityEvent();
+        public FloatUnityEvent OnAnimationPlayWithFloat = new FloatUnityEvent();
+        public ObjectUnityEvent OnAnimationPlayWithObject = new ObjectUnityEvent();
+        public UnityEvent OnAnimationEnd = new UnityEvent();
+
 
         #endregion
 
@@ -24,26 +31,37 @@ namespace BaseGameLogic.Events
 
         public void AnimationStartCallback()
         {
-            if(animationStartCallbackAction != null)
-                animationStartCallbackAction();
+            OnAnimationStart.Invoke();
         }
 
         public void OnAnimationCallback()
         {
-            if (onAnimationCallbackAction != null)
-                onAnimationCallbackAction();
+            OnAnimationPlay.Invoke();
         }
 
-        public void OnAnimationCallbackWithID(string eventID)
+        public void OnAnimationCallbackString(string data)
         {
-            if (onAnimationCallbackWithIDAction != null)
-                onAnimationCallbackWithIDAction(eventID);
+            OnAnimationPlayWithString.Invoke(data);
+        }
+
+        public void OnAnimationCallbackInt(int data)
+        {
+            OnAnimationPlayWithInt.Invoke(data);
+        }
+
+        public void OnAnimationCallbackFloat(float data)
+        {
+            OnAnimationPlayWithFloat.Invoke(data);
+        }
+
+        public void OnAnimationCallbackObject(Object data)
+        {
+            OnAnimationPlayWithObject.Invoke(data);
         }
 
         public void AnimationEndCallback()
         {
-            if(animationEndCallbackAction != null)
-                animationEndCallbackAction();
+            OnAnimationEnd.Invoke();
         }
 
         #endregion

@@ -14,7 +14,12 @@ namespace BaseGameLogic.SceneManagement
 {
     public abstract class BaseSceneLoadManager : Singleton<BaseSceneLoadManager>
     {
-        [Space]
+        [Header("Events:")]
+        public UnityEvent LoadingStart = new UnityEvent();
+        public LoadingProgressUpdate LoadingProgressUpdate = new LoadingProgressUpdate();
+        public UnityEvent LoadingEnd = new UnityEvent();
+
+        [Header("Level config:")]
         public int MapToLoadIndex = 0; 
 
         [SerializeField, HideInInspector]
@@ -32,7 +37,7 @@ namespace BaseGameLogic.SceneManagement
                 if(SceneSet == null)
                     return -1;
 
-                return SceneSet.SceneInfoList.Count;
+                return SceneSet.Count;
             }
         }
 
@@ -40,9 +45,6 @@ namespace BaseGameLogic.SceneManagement
         private float _loadingProgress = 0;
         private float _progressPerScene = 0;
 
-        public UnityEvent LoadingStart = new UnityEvent();
-        public LoadingProgressUpdate LoadingProgressUpdate = new LoadingProgressUpdate();
-        public UnityEvent LoadingEnd = new UnityEvent();
 
         private void Update()
         {
@@ -80,7 +82,7 @@ namespace BaseGameLogic.SceneManagement
 
         public void StartSceneLoading()
         {
-            string sceneName = SceneSet.SceneInfoList[CurrentLoadingSceneIndex].SceneName;
+            string sceneName = SceneSet[CurrentLoadingSceneIndex].SceneName;
             LoadSceneMode mode = CurrentLoadingSceneIndex == 0 ? LoadSceneMode.Single : LoadSceneMode.Additive;
             _loadOperation = SceneManager.LoadSceneAsync(sceneName, mode);
         }

@@ -21,22 +21,6 @@ namespace BaseGameLogic.States
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
-
-            if(_baseStateObject.LogicModulesHandler == null)
-            {
-                if(GUILayout.Button("Add logic module"))
-                {
-                    _baseStateObject.GetLogicModuleHandler();
-                    if(_baseStateObject.LogicModulesHandler == null)
-                        _baseStateObject.AddLogicModuleHandler();
-                }
-            }
-            else
-            {
-                if (GUILayout.Button("Remove logic module"))
-                    _baseStateObject.RemoveLogicModuleHandler();
-
-            }
         }
     }
 }

@@ -1,13 +1,14 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
 
-using Object = UnityEngine.Object;
 
 using System;
 using System.Collections;
 
 namespace BaseGameLogic.Animation
 {
+    using Object = UnityEngine.Object;
+    
     /// <summary>
     /// Animation events broadcaster.
     /// This object receives animation events and provides action to witch other object can sign up. 

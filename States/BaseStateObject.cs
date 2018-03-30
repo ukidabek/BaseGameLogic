@@ -36,10 +36,6 @@ namespace BaseGameLogic.States
         [SerializeField, Tooltip("List of mode creators that can be apply to object states.")]
         protected List<BaseStateModeCreator> stateModesCreators = new List<BaseStateModeCreator>();
 
-        [SerializeField]
-        private BaseLogicModulesHandler _logicModulesHandler = null;
-        public BaseLogicModulesHandler LogicModulesHandler { get { return _logicModulesHandler; } }
-
         /// <summary>
         /// Stack of states.
         /// </summary>
@@ -296,27 +292,5 @@ namespace BaseGameLogic.States
             currentStateTypes.RemoveAt(0);
             #endif    
         }
-
-        #if UNITY_EDITOR
-        public void GetLogicModuleHandler()
-        {
-            _logicModulesHandler = gameObject.GetComponent<BaseLogicModulesHandler>();
-        }
-
-        public void AddLogicModuleHandler()
-        {
-            Type[] types = AssemblyExtension.GetDerivedTypes<BaseLogicModulesHandler>();
-            if(types == null && types.Length > 0)
-                _logicModulesHandler = gameObject.AddComponent(types[0]) as BaseLogicModulesHandler;
-            else
-                Debug.LogError("There is no class that extend BaseLogicModulesHandler.");
-        }
-
-        public void RemoveLogicModuleHandler()
-        {
-            DestroyImmediate(_logicModulesHandler);
-        }
-
-        #endif
     }
 }

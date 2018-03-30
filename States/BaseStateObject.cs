@@ -281,6 +281,16 @@ namespace BaseGameLogic.States
         }
 
         /// <summary>
+        /// Enter to a net state using State creator of type T
+        /// </summary>
+        public void EnterState<T>() where T:BaseStateCreator
+        {
+            BaseStateCreator creator = GetStateCreator<T>();
+            if(creator != null)
+                EnterState(creator.CreateProduct(this));
+        }
+
+        /// <summary>
         /// Exits current state. 
         /// </summary>
         public void ExitState()

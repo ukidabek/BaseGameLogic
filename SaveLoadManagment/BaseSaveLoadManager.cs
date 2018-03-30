@@ -8,7 +8,6 @@ using System.Collections;
 using System.Collections.Generic;
 
 using BaseGameLogic.Singleton;
-using BaseGameLogic.Networking;
 
 namespace BaseGameLogic.SceneManagement
 {
@@ -16,7 +15,7 @@ namespace BaseGameLogic.SceneManagement
     {
         [Header("Events:")]
         public UnityEvent LoadingStart = new UnityEvent();
-        public LoadingProgressUpdate LoadingProgressUpdate = new LoadingProgressUpdate();
+        public FloatUnityEvent LoadingProgressUpdate = new FloatUnityEvent();
         public UnityEvent LoadingEnd = new UnityEvent();
 
         [Header("Level config:")]
@@ -78,7 +77,4 @@ namespace BaseGameLogic.SceneManagement
             _loadOperation = SceneManager.LoadSceneAsync(sceneName, mode);
         }
     }
-
-    [Serializable]
-    public sealed class LoadingProgressUpdate : UnityEvent<float> {}
 }

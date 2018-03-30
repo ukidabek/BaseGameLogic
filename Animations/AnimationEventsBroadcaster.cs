@@ -3,7 +3,7 @@
 using System;
 using System.Collections;
 
-namespace BaseGameLogic
+namespace BaseGameLogic.Events
 {
     /// <summary>
     /// Animation events broadcaster.

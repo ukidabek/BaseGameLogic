@@ -5,13 +5,15 @@ using System.Collections.Generic;
 
 using BaseGameLogic.Inputs;
 using BaseGameLogic.Audio;
+using System.Reflection;
+using System;
 
 namespace BaseGameLogic.States
 {
     /// <summary>
     /// Base state.
     /// </summary>
-    public abstract class BaseState
+    public abstract class BaseState : MonoBehaviour
     {
 		protected List<BaseStateMode> stateModes = new List<BaseStateMode> ();
 		public List<BaseStateMode> StateModes
@@ -19,32 +21,56 @@ namespace BaseGameLogic.States
     		get { return this.stateModes; }
     	}
 
-        protected BaseStateObject controlledObject = null;
-		public BaseStateObject ControlledObject
+        private BaseStateHandler controlledObject = null;
+		public BaseStateHandler ControlledObject
         {
     		get { return this.controlledObject; }
+			set { controlledObject = value; }
     	}
 
-        public BaseState(BaseStateObject controlledObject)
+		private FieldInfo[] requiredFieldList = null;
+		public Transform rootParent { get; private set; }
+
+		protected virtual void Awake() 
+		{
+			rootParent = this.transform.GetRootTransform();
+			requiredFieldList = GetAllRequiredFields();
+		}
+
+        public FieldInfo[] GetAllRequiredFields()
         {
-            this.controlledObject = controlledObject;
+			return AssemblyExtension.GetAllFieldsWithAttribute<RequiredReferenceAttribute>(this.GetType());
         }
 
+		/// <summary>
+		/// Get all references to fields marked with RequiredReference attribute 
+		/// </summary>
+		/// <param name="parent"></param>
+		public void GetAllRequiredReferences(GameObject parent = null, bool overrideReference = false)
+		{
+			parent = parent == null ? this.transform.GetRootTransform().gameObject : parent;
+			requiredFieldList = requiredFieldList == null ? GetAllRequiredFields() : requiredFieldList;
+
+			foreach (var item in requiredFieldList)
+			{
+				if(item.GetValue(this) == null || overrideReference)
+				{
+					Component component = parent.gameObject.GetComponentInChildren(item.FieldType, true);
+					item.SetValue(this, component);
+				}
+			}
+		}
+
         public virtual bool EnterConditions() { return true; }
-
-        public abstract void Enter();
-        public abstract void Exit();
-
-        public abstract void Sleep();
-        public abstract void Awake();
-
+        public abstract void OnEnter();
+        public abstract void OnExit();
+        public abstract void OnSleep();
+        public abstract void OnAwake();
         protected virtual void UpdateAnimator() {}
         public abstract void OnUpdate();
         public abstract void OnLateUpdate();
         public abstract void OnFixedUpdate();
-
         public virtual void HandleAnimator() {}
-
         public virtual void OnAnimatorIK(int layerIndex) {}
 
         public void AddStateMode(BaseStateMode mode)

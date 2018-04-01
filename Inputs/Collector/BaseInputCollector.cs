@@ -145,16 +145,19 @@ namespace BaseGameLogic.Inputs
 			
 			bool enablePause = CurrentInputSourceInstance.PauseButtonDown;
 			bool gameManagerExist = BaseGameManager.Instance != null;
-			bool gameIsPlaying = BaseGameManager.Instance.GameStatus == GameStatusEnum.Play;
-
-			if (enablePause && gameManagerExist && gameIsPlaying) 
+			if(gameManagerExist)
 			{
-				BaseGameManager.Instance.PauseGame ();
-			}
+				bool gameIsPlaying = BaseGameManager.Instance.GameStatus == GameStatusEnum.Play;
 
-			if (enablePause && gameManagerExist && !gameIsPlaying) 
-			{
-				BaseGameManager.Instance.ResumeGame ();
+				if (enablePause && gameManagerExist && gameIsPlaying) 
+				{
+					BaseGameManager.Instance.PauseGame ();
+				}
+
+				if (enablePause && gameManagerExist && !gameIsPlaying) 
+				{
+					BaseGameManager.Instance.ResumeGame ();
+				}
 			}
 		}
 

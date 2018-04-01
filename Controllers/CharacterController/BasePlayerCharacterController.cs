@@ -12,15 +12,6 @@ namespace BaseGameLogic.Character
 	{
 		public override bool IsPlayer { get { return true; } }
 
-		/// <summary>
-		/// The input collector.
-		/// Contains data on inputs.
-		/// </summary>
-		protected BaseInputCollectorManager InputCollectorManagerInstance
-		{
-			get { return GameManagerInstance.InputCollectorManager; }
-		}
-
         [SerializeField, Range(0, 8)]
 		private int _playerNumber = 0;
 		public int PlayerNumber 

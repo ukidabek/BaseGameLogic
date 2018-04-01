@@ -9,12 +9,13 @@ using BaseGameLogic.TimeManagement;
 using BaseGameLogic.Character;
 using System.Reflection;
 using System.Collections.Generic;
+using UnityEngine.Events;
 
 namespace BaseGameLogic.Management
 {
 	public abstract class BaseGameManager : Singleton<BaseGameManager> 
 	{
-		public event Action ObjectInitializationCallBack = null;
+		public InitializeObjects ObjectInitializationCallBack = new InitializeObjects();
 
 		[SerializeField]
 		private GameStatusEnum _gameStatus = GameStatusEnum.Play;
@@ -40,15 +41,16 @@ namespace BaseGameLogic.Management
 		{
             List<FieldInfo> managersPrefabFields = AssemblyExtension.GetAllFieldsWithAttribute(this.GetType(), typeof(ManagerAttribute), true);
             foreach (FieldInfo managerPrefabField in managersPrefabFields)
-                (managerPrefabField.GetValue(this) as GameObject).CreateInstance(transform);
+			{
+				object managerObject = managerPrefabField.GetValue(this);
+				if(!managerObject.Equals(null))
+					(managerPrefabField.GetValue(this) as GameObject).CreateInstance(transform);
+			}
 		}
 
 		protected virtual void InitializeOtherObjects()
 		{
-			if (ObjectInitializationCallBack != null)
-			{
-				ObjectInitializationCallBack ();
-			}
+			ObjectInitializationCallBack.Invoke (this);
 		}
 
 		protected override void Awake()
@@ -94,4 +96,6 @@ namespace BaseGameLogic.Management
             Cursor.visible = false;
         }
     }
+
+	[Serializable] public class InitializeObjects : UnityEvent<BaseGameManager> {}
 }

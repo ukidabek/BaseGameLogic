@@ -9,13 +9,13 @@ using BaseGameLogic.LogicModule;
 
 namespace BaseGameLogic.States
 {
-    [CustomEditor(typeof(BaseStateObject), true)]
+    [CustomEditor(typeof(BaseStateHandler), true)]
     public class BaseStateObjectCustomInspector : Editor
     {
-        private BaseStateObject _baseStateObject = null;
+        private BaseStateHandler _baseStateObject = null;
         protected virtual void OnEnable()
         {
-            _baseStateObject = target as BaseStateObject;
+            _baseStateObject = target as BaseStateHandler;
         }
 
         public override void OnInspectorGUI()

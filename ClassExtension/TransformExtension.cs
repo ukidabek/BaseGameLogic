@@ -36,6 +36,14 @@ public static class TransformExtension
         return Vector3.Distance(transform.position, _transform.position);
     }
 
+    public static Transform GetRootTransform(this Transform parent)
+    {
+        if(parent.parent == null)
+            return parent;
+        else
+            return GetRootTransform(parent.parent);
+    }
+
     public static Transform[] GetChildTransforms(this Transform transform)
     {
         List<Transform> transformList = new List<Transform>();

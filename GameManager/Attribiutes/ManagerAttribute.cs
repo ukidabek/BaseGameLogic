@@ -16,6 +16,5 @@ namespace BaseGameLogic.Management
             _isNecessary = isNecessary;
             _managerType = managerType;
         }
-
     }
 }

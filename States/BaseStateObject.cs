@@ -14,7 +14,7 @@ namespace BaseGameLogic.States
     /// <summary>
     /// Base game object.
     /// </summary>
-    public abstract class BaseStateObject : MonoBehaviour
+    public abstract class BaseStateHandler : MonoBehaviour
     {
         #if UNITY_EDITOR
 
@@ -27,11 +27,13 @@ namespace BaseGameLogic.States
         #region States management variables
 
 		[Header("States management.")]
+        [SerializeField]
+        protected bool enterDefaultStateOnAwake = false;
         [SerializeField, Tooltip("Default state creator - object that create states.")]
-        protected BaseStateCreator defaultStateCreator = null;
+        protected BaseState defaultState = null;
 
         [SerializeField, Tooltip("List of state creators that this object can enter.")]
-        protected List<BaseStateCreator> stateCreators = new List<BaseStateCreator>();
+        protected List<BaseState> stateList = new List<BaseState>();
 
         [SerializeField, Tooltip("List of mode creators that can be apply to object states.")]
         protected List<BaseStateModeCreator> stateModesCreators = new List<BaseStateModeCreator>();
@@ -39,7 +41,7 @@ namespace BaseGameLogic.States
         /// <summary>
         /// Stack of states.
         /// </summary>
-        protected Stack<BaseState> states = new Stack<BaseState>();
+        protected Stack<BaseState> statesStack = new Stack<BaseState>();
 
         /// <summary>
         /// Reference to current state of the object.
@@ -48,9 +50,9 @@ namespace BaseGameLogic.States
         {
             get 
             {
-                if (states.Count == 0) return null;
+                if (statesStack.Count == 0) return null;
 
-                return states.Peek(); 
+                return statesStack.Peek(); 
             }
         }
 
@@ -79,41 +81,40 @@ namespace BaseGameLogic.States
         /// </summary>
         protected virtual void EnterDefaultState()
         {
-            if (defaultStateCreator == null)
-                return;
-
-            BaseState defaultState = null;
-
-            if (defaultStateCreator != null)
+            if (defaultState == null) 
             {
-                defaultState = defaultStateCreator.CreateProduct(this);
-                
-                this.EnterState(defaultState);
+                Debug.LogWarning("There is no default state set.");
+                return;
             }
+
+            this.EnterState(defaultState);
         }
 
-        protected virtual void Awake() { }
+        protected virtual void Awake() 
+        { 
+            if(enterDefaultStateOnAwake)
+                EnterDefaultState();
+        }
 
         protected virtual void Start () 
         {
             GameManagerExist = GameManagerInstance != null;
             if(GameManagerExist)
-            {
-			    GameManagerInstance.ObjectInitializationCallBack -= InitializeObject;
-			    GameManagerInstance.ObjectInitializationCallBack += InitializeObject;
-            }
+			    GameManagerInstance.ObjectInitializationCallBack.AddListener(InitializeObject);
         }
 
 		/// <summary>
 		/// This method is called by GameManager in first update of this object.
 		/// </summary>
-		protected virtual void InitializeObject()
+		protected virtual void InitializeObject(BaseGameManager gameManager)
         {
-            EnterDefaultState();
+            if(!enterDefaultStateOnAwake)
+                EnterDefaultState();
         }
 
         protected bool ExecuteModesFunction(StateModeUpdate update)
         {
+            return true;
             bool additive = true;
             if (CurrentState == null)
                 return additive;
@@ -149,9 +150,7 @@ namespace BaseGameLogic.States
         protected virtual void OnDestroy()
         {
             if(GameManagerExist)
-            {
-                GameManagerInstance.ObjectInitializationCallBack -= InitializeObject;
-            }
+                GameManagerInstance.ObjectInitializationCallBack.RemoveListener(InitializeObject);
         }
 
         protected virtual void Update ()
@@ -182,18 +181,6 @@ namespace BaseGameLogic.States
                 CurrentState.OnFixedUpdate();
         }
 
-        public virtual void OnCollisionEnter(Collision collision) {}
-
-        public virtual void OnCollisionStay(Collision collision) {}
-
-        public virtual void OnCollisionExit(Collision collision) {}
-
-        public virtual void OnTriggerEnter(Collider collision) {}
-
-        public virtual void OnTriggerStay(Collider collision) {}
-
-        public virtual void OnTriggerExit(Collider collision) {}
-
         public virtual void OnAnimatorIK(int layerIndex)
         {
             if (IsGamePaused) return;
@@ -209,28 +196,30 @@ namespace BaseGameLogic.States
         /// </summary>
         /// <param name="stateName">Name of StateCreator.</param>
         /// <returns></returns>
-        public T GetStateCreator<T>(string stateName = "") where T:BaseStateCreator
+        public T GetState<T>(string stateName = "") where T:BaseState
         {
-            foreach (BaseStateCreator creator in stateCreators)
+            BaseState state = null;
+            foreach (BaseState creator in stateList)
             {
                 if (creator is T && string.IsNullOrEmpty(stateName))
                 {
-                    return creator as T;
+                    state = creator;
                 }
-                else
-                {
-                    if(creator.ProductName.Equals(stateName))
-                    {
-                        return creator as T;
-                    }
-                }
+                // else
+                // {
+                //     if(creator.ProductName.Equals(stateName))
+                //     {
+                //         return creator as T;
+                //     }
+                // }
             }
 
             #if UNITY_EDITOR
-            Debug.LogErrorFormat("No creator for {0} in {1}", stateName, this.gameObject.name); 
+            if(state == null)
+                Debug.LogErrorFormat("No creator for {0} in {1}", stateName, this.gameObject.name); 
             #endif
 
-            return null;
+            return state as T;
         }
 
         /// <summary>
@@ -238,20 +227,20 @@ namespace BaseGameLogic.States
         /// </summary>
         /// <param name="stateModeName">Name of StateModeCreator </param>
         /// <returns></returns>
-        public BaseStateModeCreator GetBaseStateModeCreator(string stateModeName)
-        {
-            foreach (BaseStateModeCreator creator in stateModesCreators)
-            {
-                if (creator != null && creator.ProductName.Equals(stateModeName))
-                    return creator;
-            }
+        // public BaseStateModeCreator GetBaseStateModeCreator(string stateModeName)
+        // {
+        //     foreach (BaseStateModeCreator creator in stateModesCreators)
+        //     {
+        //         if (creator != null && creator.ProductName.Equals(stateModeName))
+        //             return creator;
+        //     }
 
-            #if UNITY_EDITOR
-            Debug.LogErrorFormat("No creator for {0} in {1}", stateModeName, this.gameObject.name); 
-            #endif
+        //     #if UNITY_EDITOR
+        //     Debug.LogErrorFormat("No creator for {0} in {1}", stateModeName, this.gameObject.name); 
+        //     #endif
 
-            return null;
-        }
+        //     return null;
+        // }
 
         /// <summary>
         /// Enter a new state. 
@@ -259,15 +248,20 @@ namespace BaseGameLogic.States
         /// <param name="newState"> New state instance.</param>
         public void EnterState(BaseState newState)
         {
+            if(newState == null)
+                return;
+
             if (newState.EnterConditions())
             {
-                if (states.Count > 0)
+                if (statesStack.Count > 0)
                 {
-                    CurrentState.Sleep();
+                    CurrentState.OnSleep();
                 }
 
-                states.Push(newState);
-                CurrentState.Enter();
+                newState.ControlledObject = this;
+
+                statesStack.Push(newState);
+                CurrentState.OnEnter();
 
                 #if UNITY_EDITOR
 				currentStateTypes.Insert(0, newState.GetType().Name);
@@ -283,11 +277,11 @@ namespace BaseGameLogic.States
         /// <summary>
         /// Enter to a net state using State creator of type T
         /// </summary>
-        public void EnterState<T>() where T:BaseStateCreator
+        public void EnterState<T>() where T:BaseState
         {
-            BaseStateCreator creator = GetStateCreator<T>();
-            if(creator != null)
-                EnterState(creator.CreateProduct(this));
+            BaseState state = GetState<T>();
+            if(state != null)
+                EnterState(state);
         }
 
         /// <summary>
@@ -295,8 +289,10 @@ namespace BaseGameLogic.States
         /// </summary>
         public void ExitState()
         {
-            states.Pop().Exit();
-            CurrentState.Awake();
+            BaseState oldState = statesStack.Pop();
+            oldState.ControlledObject = null;
+            oldState.OnExit();
+            CurrentState.OnAwake();
 
             #if UNITY_EDITOR
             currentStateTypes.RemoveAt(0);

@@ -12,7 +12,7 @@ namespace BaseGameLogic.Character
     /// <summary>
     /// Base character controller.
     /// </summary>
-    public abstract class BaseCharacterController : BaseStateObject
+    public abstract class BaseCharacterController : MonoBehaviour
     {
 		public virtual bool IsPlayer { get { return false; } }
 
@@ -35,16 +35,14 @@ namespace BaseGameLogic.Character
         }
 
 
-        protected override void Start()
+        protected virtual void Start()
         {
-            base.Start();
             Register();
         }
                                                 
-		protected override void OnDestroy ()
+		protected virtual void OnDestroy ()
     	{
             Unregister();
-            base.OnDestroy ();
     	}
     }
 }

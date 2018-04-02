@@ -43,8 +43,9 @@ namespace BaseGameLogic.Management
             foreach (FieldInfo managerPrefabField in managersPrefabFields)
 			{
 				object managerObject = managerPrefabField.GetValue(this);
-				if(!managerObject.Equals(null))
-					(managerPrefabField.GetValue(this) as GameObject).CreateInstance(transform);
+				GameObject gameObject = managerObject as GameObject;
+				if(gameObject != null)
+					gameObject.CreateInstance(transform);
 			}
 		}
 

@@ -13,7 +13,7 @@ namespace BaseGameLogic.Animation
     /// Animation events broadcaster.
     /// This object receives animation events and provides action to witch other object can sign up. 
     /// </summary>
-    public abstract class AnimationEventsBroadcaster : MonoBehaviour 
+    public abstract class BaseAnimationEventsBroadcaster : MonoBehaviour 
     {
         #region Animation callbacks actions
 

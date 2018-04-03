@@ -34,7 +34,7 @@ namespace BaseGameLogic.LogicModule
         {
             Movement movement = GetMovement();
 
-            Vector3 move = movement.CalculatMoveTowards(Vector3.forward, 1);
+            Vector3 move = movement.CalculateMoveTowards(Vector3.forward, 1);
 
             Assert.AreEqual(Vector3.forward, move);
         }

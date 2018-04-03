@@ -7,6 +7,7 @@ using BaseGameLogic.Inputs;
 using BaseGameLogic.Audio;
 using System.Reflection;
 using System;
+using BaseGameLogic.LogicModule;
 
 namespace BaseGameLogic.States
 {
@@ -50,12 +51,13 @@ namespace BaseGameLogic.States
 		{
 			parent = parent == null ? this.transform.GetRootTransform().gameObject : parent;
 			requiredFieldList = requiredFieldList == null ? GetAllRequiredFields() : requiredFieldList;
-
+			BaseLogicModulesHandler handler = parent.GetComponentDeep<BaseLogicModulesHandler>();
+			
 			foreach (var item in requiredFieldList)
 			{
 				if(item.GetValue(this) == null || overrideReference)
 				{
-					Component component = parent.gameObject.GetComponentInChildren(item.FieldType, true);
+					Component component = handler.GetModule(item.FieldType);
 					item.SetValue(this, component);
 				}
 			}

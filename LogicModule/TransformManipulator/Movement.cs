@@ -32,14 +32,14 @@ namespace BaseGameLogic.LogicModule
             _transform.position += CalculatMove(input, deltaTime);
         }
 
-        public Vector3 CalculatMoveTowards(Vector3 position, float deltaTime)
+        public Vector3 CalculateMoveTowards(Vector3 position, float deltaTime)
         {
             return Vector3.MoveTowards(_transform.position, position, speed * deltaTime);
         }
 
         public void MoveTowards(Vector3 position, float deltaTime)
         {
-            _transform.position = CalculatMoveTowards(position, deltaTime);
+            _transform.position = CalculateMoveTowards(position, deltaTime);
         }
     }
 }

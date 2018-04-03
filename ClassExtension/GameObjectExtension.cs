@@ -12,13 +12,13 @@ public static class GameObjectExtension
     /// <typeparam name="T">Type of component to find.</typeparam>
     /// <param name="gameObject">Reference to object.</param>
     /// <returns>Reference to component.</returns>
-    public static T DeepGetComponent<T>(this GameObject gameObject) where T : Component
+    public static T GetComponentDeep<T>(this GameObject gameObject, bool includeInactive = false) where T : Component
     {
         T component = gameObject.GetComponent<T>();
         if (component != null)
             return component;
 
-        component = gameObject.GetComponentInChildren<T>();
+        component = gameObject.GetComponentInChildren<T>(includeInactive);
         if (component != null)
             return component;
 

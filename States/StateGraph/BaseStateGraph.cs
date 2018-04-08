@@ -28,7 +28,7 @@ namespace BaseGameLogic.States
 				item.Validate(handler);
 			}
 
-			foreach (var item in handler.CurrentState.StateTransition)
+			foreach (var item in handler.CurrentState.Transitions)
 			{
 				item.Validate(handler);
 			}

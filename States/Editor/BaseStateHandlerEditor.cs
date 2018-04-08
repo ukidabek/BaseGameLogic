@@ -12,11 +12,11 @@ namespace BaseGameLogic.States
     [CustomEditor(typeof(BaseStateHandler), true)]
     public class BaseStateHandlerEditor : Editor
     {
-        private BaseStateHandler _baseStateObject = null;
+        //private BaseStateHandler _baseStateObject = null;
 
         protected virtual void OnEnable()
         {
-            _baseStateObject = target as BaseStateHandler;
+            //_baseStateObject = target as BaseStateHandler;
         }
 
         public override void OnInspectorGUI()

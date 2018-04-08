@@ -10,10 +10,14 @@ namespace BaseGameLogic.Animation
 	public class AnimatorParametrHandler
 	{
 		[SerializeField] private Animator _animator = null;
-		[SerializeField] private string _name = string.Empty;
-		[SerializeField] private int _nameHash = 0;
 
-		public void Set()
+        [SerializeField] private string _name = string.Empty;
+        public string Name { get { return _name; } }
+
+        [SerializeField] private int _nameHash = 0;
+        public int NameHash { get { return _nameHash; } }
+
+        public void Set()
 		{
 			Set(_animator);
 		}
@@ -30,17 +34,17 @@ namespace BaseGameLogic.Animation
 
 		public void Set(Animator animator)
 		{
-			animator.SetTrigger(_nameHash);
+			animator.SetTrigger(NameHash);
 		}
 		
 		public void Set(Animator animator, float value)
 		{
-			animator.SetFloat(_nameHash, value);
+			animator.SetFloat(NameHash, value);
 		}
 
 		public void Set(Animator animator, bool value)
 		{
-			animator.SetBool(_nameHash, value);
+			animator.SetBool(NameHash, value);
 		}
 	}
 }

@@ -17,15 +17,17 @@ namespace BaseGameLogic.States
         public ConnectionPoint In = null;
         public ConnectionPoint Out = null;
 
+        public Node() {}
+
         public Node(Vector2 position, BaseState state)
         {
             Rect.position = position;
             State = state;
 
             Vector2 pointPosition = new Vector2(Rect.x, Rect.y + Rect.height / 2);
-            In = new ConnectionPoint(pointPosition, this, ConnectionPointType.In);
+            In = new ConnectionPoint(pointPosition);
             pointPosition = new Vector2(Rect.x + Rect.width, Rect.y + Rect.height/2);
-            Out = new ConnectionPoint(pointPosition, this, ConnectionPointType.Out);
+            Out = new ConnectionPoint(pointPosition);
         }
 
         public void Draw()

@@ -25,17 +25,19 @@ namespace BaseGameLogic.States
 
         private Vector2 _currentMousePossition = Vector2.zero;
 
-        public StateGraphEditorWindow(BaseStateGraph stateGraph)
+        public StateGraphEditorWindow()
+        {
+            minSize = new Vector2(800, 600);
+        }
+
+        public void Initialize(BaseStateGraph stateGraph)
         {
             _stateGraph = stateGraph;
-            minSize = new Vector2(800, 600);
 
             foreach (var item in _stateGraph.NodeInfo)
             {
                 _statesDictionary.Add(item.State, item);
             }
-
-            Show();
         }
 
         private void Awake()
@@ -115,6 +117,25 @@ namespace BaseGameLogic.States
 
                 foreach (var node in _stateGraph.NodeInfo)
                 {
+                    foreach (var transition in node.State.Transitions)
+                    {
+                        if (transition.TargetState == null) continue;
+
+                        Node targetNode = _statesDictionary[transition.TargetState];
+
+                        Handles.DrawBezier(
+                            node.Out.Rect.center,
+                            targetNode.In.Rect.center,
+                            node.Out.Rect.center - Vector2.left * 50f,
+                            targetNode.In.Rect.center + Vector2.left * 50f,
+                            Color.white,
+                            null,
+                            2f);
+
+                        Rect buttonRect = new Rect(Vector2.zero, new Vector2(10, 10));
+                        buttonRect.center = ((node.Out.Rect.center + targetNode.In.Rect.center) / 2);
+                        GUI.Button(buttonRect, "");
+                    }
                     node.Draw();
                 }
             }

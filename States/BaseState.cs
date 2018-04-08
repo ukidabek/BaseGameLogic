@@ -29,7 +29,7 @@ namespace BaseGameLogic.States
 		public Transform RootParent { get; private set; }
 
         [SerializeField] private List<StateTransition> _stateTransition = new List<StateTransition>();
-        public List<StateTransition> StateTransition { get { return _stateTransition; } }
+        public List<StateTransition> Transitions { get { return _stateTransition; } }
         
 		protected virtual void Awake() 
 		{

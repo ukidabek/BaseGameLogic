@@ -15,13 +15,13 @@ namespace BaseGameLogic.SceneManagement
             return GameObjectExtension.CreateInstanceOfAbstractType<BaseSceneLoadManager>();
         }
 
-        private BaseSceneLoadManager _manager = null;
+        //private BaseSceneLoadManager _manager = null;
         
         private ReorderableList list;
 
         private void OnEnable() 
         {
-            _manager = target as BaseSceneLoadManager;
+            //_manager = target as BaseSceneLoadManager;
             list = new ReorderableList(serializedObject, serializedObject.FindProperty("_sceneSetList"), 
                 true, true, true, true);
             list.drawElementCallback = DrawElement;

@@ -14,7 +14,9 @@ namespace BaseGameLogic.States
             base.OnInspectorGUI();
             if(GUILayout.Button("Open editor"))
             {
-                EditorWindow window = new StateGraphEditorWindow(target as BaseStateGraph);
+                StateGraphEditorWindow window = Editor.CreateInstance<StateGraphEditorWindow>();
+                window.Initialize(target as BaseStateGraph);
+                window.Show();
             }
         }
     }

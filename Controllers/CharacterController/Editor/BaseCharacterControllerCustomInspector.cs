@@ -10,7 +10,7 @@ using BaseGameLogic.States;
 namespace BaseGameLogic.Character
 {
     [CustomEditor(typeof(BaseCharacterController), true)]
-    public class BaseCharacterControllerCustomInspector : BaseStateObjectCustomInspector 
+    public class BaseCharacterControllerCustomInspector : BaseStateHandlerEditor 
     {
         protected override void OnEnable()
         {

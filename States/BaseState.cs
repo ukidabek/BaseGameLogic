@@ -1,12 +1,13 @@
 ﻿using UnityEngine;
 
+using System;
+using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 
 using BaseGameLogic.Inputs;
 using BaseGameLogic.Audio;
-using System.Reflection;
-using System;
+
 using BaseGameLogic.LogicModule;
 
 namespace BaseGameLogic.States
@@ -16,12 +17,6 @@ namespace BaseGameLogic.States
     /// </summary>
     public abstract class BaseState : MonoBehaviour
     {
-		protected List<BaseStateMode> stateModes = new List<BaseStateMode> ();
-		public List<BaseStateMode> StateModes
-        {
-    		get { return this.stateModes; }
-    	}
-
         private BaseStateHandler controlledObject = null;
 		public BaseStateHandler ControlledObject
         {
@@ -30,11 +25,15 @@ namespace BaseGameLogic.States
     	}
 
 		private FieldInfo[] requiredFieldList = null;
-		public Transform rootParent { get; private set; }
 
+		public Transform RootParent { get; private set; }
+
+        [SerializeField] private List<StateTransition> _stateTransition = new List<StateTransition>();
+        public List<StateTransition> StateTransition { get { return _stateTransition; } }
+        
 		protected virtual void Awake() 
 		{
-			rootParent = this.transform.GetRootTransform();
+			RootParent = this.transform.GetRootTransform();
 			requiredFieldList = GetAllRequiredFields();
 		}
 
@@ -50,72 +49,34 @@ namespace BaseGameLogic.States
 		public void GetAllRequiredReferences(GameObject parent = null, bool overrideReference = false)
 		{
 			parent = parent == null ? this.transform.GetRootTransform().gameObject : parent;
-			requiredFieldList = requiredFieldList == null ? GetAllRequiredFields() : requiredFieldList;
 			BaseLogicModulesHandler handler = parent.GetComponentDeep<BaseLogicModulesHandler>();
-			
-			foreach (var item in requiredFieldList)
-			{
-				if(item.GetValue(this) == null || overrideReference)
-				{
-					Component component = handler.GetModule(item.FieldType);
-					item.SetValue(this, component);
-				}
-			}
-		}
+
+            GetAllRequiredReferences(handler, overrideReference);
+        }
+
+        public void GetAllRequiredReferences(BaseLogicModulesHandler handler, bool overrideReference = false)
+        {
+			requiredFieldList = requiredFieldList == null ? GetAllRequiredFields() : requiredFieldList;
+
+            foreach (FieldInfo field in requiredFieldList)
+            {
+                if (overrideReference || field.GetValue(this) == null)
+                {
+                    field.SetValue(this, handler.GetModule(field.FieldType));
+                }
+            }
+        }
 
         public virtual bool EnterConditions() { return true; }
         public abstract void OnEnter();
         public abstract void OnExit();
         public abstract void OnSleep();
         public abstract void OnAwake();
-        protected virtual void UpdateAnimator() {}
+        public virtual void UpdateAnimator() {}
         public abstract void OnUpdate();
         public abstract void OnLateUpdate();
         public abstract void OnFixedUpdate();
         public virtual void HandleAnimator() {}
         public virtual void OnAnimatorIK(int layerIndex) {}
-
-        public void AddStateMode(BaseStateMode mode)
-		{
-            stateModes.Add (mode);
-            mode.ModAdded();
-		}
-
-		/// <summary>
-		/// Gets the state modes.
-		/// </summary>
-		/// <returns>The state modes.</returns>
-		/// <typeparam name="T">The 1st type parameter.</typeparam>
-		public List<T> GetStateModes<T>() where T:BaseStateMode
-		{
-			List<T> modes = new List<T> ();
-
-			foreach (BaseStateMode mode in stateModes) 
-			{
-				if (mode is T) 
-				{
-					modes.Add (mode as T);
-				}
-			}
-			return modes;
-		}
-
-		/// <summary>
-		/// Removes the state modes.
-		/// </summary>
-		/// <typeparam name="T">The 1st type parameter.</typeparam>
-		public void RemoveStateModes<T>() where T:BaseStateMode
-		{
-			for (int i = 0; i < stateModes.Count; i++) 
-			{
-				if (stateModes [i] is T) 
-				{
-                    BaseStateMode mode = stateModes[i]; 
-                    stateModes.RemoveAt (i);
-                    mode.ModRemoved();
-					i--;
-				}
-			}
-		}
     }
 }

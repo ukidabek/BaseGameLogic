@@ -35,7 +35,6 @@ namespace BaseGameLogic.SceneManagement
         private float _loadingProgress = 0;
         private float _progressPerScene = 0;
 
-
         private void Update()
         {
             if(_loadOperation != null)

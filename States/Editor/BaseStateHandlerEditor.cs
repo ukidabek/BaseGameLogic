@@ -10,9 +10,10 @@ using BaseGameLogic.LogicModule;
 namespace BaseGameLogic.States
 {
     [CustomEditor(typeof(BaseStateHandler), true)]
-    public class BaseStateObjectCustomInspector : Editor
+    public class BaseStateHandlerEditor : Editor
     {
         private BaseStateHandler _baseStateObject = null;
+
         protected virtual void OnEnable()
         {
             _baseStateObject = target as BaseStateHandler;

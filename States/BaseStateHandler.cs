@@ -32,11 +32,10 @@ namespace BaseGameLogic.States
         [SerializeField, Tooltip("Default state creator - object that create states.")]
         protected BaseState defaultState = null;
 
+        [SerializeField] protected BaseStateGraph _graph = null;
+
         [SerializeField, Tooltip("List of state creators that this object can enter.")]
         protected List<BaseState> stateList = new List<BaseState>();
-
-        [SerializeField, Tooltip("List of mode creators that can be apply to object states.")]
-        protected List<BaseStateModeCreator> stateModesCreators = new List<BaseStateModeCreator>();
 
         /// <summary>
         /// Stack of states.
@@ -50,7 +49,8 @@ namespace BaseGameLogic.States
         {
             get 
             {
-                if (statesStack.Count == 0) return null;
+                if (statesStack.Count == 0) 
+                    return null;
 
                 return statesStack.Peek(); 
             }
@@ -60,19 +60,13 @@ namespace BaseGameLogic.States
 
         #region Managers references
 
-        protected bool GameManagerExist {get; private set; }
-        protected BaseGameManager GameManagerInstance 
-		{
-			get { return BaseGameManager.Instance; }
-		}
+        protected bool GameManagerExist { get; private set; }
+        protected BaseGameManager GameManagerInstance { get { return BaseGameManager.Instance; } }
 
         /// <summary>
         /// Enable or disable execution of StateObject updates methods.
         /// </summary>
-		protected bool IsGamePaused
-		{
-			get { return GameManagerExist && GameManagerInstance.GameStatus == GameStatusEnum.Pause; }
-		}
+		protected bool IsGamePaused { get { return GameManagerExist && GameManagerInstance.GameStatus == GameStatusEnum.Pause; } }
 
         #endregion
 
@@ -81,6 +75,12 @@ namespace BaseGameLogic.States
         /// </summary>
         protected virtual void EnterDefaultState()
         {
+            if(_graph != null)
+            {
+                this.EnterState(_graph.RootState);
+                return;
+            }
+
             if (defaultState == null) 
             {
                 Debug.LogWarning("There is no default state set.");
@@ -112,39 +112,6 @@ namespace BaseGameLogic.States
                 EnterDefaultState();
         }
 
-        protected bool ExecuteModesFunction(StateModeUpdate update)
-        {
-            return true;
-            bool additive = true;
-            if (CurrentState == null)
-                return additive;
-            
-			StateModeBlending blending = StateModeBlending.Additive;
-			List<BaseStateMode> stateModes = CurrentState.StateModes;
-
-			for (int i = 0; i < stateModes.Count; i++) 
-			{
-				BaseStateMode mode = stateModes [i];
-				switch (update) 
-				{
-				case StateModeUpdate.Normal:
-					blending = mode.Update ();
-					break;
-				case StateModeUpdate.Fixed:
-					blending = mode.FixedUpdate ();
-					break;
-				case StateModeUpdate.Late:
-					blending = mode.LateUpdate ();
-					break;
-				}
-
-				if (blending == StateModeBlending.Override)
-					additive = false;
-			}
-
-			return additive;
-		}
-
         #region MonoBehaviour methods
 
         protected virtual void OnDestroy()
@@ -155,38 +122,37 @@ namespace BaseGameLogic.States
 
         protected virtual void Update ()
         {
-			if (IsGamePaused)
+			if (IsGamePaused && CurrentState != null)
 				return;
-			
-			bool additive = ExecuteModesFunction (StateModeUpdate.Normal); 
-			if(CurrentState != null && additive)
-                CurrentState.OnUpdate();
+
+            if(_graph != null)
+                _graph.HandleTransitions(this);
+
+			CurrentState.OnUpdate();
         }
 
         protected virtual void LateUpdate()
         {
-			if (IsGamePaused) return;
+			if (IsGamePaused && CurrentState != null) 
+                return;
 			
-			bool additive = ExecuteModesFunction (StateModeUpdate.Late); 
-			if(CurrentState != null && additive)
-                CurrentState.OnLateUpdate();
+			CurrentState.OnLateUpdate();
         }
 
         protected virtual void FixedUpdate()
         {
-			if (IsGamePaused) return;
+			if (IsGamePaused && CurrentState != null) 
+                return;
 			
-			bool additive = ExecuteModesFunction (StateModeUpdate.Fixed); 
-			if(CurrentState != null && additive)
-                CurrentState.OnFixedUpdate();
+			CurrentState.OnFixedUpdate();
         }
 
         public virtual void OnAnimatorIK(int layerIndex)
         {
-            if (IsGamePaused) return;
+            if (IsGamePaused && CurrentState != null) 
+                return;
 
-            if (CurrentState != null)
-                CurrentState.OnAnimatorIK(layerIndex);
+            CurrentState.OnAnimatorIK(layerIndex);
         }
 
         #endregion
@@ -223,26 +189,6 @@ namespace BaseGameLogic.States
         }
 
         /// <summary>
-        /// Return a StateModeCreator added to BaseStateObject by it's name.
-        /// </summary>
-        /// <param name="stateModeName">Name of StateModeCreator </param>
-        /// <returns></returns>
-        // public BaseStateModeCreator GetBaseStateModeCreator(string stateModeName)
-        // {
-        //     foreach (BaseStateModeCreator creator in stateModesCreators)
-        //     {
-        //         if (creator != null && creator.ProductName.Equals(stateModeName))
-        //             return creator;
-        //     }
-
-        //     #if UNITY_EDITOR
-        //     Debug.LogErrorFormat("No creator for {0} in {1}", stateModeName, this.gameObject.name); 
-        //     #endif
-
-        //     return null;
-        // }
-
-        /// <summary>
         /// Enter a new state. 
         /// </summary>
         /// <param name="newState"> New state instance.</param>
@@ -259,7 +205,7 @@ namespace BaseGameLogic.States
                 }
 
                 newState.ControlledObject = this;
-
+                newState.GetAllRequiredReferences(this.gameObject, true);
                 statesStack.Push(newState);
                 CurrentState.OnEnter();
 

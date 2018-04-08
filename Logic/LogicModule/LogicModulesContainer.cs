@@ -32,10 +32,21 @@ namespace BaseGameLogic.LogicModule
 
         public BaseLogicModule GetModule(Type type)
         {
+            Type mono = typeof(MonoBehaviour);
+
             for (int i = 0; i < _modulesList.Count; i++)
             {
-                if (_modulesList[i] != null && _modulesList[i].GetType() == type)
-                    return _modulesList[i];
+                if (_modulesList[i] != null)
+                {
+                    Type currentType = _modulesList[i].GetType();
+                    while(mono != currentType)
+                    {
+                        if(type == currentType)
+                            return _modulesList[i];
+                        else
+                            currentType = currentType.BaseType;
+                    }
+                }
             }
 
             return null;

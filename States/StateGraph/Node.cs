@@ -11,11 +11,14 @@ namespace BaseGameLogic.States
         public BaseState State = null;
         public Vector2 MenuAreaOffset = Vector2.zero;
 
-        public bool IsDragged;
-        public bool IsSelected;
+        public bool IsDragged = false;
+        public bool IsSelected = false;
+        public bool RemoveNode = false;
 
         public ConnectionPoint In = null;
         public ConnectionPoint Out = null;
+
+        public event Action<ConnectionPointType, BaseState> OnConnectionPointClicked = null;
 
         public Node() {}
 
@@ -33,8 +36,16 @@ namespace BaseGameLogic.States
         public void Draw()
         {
             GUI.Box(Rect, State.GetType().Name + (IsSelected ? "*" : ""));
-            In.Draw();
-            Out.Draw();
+
+            if(In.Draw() && OnConnectionPointClicked != null)
+            {
+                OnConnectionPointClicked(ConnectionPointType.In, State);
+            }
+
+            if (Out.Draw() && OnConnectionPointClicked != null)
+            {
+                OnConnectionPointClicked(ConnectionPointType.Out, State);
+            }
         }
 
         public bool ProcessEvents(Event e, Vector2 offset)
@@ -42,18 +53,18 @@ namespace BaseGameLogic.States
             switch (e.type)
             {
                 case EventType.MouseDown:
+                    bool contains = Rect.Contains(e.mousePosition - offset);
                     IsSelected = false;
-                    if (e.button == 0)
+                    switch(e.button)
                     {
-                        if (Rect.Contains(e.mousePosition - offset))
-                        {
-                            IsSelected = IsDragged = true;
-                            GUI.changed = true;
-                        }
-                        else
-                        {
-                            GUI.changed = true;
-                        }
+                        case 0:
+                        case 1:
+                            if (contains)
+                            {
+                                IsSelected = IsDragged = true;
+                                return true;
+                            }
+                            break;
                     }
                     break;
 
@@ -79,6 +90,12 @@ namespace BaseGameLogic.States
             Rect.position += delta;
             In.Rect.position += delta;
             Out.Rect.position += delta;
+        }
+
+        public void Remove()
+        {
+            GameObject.DestroyImmediate(State);
+            RemoveNode = true;
         }
     }
 }

@@ -32,7 +32,6 @@ namespace BaseGameLogic.States
         private GenericMenu _selectedNodeContextMenu = new GenericMenu();
         private GenericMenu _selectedTransitionContextMenu = new GenericMenu();
 
-
         private Vector2 _currentMousePossition = Vector2.zero;
 
         private Connector _connector = null;
@@ -56,9 +55,9 @@ namespace BaseGameLogic.States
 
             foreach (var item in _nodes)
             {
-                if (item.State == null) continue;
+                if (item.State != null) 
+                    _statesDictionary.Add(item.State, item);
 
-                _statesDictionary.Add(item.State, item);
                 item.OnConnectionPointClicked += _connector.Connect;
             }
         }
@@ -288,7 +287,7 @@ namespace BaseGameLogic.States
 
             Editor editor = Editor.CreateEditor(item);
             EditorGUILayout.InspectorTitlebar(false, item);
-            editor.DrawDefaultInspector();
+            editor.OnInspectorGUI();
         }
 
         private void AddState(object data)

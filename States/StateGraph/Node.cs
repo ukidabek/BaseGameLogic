@@ -20,17 +20,18 @@ namespace BaseGameLogic.States
 
         public event Action<ConnectionPointType, BaseState> OnConnectionPointClicked = null;
 
-        public Node() {}
+        public Node()
+        {
+            Vector2 pointPosition = new Vector2(Rect.x, Rect.y + Rect.height / 2);
+            In = new ConnectionPoint(pointPosition);
+            pointPosition = new Vector2(Rect.x + Rect.width, Rect.y + Rect.height / 2);
+            Out = new ConnectionPoint(pointPosition);
+        }
 
-        public Node(Vector2 position, BaseState state)
+        public Node(Vector2 position, BaseState state) : this()
         {
             Rect.position = position;
             State = state;
-
-            Vector2 pointPosition = new Vector2(Rect.x, Rect.y + Rect.height / 2);
-            In = new ConnectionPoint(pointPosition);
-            pointPosition = new Vector2(Rect.x + Rect.width, Rect.y + Rect.height/2);
-            Out = new ConnectionPoint(pointPosition);
         }
 
         public void Draw()

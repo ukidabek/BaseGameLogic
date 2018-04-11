@@ -58,6 +58,7 @@ namespace BaseGameLogic.States
                 if (item.State != null) 
                     _statesDictionary.Add(item.State, item);
 
+                item.IsSelected = false;
                 item.OnConnectionPointClicked += _connector.Connect;
             }
         }

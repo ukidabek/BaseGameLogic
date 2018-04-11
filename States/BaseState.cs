@@ -30,8 +30,11 @@ namespace BaseGameLogic.States
 
         [SerializeField] private List<StateTransition> _stateTransition = new List<StateTransition>();
         public List<StateTransition> Transitions { get { return _stateTransition; } }
-        
-		protected virtual void Awake() 
+
+        [SerializeField] private List<BaseStateTransitionCondition> _exitStateConditons = new List<BaseStateTransitionCondition>();
+        public List<BaseStateTransitionCondition> ExitStateConditons { get { return _exitStateConditons; } }
+
+        protected virtual void Awake() 
 		{
 			RootParent = this.transform.GetRootTransform();
 			requiredFieldList = GetAllRequiredFields();

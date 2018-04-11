@@ -11,6 +11,7 @@ namespace BaseGameLogic.States
     public class StateGraphEditorWindow : EditorWindow
     {
         private BaseStateGraph _stateGraph = null;
+        private List<Node> _nodes = new List<Node>();
         private List<TransitionInfo> _transitionRectList = new List<TransitionInfo>();
         private TransitionInfo _selectedTransition = null;
 
@@ -25,7 +26,9 @@ namespace BaseGameLogic.States
         private Rect _inspectorAreaRecr = new Rect();
         private float _inspectorSize = .3f;
 
-        private GenericMenu _contextMenu = new GenericMenu();
+        private GenericMenu _addStateContextMenu = new GenericMenu();
+        private GenericMenu _addContitionContextMenu = new GenericMenu();
+
         private GenericMenu _selectedNodeContextMenu = new GenericMenu();
         private GenericMenu _selectedTransitionContextMenu = new GenericMenu();
 
@@ -33,6 +36,7 @@ namespace BaseGameLogic.States
         private Vector2 _currentMousePossition = Vector2.zero;
 
         private Connector _connector = null;
+        private Connector _formAnyStateConnector = null;
 
         public StateGraphEditorWindow()
         {
@@ -45,9 +49,15 @@ namespace BaseGameLogic.States
             _stateGraph = stateGraph;
 
             _connector = new Connector(SetDirty);
+            _formAnyStateConnector = new Connector(SetDirty, _stateGraph);
 
-            foreach (var item in _stateGraph.NodeInfo)
+            _nodes.AddRange(_stateGraph.NodeInfo);
+            _nodes.Add(_stateGraph.FromAnyStateNode);
+
+            foreach (var item in _nodes)
             {
+                if (item.State == null) continue;
+
                 _statesDictionary.Add(item.State, item);
                 item.OnConnectionPointClicked += _connector.Connect;
             }
@@ -60,16 +70,23 @@ namespace BaseGameLogic.States
 
             CalculateInspectorAndGraphRect();
 
-            Type[] stateTypes = AssemblyExtension.GetDerivedTypes<BaseState>();
-
-            foreach (var item in stateTypes)
-            {
-                GUIContent content = new GUIContent(string.Format("Add state/{0}", item.Name));
-                _contextMenu.AddItem(content, false, AddState, item);
-            }
+            _addStateContextMenu = GenerateAddMenu(AssemblyExtension.GetDerivedTypes<BaseState>(), "Add state/{0}", AddState);
+            _addContitionContextMenu = GenerateAddMenu(AssemblyExtension.GetDerivedTypes<BaseStateTransitionCondition>(), "{0}", AddCondition);
 
             _selectedNodeContextMenu.AddItem(new GUIContent("Remove state"), false, RemoveState);
             _selectedTransitionContextMenu.AddItem(new GUIContent("Remove transition"), false, RemoveTransition);
+        }
+
+        private GenericMenu GenerateAddMenu(Type[] typesToAdd, string formatString, GenericMenu.MenuFunction2 addState, GenericMenu existingMenu = null)
+        {
+            GenericMenu menu = existingMenu != null ? existingMenu : new GenericMenu();
+            foreach (var item in typesToAdd)
+            {
+                GUIContent content = new GUIContent(string.Format(formatString, item.Name));
+                menu.AddItem(content, false, addState, item);
+            }
+
+            return menu;
         }
 
         private void CalculateInspectorAndGraphRect()
@@ -84,7 +101,7 @@ namespace BaseGameLogic.States
 
         private void OnDestroy()
         {
-            foreach (var item in _stateGraph.NodeInfo)
+            foreach (var item in _nodes)
             {
                 item.OnConnectionPointClicked -= _connector.Connect;
             }
@@ -106,7 +123,7 @@ namespace BaseGameLogic.States
         private void ProcessNodeEvents(Event current)
         {
             _selectedNode = null;
-            foreach (var item in _stateGraph.NodeInfo)
+            foreach (var item in _nodes)
             {
                 if (item.ProcessEvents(current, new Vector2(0, _menuAreaRect.height)))
                 {
@@ -114,7 +131,10 @@ namespace BaseGameLogic.States
                 }
 
                 if (item.IsSelected)
+                {
                     _selectedNode = item;
+                    _selectedTransition = null;
+                }
             }
         }
 
@@ -130,6 +150,12 @@ namespace BaseGameLogic.States
                         {
                             transitionSelected = true;
                             _selectedTransition = item;
+                            if(_selectedNode != null)
+                            {
+                                _selectedNode.IsSelected = false;
+                                _selectedNode = null;
+                            }
+                            GUI.changed = true;
                             break;
                         }
                     }
@@ -138,12 +164,10 @@ namespace BaseGameLogic.States
                         case 1:
                             if (_selectedNode == null)
                             {
-                                //_selectedTransition = null;
-
                                 if(transitionSelected)
                                     _selectedTransitionContextMenu.ShowAsContext();
                                 else
-                                    _contextMenu.ShowAsContext();
+                                    _addStateContextMenu.ShowAsContext();
                             }
                             else
                             {
@@ -174,9 +198,10 @@ namespace BaseGameLogic.States
 
                 _transitionRectList.Clear();
 
-                for (int i = 0; i < _stateGraph.NodeInfo.Count; i++)
+                for (int i = 0; i < _nodes.Count; i++)
                 {
-                    var node = _stateGraph.NodeInfo[i];
+                    var node = _nodes[i];
+                    if (node.State == null) continue;
                     for (int j = 0; j < node.State.Transitions.Count; j++)
                     {
                         var transition = node.State.Transitions[j];
@@ -206,6 +231,7 @@ namespace BaseGameLogic.States
                     }
                     node.Draw();
                 }
+                _stateGraph.FromAnyStateNode.Draw();
             }
             GUILayout.EndArea();
         }
@@ -214,18 +240,55 @@ namespace BaseGameLogic.States
         {
             GUILayout.BeginArea(_inspectorAreaRecr);
             {
-                if(_selectedTransition != null)
-                {
-                    StateTransition transition = _stateGraph.NodeInfo[_selectedTransition.NodeIndex].State.Transitions[_selectedTransition.TransitionIndex];
-                    foreach (var item in transition.Conditions)
-                    {
-                        Editor editor = Editor.CreateEditor(item);
-                        EditorGUILayout.InspectorTitlebar(false, item);
-                        editor.DrawDefaultInspector();
-                    }
-                }
+                DrawTransitionInspector();
+                DrawStateInspecotr();
             }
             GUILayout.EndArea();
+        }
+
+        private void DrawStateInspecotr()
+        {
+            if (_selectedNode != null)
+            {
+                DrawInspectorArea(_selectedNode.State);
+            }
+        }
+
+        private void DrawTransitionInspector()
+        {
+            if (_selectedTransition != null)
+            {
+                GUIStyle style = new GUIStyle();
+                style.richText = true;
+                EditorGUILayout.LabelField("<b>Transition conditions</b>", style);
+                StateTransition transition = _stateGraph.NodeInfo[_selectedTransition.NodeIndex].State.Transitions[_selectedTransition.TransitionIndex];
+                for (int i = 0; i < transition.Conditions.Count; i++)
+                {
+                    var item = transition.Conditions[i];
+                    if (item == null)
+                    {
+                        transition.Conditions.RemoveAt(i);
+                        --i;
+                        continue;
+                    }
+
+                    DrawInspectorArea(item);
+                }
+
+                EditorGUILayout.Space();
+
+                if (GUILayout.Button("Add condition"))
+                    _addContitionContextMenu.ShowAsContext();
+            }
+        }
+
+        private void DrawInspectorArea(MonoBehaviour item)
+        {
+            if (item == null) return;
+
+            Editor editor = Editor.CreateEditor(item);
+            EditorGUILayout.InspectorTitlebar(false, item);
+            editor.DrawDefaultInspector();
         }
 
         private void AddState(object data)
@@ -237,11 +300,26 @@ namespace BaseGameLogic.States
 
             Node newNode = new Node(_currentMousePossition, state);
             _stateGraph.NodeInfo.Add(newNode);
+            _nodes.Add(newNode);
 
             SetDirty(_stateGraph);
 
             if (_stateGraph.RootState == null)
                 _stateGraph.RootState = state;
+        }
+
+        private void AddCondition(object data)
+        {
+            if(_selectedTransition != null)
+            {
+                Type type = data as Type;
+                var condition = _stateGraph.gameObject.AddComponent(type) as BaseStateTransitionCondition;
+
+                Undo.RecordObject(_stateGraph, "Connection added");
+
+                var transition = _stateGraph[_selectedTransition.NodeIndex, _selectedTransition.TransitionIndex];
+                transition.Conditions.Add(condition);
+            }
         }
 
         private void RemoveState()
@@ -301,59 +379,6 @@ namespace BaseGameLogic.States
 
             EditorUtility.SetDirty(monoBehaviour);
             EditorSceneManager.MarkSceneDirty(monoBehaviour.gameObject.scene);
-        }
-    }
-
-    internal class Connector
-    {
-        private BaseState _inNode = null;
-        private BaseState _outNode = null;
-
-        private Action<MonoBehaviour> SetDirty = null;
-
-        public Connector(Action<MonoBehaviour> setDirty)
-        {
-            SetDirty = setDirty;
-        }
-
-        public void Connect(ConnectionPointType type, BaseState state)
-        {
-            switch (type)
-            {
-                case ConnectionPointType.In:
-                    if (_inNode == null) _inNode = state;
-                    break;
-                case ConnectionPointType.Out:
-                    if (_outNode == null) _outNode = state;
-                    break;
-            }
-
-            if(_inNode != null && _outNode != null)
-            {
-                Undo.RecordObject(_outNode.gameObject, "Transition added");
-                _outNode.Transitions.Add(new StateTransition(_inNode));
-                _inNode = _outNode = null;
-
-                if(SetDirty != null)
-                {
-                    SetDirty(_outNode);
-                    SetDirty(_inNode);
-                }
-            }
-        }
-    }
-
-    internal class TransitionInfo
-    {
-        public Rect Rect;
-        public int NodeIndex = 0;
-        public int TransitionIndex = 0;
-
-        public TransitionInfo(Rect rect, int nodeInde, int transitionIndex)
-        {
-            Rect = rect;
-            NodeIndex = nodeInde;
-            TransitionIndex = transitionIndex;
         }
     }
 }

@@ -35,7 +35,7 @@ namespace BaseGameLogic.States
 
         public void Draw()
         {
-            GUI.Box(Rect, State.GetType().Name + (IsSelected ? "*" : ""));
+            GUI.Box(Rect, State != null ? State.GetType().Name : "Any state" + (IsSelected ? "*" : ""));
 
             if(In.Draw() && OnConnectionPointClicked != null)
             {

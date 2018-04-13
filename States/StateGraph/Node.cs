@@ -22,15 +22,21 @@ namespace BaseGameLogic.States
 
         public Node()
         {
+            CalculateConnectionPointPosition();
+        }
+
+        private void CalculateConnectionPointPosition()
+        {
             Vector2 pointPosition = new Vector2(Rect.x, Rect.y + Rect.height / 2);
             In = new ConnectionPoint(pointPosition);
             pointPosition = new Vector2(Rect.x + Rect.width, Rect.y + Rect.height / 2);
             Out = new ConnectionPoint(pointPosition);
         }
 
-        public Node(Vector2 position, BaseState state) : this()
+        public Node(Vector2 position, BaseState state)
         {
             Rect.position = position;
+            CalculateConnectionPointPosition();
             State = state;
         }
 

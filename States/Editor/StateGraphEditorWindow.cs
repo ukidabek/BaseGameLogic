@@ -53,12 +53,15 @@ namespace BaseGameLogic.States
             _nodes.AddRange(_stateGraph.NodeInfo);
             _nodes.Add(_stateGraph.FromAnyStateNode);
 
+            _stateGraph.FromAnyStateNode.OnConnectionPointClicked += _formAnyStateConnector.Connect;
+
             foreach (var item in _nodes)
             {
                 if (item.State != null) 
                     _statesDictionary.Add(item.State, item);
 
                 item.IsSelected = false;
+                item.OnConnectionPointClicked += _formAnyStateConnector.Connect;
                 item.OnConnectionPointClicked += _connector.Connect;
             }
         }
@@ -101,9 +104,12 @@ namespace BaseGameLogic.States
 
         private void OnDestroy()
         {
+            _stateGraph.FromAnyStateNode.OnConnectionPointClicked -= _formAnyStateConnector.Connect;
+
             foreach (var item in _nodes)
             {
                 item.OnConnectionPointClicked -= _connector.Connect;
+                item.OnConnectionPointClicked -= _formAnyStateConnector.Connect;
             }
         }
 
@@ -198,6 +204,15 @@ namespace BaseGameLogic.States
 
                 _transitionRectList.Clear();
 
+                for (int i = 0; i < _stateGraph.FormAnyStateTransition.Count; i++)
+                {
+                    DrawTransitionBezier(
+                        _stateGraph.FromAnyStateNode,
+                        _stateGraph.FormAnyStateTransition[i],
+                        -1,
+                        i);
+                }
+
                 for (int i = 0; i < _nodes.Count; i++)
                 {
                     var node = _nodes[i];
@@ -212,21 +227,7 @@ namespace BaseGameLogic.States
                         }
                         else
                         {
-                            Node targetNode = _statesDictionary[transition.TargetState];
-
-                            Handles.DrawBezier(
-                                node.Out.Rect.center,
-                                targetNode.In.Rect.center,
-                                node.Out.Rect.center - Vector2.left * 50f,
-                                targetNode.In.Rect.center + Vector2.left * 50f,
-                                Color.white,
-                                null,
-                                2f);
-
-                            Rect transitionRect = new Rect(Vector2.zero, new Vector2(10, 10));
-                            transitionRect.center = ((node.Out.Rect.center + targetNode.In.Rect.center) / 2);
-                            _transitionRectList.Add(new TransitionInfo(transitionRect, i, j));
-                            GUI.Box(transitionRect, "");
+                            DrawTransitionBezier(node, transition, i, j);
                         }
                     }
                     node.Draw();
@@ -234,6 +235,25 @@ namespace BaseGameLogic.States
                 _stateGraph.FromAnyStateNode.Draw();
             }
             GUILayout.EndArea();
+        }
+
+        private void DrawTransitionBezier(Node node, StateTransition transition, int i, int j)
+        {
+            Node targetNode = _statesDictionary[transition.TargetState];
+
+            Handles.DrawBezier(
+                node.Out.Rect.center,
+                targetNode.In.Rect.center,
+                node.Out.Rect.center - Vector2.left * 50f,
+                targetNode.In.Rect.center + Vector2.left * 50f,
+                Color.white,
+                null,
+                2f);
+
+            Rect transitionRect = new Rect(Vector2.zero, new Vector2(10, 10));
+            transitionRect.center = ((node.Out.Rect.center + targetNode.In.Rect.center) / 2);
+            _transitionRectList.Add(new TransitionInfo(transitionRect, i, j));
+            GUI.Box(transitionRect, "");
         }
 
         private void DrawInspectorArea()
@@ -248,9 +268,13 @@ namespace BaseGameLogic.States
 
         private void DrawStateInspecotr()
         {
-            if (_selectedNode != null)
+            if (_selectedNode != null && _selectedNode.State != null)
             {
                 DrawInspectorArea(_selectedNode.State);
+
+                EditorGUILayout.Space();
+
+                DrawTransitionConditionsInspector(_selectedNode.State.ExitStateConditons);
             }
         }
 
@@ -261,25 +285,31 @@ namespace BaseGameLogic.States
                 GUIStyle style = new GUIStyle();
                 style.richText = true;
                 EditorGUILayout.LabelField("<b>Transition conditions</b>", style);
-                StateTransition transition = _stateGraph.NodeInfo[_selectedTransition.NodeIndex].State.Transitions[_selectedTransition.TransitionIndex];
-                for (int i = 0; i < transition.Conditions.Count; i++)
-                {
-                    var item = transition.Conditions[i];
-                    if (item == null)
-                    {
-                        transition.Conditions.RemoveAt(i);
-                        --i;
-                        continue;
-                    }
+                StateTransition transition = _stateGraph[_selectedTransition.NodeIndex, _selectedTransition.TransitionIndex];
 
-                    DrawInspectorArea(item);
+                DrawTransitionConditionsInspector(transition.Conditions);
+            }
+        }
+
+        private void DrawTransitionConditionsInspector(List<BaseStateTransitionCondition> conditions)
+        {
+            for (int i = 0; i < conditions.Count; i++)
+            {
+                var item = conditions[i];
+                if (item == null)
+                {
+                    conditions.RemoveAt(i);
+                    --i;
+                    continue;
                 }
 
-                EditorGUILayout.Space();
-
-                if (GUILayout.Button("Add condition"))
-                    _addContitionContextMenu.ShowAsContext();
+                DrawInspectorArea(item);
             }
+
+            EditorGUILayout.Space();
+
+            if (GUILayout.Button("Add condition"))
+                _addContitionContextMenu.ShowAsContext();
         }
 
         private void DrawInspectorArea(MonoBehaviour item)
@@ -299,6 +329,11 @@ namespace BaseGameLogic.States
             Undo.RecordObject(_stateGraph, "State added");
 
             Node newNode = new Node(_currentMousePossition, state);
+            _statesDictionary.Add(state, newNode);
+
+            newNode.OnConnectionPointClicked += _formAnyStateConnector.Connect;
+            newNode.OnConnectionPointClicked += _connector.Connect;
+
             _stateGraph.NodeInfo.Add(newNode);
             _nodes.Add(newNode);
 
@@ -324,7 +359,7 @@ namespace BaseGameLogic.States
 
         private void RemoveState()
         {
-            if (_selectedNode != null)
+            if (_selectedNode != null && _selectedNode.State != null)
             {
                 Undo.RecordObject(_stateGraph.gameObject, "State removed");
                 int index = _stateGraph.NodeInfo.IndexOf(_selectedNode);
@@ -340,9 +375,27 @@ namespace BaseGameLogic.States
             if (_selectedTransition != null)
             {
                 Undo.RecordObject(_stateGraph, "Transition removed");
-                _stateGraph.NodeInfo[_selectedTransition.NodeIndex].State.Transitions.RemoveAt(_selectedTransition.TransitionIndex);
+                if(_selectedTransition.NodeIndex < 0)
+                {
+                    RemoveAllContitionObjects(_stateGraph.FormAnyStateTransition[_selectedTransition.TransitionIndex]);
+                    _stateGraph.FormAnyStateTransition.RemoveAt(_selectedTransition.TransitionIndex);
+                }
+                else
+                {
+                    RemoveAllContitionObjects(_stateGraph[_selectedTransition.NodeIndex, _selectedTransition.TransitionIndex]);
+                    _stateGraph.NodeInfo[_selectedTransition.NodeIndex].State.Transitions.RemoveAt(_selectedTransition.TransitionIndex);
+                }
+
                 _selectedTransition = null;
                 SetDirty(_stateGraph);
+            }
+        }
+
+        private void RemoveAllContitionObjects(StateTransition stateTransition)
+        {
+            for (int i = 0; i < stateTransition.Conditions.Count; i++)
+            {
+                DestroyImmediate(stateTransition.Conditions[i]);
             }
         }
 

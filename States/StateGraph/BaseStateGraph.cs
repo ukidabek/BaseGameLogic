@@ -14,8 +14,8 @@ namespace BaseGameLogic.States
         [SerializeField] private List<Node> _nodeInfo = new List<Node>();
         public List<Node> NodeInfo { get { return _nodeInfo; } }
 
-        [SerializeField] private List<StateTransition> _formEnyStateTransition = new List<StateTransition>();
-        public List<StateTransition> FormAnyStateTransition { get { return _formEnyStateTransition; } }
+        [SerializeField] private List<StateTransition> _formAnyStateTransition = new List<StateTransition>();
+        public List<StateTransition> FormAnyStateTransition { get { return _formAnyStateTransition; } }
 
         [SerializeField] private BaseState _rootState = null;
         public BaseState RootState
@@ -27,12 +27,20 @@ namespace BaseGameLogic.States
 
         public StateTransition this[int i, int y]
         {
-            get { return _nodeInfo[i].State.Transitions[y]; }
+            get
+            {
+                if(i < 0)
+                {
+                    return _formAnyStateTransition[y];
+                }
+
+                return _nodeInfo[i].State.Transitions[y];
+            }
         }
 
         public void HandleTransitions(BaseStateHandler handler) 
 		{
-            HandleTransitionLoop(handler, _formEnyStateTransition);
+            HandleTransitionLoop(handler, _formAnyStateTransition);
             HandleTransitionLoop(handler, handler.CurrentState.Transitions);
 
             bool exitState = false;

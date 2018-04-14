@@ -34,6 +34,7 @@ namespace BaseGameLogic.States
         [SerializeField] private List<BaseStateTransitionCondition> _exitStateConditons = new List<BaseStateTransitionCondition>();
         public List<BaseStateTransitionCondition> ExitStateConditons { get { return _exitStateConditons; } }
 
+
         protected virtual void Awake() 
 		{
 			RootParent = this.transform.GetRootTransform();

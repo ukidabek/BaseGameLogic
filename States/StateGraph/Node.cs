@@ -9,20 +9,39 @@ namespace BaseGameLogic.States
     {
         public Rect Rect = new Rect(Vector2.zero, new Vector2(120, 30));
         public BaseState State = null;
-        public Vector2 MenuAreaOffset = Vector2.zero;
 
         public bool IsDragged = false;
         public bool IsSelected = false;
         public bool RemoveNode = false;
+        public bool IsReference = false;
 
         public ConnectionPoint In = null;
         public ConnectionPoint Out = null;
+
+        [SerializeField] private Color _bacgroundColor = Color.white;
+        public Color BacgroundColor
+        {
+            get { return _bacgroundColor; }
+            set { _bacgroundColor = value; }
+        }
 
         public event Action<ConnectionPointType, BaseState> OnConnectionPointClicked = null;
 
         public Node()
         {
             CalculateConnectionPointPosition();
+            GetRandomColor();
+        }
+
+        private void GetRandomColor()
+        {
+            System.Random random = new System.Random();
+
+            float r = (float)(random.NextDouble() * (1 - 0) + 0);
+            float g = (float)(random.NextDouble() * (1 - 0) + 0);
+            float b = (float)(random.NextDouble() * (1 - 0) + 0);
+
+            _bacgroundColor = new Color(r, g, b, .75f);
         }
 
         private void CalculateConnectionPointPosition()
@@ -38,13 +57,28 @@ namespace BaseGameLogic.States
             Rect.position = position;
             CalculateConnectionPointPosition();
             State = state;
+            GetRandomColor();
+        }
+
+        public Node(Vector2 position, Node node)
+        {
+            Rect.position = position;
+            CalculateConnectionPointPosition();
+            _bacgroundColor = node._bacgroundColor;
+            State = node.State;
+            IsReference = true;
         }
 
         public void Draw()
         {
+            Color oldColor = GUI.backgroundColor;
+            GUI.backgroundColor = _bacgroundColor;
+
             GUI.Box(Rect, State != null ? State.GetType().Name : "Any state" + (IsSelected ? "*" : ""));
 
-            if(In.Draw() && OnConnectionPointClicked != null)
+            GUI.backgroundColor = oldColor;
+
+            if (In.Draw() && OnConnectionPointClicked != null)
             {
                 OnConnectionPointClicked(ConnectionPointType.In, State);
             }
@@ -55,14 +89,14 @@ namespace BaseGameLogic.States
             }
         }
 
-        public bool ProcessEvents(Event e, Vector2 offset)
+        public bool ProcessEvents(Event currentEvent, Vector2 offset)
         {
-            switch (e.type)
+            switch (currentEvent.type)
             {
                 case EventType.MouseDown:
-                    bool contains = Rect.Contains(e.mousePosition - offset);
+                    bool contains = Rect.Contains(currentEvent.mousePosition - offset);
                     IsSelected = false;
-                    switch(e.button)
+                    switch(currentEvent.button)
                     {
                         case 0:
                         case 1:
@@ -80,10 +114,10 @@ namespace BaseGameLogic.States
                     break;
 
                 case EventType.MouseDrag:
-                    if (e.button == 0 && IsDragged)
+                    if (currentEvent.button == 0 && IsDragged)
                     {
-                        Drag(e.delta);
-                        e.Use();
+                        Drag(currentEvent.delta);
+                        currentEvent.Use();
                         return true;
                     }
                     break;

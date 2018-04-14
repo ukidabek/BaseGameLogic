@@ -45,9 +45,7 @@ namespace BaseGameLogic.States
             get
             {
                 if(i < 0)
-                {
                     return _formAnyStateTransition[y];
-                }
 
                 return _nodeInfo[i].State.Transitions[y];
             }

@@ -15,7 +15,7 @@ namespace BaseGameLogic.States
         private List<TransitionInfo> _transitionRectList = new List<TransitionInfo>();
         private TransitionInfo _selectedTransition = null;
 
-        private Dictionary<BaseState, Node> _statesDictionary = new Dictionary<BaseState, Node>();
+        private Dictionary<BaseState, List<Node>> _statesDictionary = new Dictionary<BaseState, List<Node>>();
         private Node _selectedNode = null;
 
         private Vector2 offset;
@@ -47,6 +47,14 @@ namespace BaseGameLogic.States
         {
             _stateGraph = stateGraph;
 
+            _addStateContextMenu = GenerateAddMenu(AssemblyExtension.GetDerivedTypes<BaseState>(), "Add state/{0}", AddState, GetNameFromType);
+            //_addStateContextMenu = GenerateAddMenu(_stateGraph.NodeInfo.ToArray(), "Add state reference/{0}", AddStateReference, GetNameFromNode, _addStateContextMenu);
+            _addContitionContextMenu = GenerateAddMenu(AssemblyExtension.GetDerivedTypes<BaseStateTransitionCondition>(), "{0}", AddCondition, GetNameFromType);
+
+            _selectedNodeContextMenu.AddItem(new GUIContent("Remove state"), false, RemoveState);
+            _selectedTransitionContextMenu.AddItem(new GUIContent("Remove transition"), false, RemoveTransition);
+
+
             _connector = new Connector(SetDirty);
             _formAnyStateConnector = new Connector(SetDirty, _stateGraph);
 
@@ -57,8 +65,21 @@ namespace BaseGameLogic.States
 
             foreach (var item in _nodes)
             {
-                if (item.State != null) 
-                    _statesDictionary.Add(item.State, item);
+                if (item.State != null)
+                {
+                    List<Node> nodeList = null;
+                    if (_statesDictionary.ContainsKey(item.State))
+                    {
+                        nodeList = _statesDictionary[item.State];
+                    }
+                    else
+                    {
+                        nodeList = new List<Node>();
+                        _statesDictionary.Add(item.State, nodeList);
+                    }
+
+                    nodeList.Add(item);
+                }
 
                 item.IsSelected = false;
                 item.OnConnectionPointClicked += _formAnyStateConnector.Connect;
@@ -72,20 +93,30 @@ namespace BaseGameLogic.States
             _menuAreaRect.size = new Vector2(position.width, EditorGUIUtility.singleLineHeight);
 
             CalculateInspectorAndGraphRect();
-
-            _addStateContextMenu = GenerateAddMenu(AssemblyExtension.GetDerivedTypes<BaseState>(), "Add state/{0}", AddState);
-            _addContitionContextMenu = GenerateAddMenu(AssemblyExtension.GetDerivedTypes<BaseStateTransitionCondition>(), "{0}", AddCondition);
-
-            _selectedNodeContextMenu.AddItem(new GUIContent("Remove state"), false, RemoveState);
-            _selectedTransitionContextMenu.AddItem(new GUIContent("Remove transition"), false, RemoveTransition);
         }
 
-        private GenericMenu GenerateAddMenu(Type[] typesToAdd, string formatString, GenericMenu.MenuFunction2 addState, GenericMenu existingMenu = null)
+        private string GetNameFromType(object obj)
+        {
+            return (obj as Type).Name;
+        }
+
+        private string GetNameFromNode(object obj)
+        {
+            return (obj as Node).State.GetType().Name;
+        }
+
+        private GenericMenu GenerateAddMenu(object[] typesToAdd, string formatString, GenericMenu.MenuFunction2 addState, Func<object, string> getName = null, GenericMenu existingMenu = null)
         {
             GenericMenu menu = existingMenu != null ? existingMenu : new GenericMenu();
+            Func<object, string> _getName = getName;
+            if(_getName == null)
+            {
+                _getName = ( object obj) => { return obj.ToString(); };
+            }
+
             foreach (var item in typesToAdd)
             {
-                GUIContent content = new GUIContent(string.Format(formatString, item.Name));
+                GUIContent content = new GUIContent(string.Format(formatString, _getName(item)));
                 menu.AddItem(content, false, addState, item);
             }
 
@@ -207,6 +238,13 @@ namespace BaseGameLogic.States
 
                 for (int i = 0; i < _stateGraph.FormAnyStateTransition.Count; i++)
                 {
+                    if(_stateGraph.FormAnyStateTransition[i].TargetState == null)
+                    {
+                        _stateGraph.FormAnyStateTransition.RemoveAt(i);
+                        --i;
+                        continue;
+                    }
+
                     DrawTransitionBezier(
                         _stateGraph.FromAnyStateNode,
                         _stateGraph.FormAnyStateTransition[i],
@@ -240,21 +278,26 @@ namespace BaseGameLogic.States
 
         private void DrawTransitionBezier(Node node, StateTransition transition, int i, int j)
         {
-            Node targetNode = _statesDictionary[transition.TargetState];
+            List<Node> targetNode = _statesDictionary[transition.TargetState];
 
-            Handles.DrawBezier(
-                node.Out.Rect.center,
-                targetNode.In.Rect.center,
-                node.Out.Rect.center - Vector2.left * 50f,
-                targetNode.In.Rect.center + Vector2.left * 50f,
-                Color.white,
-                null,
-                2f);
+            if (node.IsReference) return;
 
-            Rect transitionRect = new Rect(Vector2.zero, new Vector2(10, 10));
-            transitionRect.center = ((node.Out.Rect.center + targetNode.In.Rect.center) / 2);
-            _transitionRectList.Add(new TransitionInfo(transitionRect, i, j));
-            GUI.Box(transitionRect, "");
+            for (int k = 0; k < targetNode.Count; k++)
+            {
+                Handles.DrawBezier(
+                    node.Out.Rect.center,
+                    targetNode[k].In.Rect.center,
+                    node.Out.Rect.center - Vector2.left * 50f,
+                    targetNode[k].In.Rect.center + Vector2.left * 50f,
+                    Color.white,
+                    null,
+                    2f);
+
+                Rect transitionRect = new Rect(Vector2.zero, new Vector2(10, 10));
+                transitionRect.center = ((node.Out.Rect.center + targetNode[k].In.Rect.center) / 2);
+                _transitionRectList.Add(new TransitionInfo(transitionRect, i, j));
+                GUI.Box(transitionRect, "");
+            }
         }
 
         private void DrawInspectorArea()
@@ -271,6 +314,7 @@ namespace BaseGameLogic.States
         {
             if (_selectedNode != null && _selectedNode.State != null)
             {
+                _selectedNode.BacgroundColor = EditorGUILayout.ColorField(_selectedNode.BacgroundColor);
                 DrawInspectorArea(_selectedNode.State);
 
                 EditorGUILayout.Space();
@@ -331,7 +375,9 @@ namespace BaseGameLogic.States
             Undo.RecordObject(_stateGraph, "State added");
 
             Node newNode = new Node(_currentMousePossition, state);
-            _statesDictionary.Add(state, newNode);
+            List<Node> nodeList = new List<Node>();
+            nodeList.Add(newNode);
+            _statesDictionary.Add(state, nodeList);
 
             newNode.OnConnectionPointClicked += _formAnyStateConnector.Connect;
             newNode.OnConnectionPointClicked += _connector.Connect;
@@ -343,6 +389,19 @@ namespace BaseGameLogic.States
 
             if (_stateGraph.RootState == null)
                 _stateGraph.RootState = state;
+        }
+
+        private void AddStateReference(object data)
+        {
+            Node node = data as Node;
+            Node newNode = new Node(_currentMousePossition, node);
+            _stateGraph.NodeInfo.Add(newNode);
+
+            //_addStateContextMenu = GenerateAddMenu(_stateGraph.NodeInfo.ToArray(), "Add state reference/{0}", AddStateReference, GetNameFromNode, _addStateContextMenu);
+
+            //GUIContent content = new GUIContent(string.Format("Add state reference/{0}", _getName(item)));
+            //_addStateContextMenu.AddItem(content, false, AddStateReference, newNode);
+
         }
 
         private void AddCondition(object data)
@@ -373,8 +432,15 @@ namespace BaseGameLogic.States
                 Undo.RecordObject(_stateGraph.gameObject, "State removed");
                 int index = _stateGraph.NodeInfo.IndexOf(_selectedNode);
                 _stateGraph.NodeInfo.RemoveAt(index);
-                _selectedNode.Remove();
-                _selectedNode = null;
+                index = _nodes.IndexOf(_selectedNode);
+                _nodes.RemoveAt(index);
+
+                if (!_selectedNode.IsReference)
+                {
+                    _selectedNode.Remove();
+                    _selectedNode = null;
+                }
+
                 SetDirty(_stateGraph);
             }
         }

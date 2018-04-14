@@ -23,15 +23,16 @@ namespace BaseGameLogic.States
             _targetState = targetState;
         }
 
-        public void Validate(BaseStateHandler stateHandler)
+        public bool Validate(BaseStateHandler stateHandler)
         {
             for (int i = 0; i < Conditions.Capacity; i++)
             {
                 if (!Conditions[i].Validate() || _targetState == stateHandler.CurrentState)
-                    return;
+                    return false;
             }
 
             stateHandler.EnterState(_targetState);
+            return true;
         }
 
         public void Remove()

@@ -37,6 +37,7 @@ namespace BaseGameLogic.States
         [SerializeField, Tooltip("List of state creators that this object can enter.")]
         protected List<BaseState> stateList = new List<BaseState>();
 
+        protected BaseState _currentState = null;
         /// <summary>
         /// Stack of states.
         /// </summary>
@@ -49,10 +50,17 @@ namespace BaseGameLogic.States
         {
             get 
             {
-                if (statesStack.Count == 0) 
-                    return null;
+                switch (_graph.Type)
+                {
+                    case GraphType.Stack:
+                        if (statesStack.Count == 0) return null;
+                        return statesStack.Peek();
 
-                return statesStack.Peek(); 
+                    case GraphType.Free:
+                        return _currentState;
+                }
+
+                return null;
             }
         }
 
@@ -171,13 +179,6 @@ namespace BaseGameLogic.States
                 {
                     state = creator;
                 }
-                // else
-                // {
-                //     if(creator.ProductName.Equals(stateName))
-                //     {
-                //         return creator as T;
-                //     }
-                // }
             }
 
             #if UNITY_EDITOR
@@ -199,14 +200,20 @@ namespace BaseGameLogic.States
 
             if (newState.EnterConditions())
             {
-                if (statesStack.Count > 0)
+                if(_graph.Type == GraphType.Stack)
                 {
-                    CurrentState.OnSleep();
+                    if (statesStack.Count > 0)
+                        CurrentState.OnSleep();
+                    
+                    statesStack.Push(newState);
+                }
+                else
+                {
+                    _currentState = newState;
                 }
 
                 newState.ControlledObject = this;
                 newState.GetAllRequiredReferences(this.gameObject, true);
-                statesStack.Push(newState);
                 CurrentState.OnEnter();
 
                 #if UNITY_EDITOR
@@ -235,6 +242,8 @@ namespace BaseGameLogic.States
         /// </summary>
         public void ExitState()
         {
+            if (_graph.Type == GraphType.Free)
+                return;
             BaseState oldState = statesStack.Pop();
             oldState.ControlledObject = null;
             oldState.OnExit();

@@ -6,8 +6,21 @@ using System;
 
 namespace BaseGameLogic.States
 {
+    public enum GraphType
+    {
+        Stack,
+        Free
+    }
+
     public abstract class BaseStateGraph : MonoBehaviour
     {
+        [SerializeField] private GraphType _type = GraphType.Stack;
+        public GraphType Type
+        {
+            get { return _type; }
+            set { _type = value; }
+        }
+
         [SerializeField] private Node _fromAnyStateNode = new Node();
         public Node FromAnyStateNode { get { return _fromAnyStateNode; } }
 
@@ -24,6 +37,8 @@ namespace BaseGameLogic.States
             set { _rootState = value; }
         }
 
+        private bool _transitionDone = false;
+        public bool TransitionDone { get { return _transitionDone; } }
 
         public StateTransition this[int i, int y]
         {
@@ -40,8 +55,12 @@ namespace BaseGameLogic.States
 
         public void HandleTransitions(BaseStateHandler handler) 
 		{
+            _transitionDone = false;
+
             HandleTransitionLoop(handler, _formAnyStateTransition);
             HandleTransitionLoop(handler, handler.CurrentState.Transitions);
+
+            if (Type == GraphType.Free || _transitionDone) return;
 
             bool exitState = false;
             foreach (var item in handler.CurrentState.ExitStateConditons)
@@ -56,7 +75,11 @@ namespace BaseGameLogic.States
         {
             foreach (var item in transitions)
             {
-                item.Validate(handler);
+                if (item.Validate(handler))
+                {
+                    _transitionDone = true;
+                    break;
+                }
             }
         }
     }

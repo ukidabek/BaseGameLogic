@@ -16,6 +16,9 @@ namespace BaseGameLogic.States
         private bool _formAnyStateTransition = false;
         private Node _node = null;
 
+        private bool _inNodeSelected = false;
+        private bool _outNodeSelected = false;
+
         public Connector(Action<MonoBehaviour> setDirty)
         {
             SetDirty = setDirty;
@@ -35,14 +38,16 @@ namespace BaseGameLogic.States
             {
                 case ConnectionPointType.In:
                     if (_inNode == null) _inNode = state;
+                    _inNodeSelected = true;
                     break;
                 case ConnectionPointType.Out:
                     if (_outNode == null) _outNode = state;
                     if (_graph != null) _formAnyStateTransition = true;
+                    _outNodeSelected = true;
                     break;
             }
 
-            if(_inNode != null && _outNode != null)
+            if(_graph == null && !_formAnyStateTransition && _inNode != null && _outNode != null)
             {
                 Undo.RecordObject(_outNode.gameObject, "Transition added");
                 _outNode.Transitions.Add(new StateTransition(_inNode));
@@ -52,11 +57,9 @@ namespace BaseGameLogic.States
                     SetDirty(_outNode);
                     SetDirty(_inNode);
                 }
-
-                _inNode = _outNode = null;
             }
 
-            if(_graph != null && _formAnyStateTransition && _inNode != null)
+            if(_graph != null && _formAnyStateTransition && _inNode != null && _outNode == null)
             {
                 Undo.RecordObject(_inNode.gameObject, "From Any state transition added");
 
@@ -67,9 +70,13 @@ namespace BaseGameLogic.States
                     SetDirty(_graph);
                     SetDirty(_outNode);
                 }
+            }
 
+            if(_inNodeSelected && _outNodeSelected)
+            {
                 _formAnyStateTransition = false;
-                _inNode = null;
+                _inNodeSelected = _outNodeSelected = false;
+                _inNode = _outNode = null;
             }
         }
     }

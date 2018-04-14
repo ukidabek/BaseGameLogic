@@ -191,6 +191,7 @@ namespace BaseGameLogic.States
         {
             GUILayout.BeginArea(_menuAreaRect);
             {
+                _stateGraph.Type = (GraphType)EditorGUILayout.EnumPopup(_stateGraph.Type);
             }
             GUILayout.EndArea();
         }
@@ -274,7 +275,8 @@ namespace BaseGameLogic.States
 
                 EditorGUILayout.Space();
 
-                DrawTransitionConditionsInspector(_selectedNode.State.ExitStateConditons);
+                if(_stateGraph.Type == GraphType.Stack)
+                    DrawTransitionConditionsInspector(_selectedNode.State.ExitStateConditons);
             }
         }
 
@@ -347,14 +349,21 @@ namespace BaseGameLogic.States
         {
             if(_selectedTransition != null)
             {
-                Type type = data as Type;
-                var condition = _stateGraph.gameObject.AddComponent(type) as BaseStateTransitionCondition;
-
                 Undo.RecordObject(_stateGraph, "Connection added");
-
                 var transition = _stateGraph[_selectedTransition.NodeIndex, _selectedTransition.TransitionIndex];
-                transition.Conditions.Add(condition);
+                transition.Conditions.Add(CreateCondition(data));
             }
+            if (_selectedNode != null && _selectedNode.State != null)
+            {
+                Undo.RecordObject(_stateGraph, "Connection added");
+                _selectedNode.State.ExitStateConditons.Add(CreateCondition(data));
+            }
+        }
+
+        private BaseStateTransitionCondition CreateCondition(object data)
+        {
+            Type type = data as Type;
+            return _stateGraph.gameObject.AddComponent(type) as BaseStateTransitionCondition;
         }
 
         private void RemoveState()

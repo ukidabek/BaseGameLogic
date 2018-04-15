@@ -43,7 +43,7 @@ namespace BaseGameLogic.States
 
         public FieldInfo[] GetAllRequiredFields()
         {
-			return AssemblyExtension.GetAllFieldsWithAttribute<RequiredReferenceAttribute>(this.GetType());
+			return AssemblyExtension.GetAllFieldsWithAttribute(this.GetType(), typeof(RequiredReferenceAttribute), true).ToArray();
         }
 
 		/// <summary>

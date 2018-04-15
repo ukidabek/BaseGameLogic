@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 using BaseGameLogic.LogicModule;
+using UnityEngine.Events;
 
 namespace BaseGameLogic.AI.Sensors
 {
@@ -11,33 +12,30 @@ namespace BaseGameLogic.AI.Sensors
     {
         [SerializeField] private Queue<GameObject> _targetQueue = new Queue<GameObject>();
         [SerializeField] private GameObject _target = null;
+        public GameObject Target { get { return _target; } }
+
+        public TargetChangedUnityEvent TargetChanged = new TargetChangedUnityEvent();
+
+        [SerializeField, Space] private BaseTargetSelector _targetSelector = null;
+
 
         public void TargetDetected(GameObject target)
         {
-            _targetQueue.Enqueue(target);
+            if(!_targetQueue.Contains(target))
+                _targetQueue.Enqueue(target);
         }
 
         protected override void Update()
         {
-            float distance = 0; 
-            if (_targetQueue.Count > 0)
+            GameObject newTarget = _targetSelector.SelecTarget(_targetQueue);
+            if(_target != newTarget)
             {
-                _target = _targetQueue.Dequeue();
-                distance = Vector3.Distance(transform.position, _target.transform.position);
-            }
-            else
-                _target = null;
-
-            while (_targetQueue.Count > 0)
-            {
-                GameObject target = _targetQueue.Dequeue();
-                float currentDistance = Vector3.Distance(transform.position, target.transform.position);
-
-                if(currentDistance < distance)
-                {
-                    _target = target;
-                }
+                _target = newTarget;
+                TargetChanged.Invoke(newTarget);
             }
         }
     }
+
+    [System.Serializable]
+    public class TargetChangedUnityEvent : UnityEvent<GameObject> { }
 }

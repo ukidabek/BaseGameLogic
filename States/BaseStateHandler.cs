@@ -98,14 +98,13 @@ namespace BaseGameLogic.States
             this.EnterState(defaultState);
         }
 
-        protected virtual void Awake() 
-        { 
-            if(enterDefaultStateOnAwake)
-                EnterDefaultState();
-        }
+        protected virtual void Awake() {}
 
         protected virtual void Start () 
         {
+            if(enterDefaultStateOnAwake)
+                EnterDefaultState();
+
             GameManagerExist = GameManagerInstance != null;
             if(GameManagerExist)
 			    GameManagerInstance.ObjectInitializationCallBack.AddListener(InitializeObject);

@@ -135,6 +135,8 @@ namespace BaseGameLogic.States
 
         private void OnDestroy()
         {
+            if (_stateGraph == null) return;
+
             _stateGraph.FromAnyStateNode.OnConnectionPointClicked -= _formAnyStateConnector.Connect;
 
             foreach (var item in _nodes)

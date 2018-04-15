@@ -67,4 +67,11 @@ public static class TransformExtension
 
         return transformList.ToArray();
     }
+
+    public static Vector3 GetWorldPointOnCircle(this Transform transform, float angle, float radius)
+    {
+        Quaternion rotation = Quaternion.AngleAxis(angle, Vector3.up);
+        Vector3 localPosition = rotation * (Vector3.zero + Vector3.forward * radius);
+        return transform.TransformPoint(localPosition);
+    }
 }

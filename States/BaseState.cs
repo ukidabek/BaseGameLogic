@@ -39,7 +39,23 @@ namespace BaseGameLogic.States
 		{
 			RootParent = this.transform.GetRootTransform();
 			requiredFieldList = GetAllRequiredFields();
-		}
+
+            foreach (var tranistion in _stateTransition)
+            {
+                FillConditionReference(this, RootParent.gameObject, tranistion.Conditions);
+            }
+
+            FillConditionReference(this, RootParent.gameObject, _exitStateConditons);
+        }
+
+        private void FillConditionReference(BaseState baseState, GameObject gameObject, List<BaseStateTransitionCondition> conditions)
+        {
+            foreach (var condition in conditions)
+            {
+                condition.GetConditionReferences(baseState, gameObject);
+            }
+        }
+
 
         public FieldInfo[] GetAllRequiredFields()
         {

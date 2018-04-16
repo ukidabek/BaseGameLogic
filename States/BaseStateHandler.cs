@@ -29,13 +29,10 @@ namespace BaseGameLogic.States
 		[Header("States management.")]
         [SerializeField]
         protected bool enterDefaultStateOnAwake = false;
-        [SerializeField, Tooltip("Default state creator - object that create states.")]
-        protected BaseState defaultState = null;
 
         [SerializeField] protected BaseStateGraph _graph = null;
+        [SerializeField] protected GameObject stateGraphPrefab = null;
 
-        [SerializeField, Tooltip("List of state creators that this object can enter.")]
-        protected List<BaseState> stateList = new List<BaseState>();
 
         protected BaseState _currentState = null;
         /// <summary>
@@ -88,17 +85,15 @@ namespace BaseGameLogic.States
                 this.EnterState(_graph.RootState);
                 return;
             }
-
-            if (defaultState == null) 
-            {
-                Debug.LogWarning("There is no default state set.");
-                return;
-            }
-
-            this.EnterState(defaultState);
         }
 
-        protected virtual void Awake() {}
+        protected virtual void Awake()
+        {
+            if(stateGraphPrefab != null)
+            {
+                _graph = Instantiate(stateGraphPrefab, this.transform, false).GetComponent<BaseStateGraph>();
+            }
+        }
 
         protected virtual void Start () 
         {
@@ -165,30 +160,6 @@ namespace BaseGameLogic.States
         #endregion
 
         /// <summary>
-        /// Return a StateCreator added to BaseStateObject by it's name.
-        /// </summary>
-        /// <param name="stateName">Name of StateCreator.</param>
-        /// <returns></returns>
-        public T GetState<T>(string stateName = "") where T:BaseState
-        {
-            BaseState state = null;
-            foreach (BaseState creator in stateList)
-            {
-                if (creator is T && string.IsNullOrEmpty(stateName))
-                {
-                    state = creator;
-                }
-            }
-
-            #if UNITY_EDITOR
-            if(state == null)
-                Debug.LogErrorFormat("No creator for {0} in {1}", stateName, this.gameObject.name); 
-            #endif
-
-            return state as T;
-        }
-
-        /// <summary>
         /// Enter a new state. 
         /// </summary>
         /// <param name="newState"> New state instance.</param>
@@ -224,16 +195,6 @@ namespace BaseGameLogic.States
                 string typeName = newState.GetType().Name;
                 Debug.LogErrorFormat("Conditions to enter the state type of {0} were not met.", typeName);
             }
-        }
-
-        /// <summary>
-        /// Enter to a net state using State creator of type T
-        /// </summary>
-        public void EnterState<T>() where T:BaseState
-        {
-            BaseState state = GetState<T>();
-            if(state != null)
-                EnterState(state);
         }
 
         /// <summary>

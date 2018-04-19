@@ -322,7 +322,8 @@ namespace BaseGameLogic.States
                 EditorGUILayout.Space();
 
                 if(_stateGraph.Type == GraphType.Stack)
-                    DrawTransitionConditionsInspector(_selectedNode.State.ExitStateConditons);
+                    foreach (var item in _selectedNode.State.ExitStateTransitions)
+                        DrawTransitionConditionsInspector(item.Conditions);
             }
         }
 
@@ -417,7 +418,7 @@ namespace BaseGameLogic.States
             if (_selectedNode != null && _selectedNode.State != null)
             {
                 Undo.RecordObject(_stateGraph, "Connection added");
-                _selectedNode.State.ExitStateConditons.Add(CreateCondition(data));
+                //_selectedNode.State.ExitStateConditons.Add(CreateCondition(data));
             }
         }
 

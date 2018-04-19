@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEditor.Animations;
 
 using System;
 using System.Collections;
@@ -10,8 +9,8 @@ namespace BaseGameLogic.Animation
 	[Serializable]
 	public class AnimatorParametrHandler
 	{
-		[SerializeField] private AnimatorController _animator = null;
-        public AnimatorController Animator { get { return _animator; } }
+		[SerializeField] private RuntimeAnimatorController _animator = null;
+        public RuntimeAnimatorController Animator { get { return _animator; } }
 
         [SerializeField] private string _name = string.Empty;
         public string Name { get { return _name; } }

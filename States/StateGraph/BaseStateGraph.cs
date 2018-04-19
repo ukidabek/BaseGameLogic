@@ -60,13 +60,14 @@ namespace BaseGameLogic.States
 
             if (Type == GraphType.Free || _transitionDone) return;
 
-            bool exitState = false;
-            foreach (var item in handler.CurrentState.ExitStateConditons)
+            for (int i = 0; i < handler.CurrentState.ExitStateTransitions.Count; i++)
             {
-                exitState = item.Validate();
-                if (!exitState) break;
+                BaseTransition transition = handler.CurrentState.ExitStateTransitions[i];
+                if(transition.Validate(handler))
+                {
+                    break;
+                }
             }
-            if (exitState) handler.ExitState();
 		}
 
         private void HandleTransitionLoop(BaseStateHandler handler, List<StateTransition> transitions)

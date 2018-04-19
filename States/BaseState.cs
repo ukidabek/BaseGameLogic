@@ -31,8 +31,11 @@ namespace BaseGameLogic.States
         [SerializeField] private List<StateTransition> _stateTransition = new List<StateTransition>();
         public List<StateTransition> Transitions { get { return _stateTransition; } }
 
-        [SerializeField] private List<BaseStateTransitionCondition> _exitStateConditons = new List<BaseStateTransitionCondition>();
-        public List<BaseStateTransitionCondition> ExitStateConditons { get { return _exitStateConditons; } }
+        [SerializeField] private List<ExitStateTransition> _exitStateTransitions = new List<ExitStateTransition>();
+        public List<ExitStateTransition> ExitStateTransitions { get { return _exitStateTransitions; } }
+
+        //[SerializeField] private List<BaseStateTransitionCondition> _exitStateConditons = new List<BaseStateTransitionCondition>();
+        //public List<BaseStateTransitionCondition> ExitStateConditons { get { return _exitStateConditons; } }
 
 
         protected virtual void Awake() 
@@ -45,7 +48,10 @@ namespace BaseGameLogic.States
                 FillConditionReference(this, RootParent.gameObject, tranistion.Conditions);
             }
 
-            FillConditionReference(this, RootParent.gameObject, _exitStateConditons);
+            foreach (var item in _exitStateTransitions)
+            {
+                FillConditionReference(this, RootParent.gameObject, item.Conditions);
+            }
         }
 
         private void FillConditionReference(BaseState baseState, GameObject gameObject, List<BaseStateTransitionCondition> conditions)

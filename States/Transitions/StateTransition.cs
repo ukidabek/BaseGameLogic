@@ -7,14 +7,10 @@ using System.Collections.Generic;
 namespace BaseGameLogic.States
 {
     [Serializable]
-    public class StateTransition
+    public class StateTransition : BaseTransition
     { 
         [SerializeField] private BaseState _targetState = null;
         public BaseState TargetState { get { return _targetState; } }
-
-
-        [SerializeField] private List<BaseStateTransitionCondition> _conditions = new List<BaseStateTransitionCondition>();
-        public List<BaseStateTransitionCondition> Conditions { get { return _conditions; } }
 
         public StateTransition() {}
 
@@ -23,7 +19,7 @@ namespace BaseGameLogic.States
             _targetState = targetState;
         }
 
-        public bool Validate(BaseStateHandler stateHandler)
+        public override bool Validate(BaseStateHandler stateHandler)
         {
             for (int i = 0; i < Conditions.Capacity; i++)
             {
@@ -35,7 +31,7 @@ namespace BaseGameLogic.States
             return true;
         }
 
-        public void Remove()
+        public override void Remove()
         {
             for (int i = 0; i < Conditions.Count; i++)
             {

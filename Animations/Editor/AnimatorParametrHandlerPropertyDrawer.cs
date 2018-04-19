@@ -38,31 +38,27 @@ namespace BaseGameLogic.Animation
 				EditorGUI.LabelField(labelPosition, "Animator");
 				EditorGUI.PropertyField(fieldPosition, animatorProperty, GUIContent.none);
 
-				Animator animator = animatorProperty.objectReferenceValue as Animator;
-				if(animator != null)
+                AnimatorController animatorController = animatorProperty.objectReferenceValue as AnimatorController;
+				if(animatorController != null)
 				{
-					AnimatorController animatorController =  animator.runtimeAnimatorController as AnimatorController;
-					if(animatorController != null)
+					if(animatorController.parameters.Length != parameters.Count)
 					{
-						if(animatorController.parameters.Length != parameters.Count)
+						parameters.Clear();
+						foreach (var item in animatorController.parameters)
 						{
-							parameters.Clear();
-							foreach (var item in animatorController.parameters)
-							{
-								parameters.Add(item.name);
-							}
+							parameters.Add(item.name);
 						}
+					}
 
-						labelPosition.y = fieldPosition.y += EditorGUIUtility.singleLineHeight;
+					labelPosition.y = fieldPosition.y += EditorGUIUtility.singleLineHeight;
 
-						int index = parameters.IndexOf(nameProperty.stringValue);
-						EditorGUI.LabelField(labelPosition, "Parametr name: ");
-						index = EditorGUI.Popup(fieldPosition, index, parameters.ToArray());
-						if(index > -1)
-						{
-							nameProperty.stringValue = parameters[index];
-							hashProperty.intValue = animatorController.parameters[index].nameHash;
-						}
+					int index = parameters.IndexOf(nameProperty.stringValue);
+					EditorGUI.LabelField(labelPosition, "Parametr name: ");
+					index = EditorGUI.Popup(fieldPosition, index, parameters.ToArray());
+					if(index > -1)
+					{
+						nameProperty.stringValue = parameters[index];
+						hashProperty.intValue = animatorController.parameters[index].nameHash;
 					}
 				}
 				else

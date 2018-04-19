@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEditor.Animations;
 
 using System;
 using System.Collections;
@@ -9,7 +10,8 @@ namespace BaseGameLogic.Animation
 	[Serializable]
 	public class AnimatorParametrHandler
 	{
-		[SerializeField] private Animator _animator = null;
+		[SerializeField] private AnimatorController _animator = null;
+        public AnimatorController Animator { get { return _animator; } }
 
         [SerializeField] private string _name = string.Empty;
         public string Name { get { return _name; } }
@@ -17,22 +19,8 @@ namespace BaseGameLogic.Animation
         [SerializeField] private int _nameHash = 0;
         public int NameHash { get { return _nameHash; } }
 
-        public void Set()
-		{
-			Set(_animator);
-		}
 
-		public void Set(float value)
-		{
-			Set(_animator, value);
-		}
-
-		public void Set(bool value)
-		{
-			Set(_animator, value);
-		}
-
-		public void Set(Animator animator)
+        public void Set(Animator animator)
 		{
 			animator.SetTrigger(NameHash);
 		}

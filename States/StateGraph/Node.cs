@@ -72,9 +72,9 @@ namespace BaseGameLogic.States
         public void Draw()
         {
             Color oldColor = GUI.backgroundColor;
-            GUI.backgroundColor = _bacgroundColor;
+            GUI.backgroundColor = IsSelected ? Color.red : _bacgroundColor;
 
-            GUI.Box(Rect, State != null ? State.GetType().Name : "Any state" + (IsSelected ? "*" : ""));
+            GUI.Box(Rect, State != null ? State.GetType().Name : "Any state");
 
             GUI.backgroundColor = oldColor;
 

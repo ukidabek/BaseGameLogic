@@ -37,6 +37,9 @@ namespace BaseGameLogic.States
         private Connector _connector = null;
         private Connector _formAnyStateConnector = null;
 
+        private StateInspecotr _stateInspecotr = new StateInspecotr();
+        private TransitionConditionsInspector _transitionConditionsInspector = new TransitionConditionsInspector();
+
         public StateGraphEditorWindow()
         {
             titleContent = new GUIContent("State Graph");
@@ -54,6 +57,8 @@ namespace BaseGameLogic.States
             _selectedNodeContextMenu.AddItem(new GUIContent("Remove state"), false, RemoveState);
             _selectedTransitionContextMenu.AddItem(new GUIContent("Remove transition"), false, RemoveTransition);
 
+
+            _stateInspecotr.SetData(_selectedNode, _stateGraph, _addContitionContextMenu);
 
             _connector = new Connector(SetDirty);
             _formAnyStateConnector = new Connector(SetDirty, _stateGraph);
@@ -247,11 +252,7 @@ namespace BaseGameLogic.States
                         continue;
                     }
 
-                    DrawTransitionBezier(
-                        _stateGraph.FromAnyStateNode,
-                        _stateGraph.FormAnyStateTransition[i],
-                        -1,
-                        i);
+                    DrawTransitionBezier(_stateGraph.FromAnyStateNode, _stateGraph.FormAnyStateTransition[i], -1, i);
                 }
 
                 for (int i = 0; i < _nodes.Count; i++)
@@ -286,12 +287,13 @@ namespace BaseGameLogic.States
 
             for (int k = 0; k < targetNode.Count; k++)
             {
+                bool isSelectedTransition = _selectedTransition != null && _selectedTransition.NodeIndex == i && _selectedTransition.TransitionIndex == j;
                 Handles.DrawBezier(
                     node.Out.Rect.center,
                     targetNode[k].In.Rect.center,
                     node.Out.Rect.center - Vector2.left * 50f,
                     targetNode[k].In.Rect.center + Vector2.left * 50f,
-                    Color.white,
+                    isSelectedTransition ? Color.red : Color.white,
                     null,
                     2f);
 
@@ -306,68 +308,15 @@ namespace BaseGameLogic.States
         {
             GUILayout.BeginArea(_inspectorAreaRecr);
             {
-                DrawTransitionInspector();
-                DrawStateInspecotr();
-            }
-            GUILayout.EndArea();
-        }
-
-        private void DrawStateInspecotr()
-        {
-            if (_selectedNode != null && _selectedNode.State != null)
-            {
-                _selectedNode.BacgroundColor = EditorGUILayout.ColorField(_selectedNode.BacgroundColor);
-                DrawInspectorArea(_selectedNode.State);
-
-                EditorGUILayout.Space();
-
-                if(_stateGraph.Type == GraphType.Stack)
-                    foreach (var item in _selectedNode.State.ExitStateTransitions)
-                        DrawTransitionConditionsInspector(item.Conditions);
-            }
-        }
-
-        private void DrawTransitionInspector()
-        {
-            if (_selectedTransition != null)
-            {
-                GUIStyle style = new GUIStyle();
-                style.richText = true;
-                EditorGUILayout.LabelField("<b>Transition conditions</b>", style);
-                StateTransition transition = _stateGraph[_selectedTransition.NodeIndex, _selectedTransition.TransitionIndex];
-
-                DrawTransitionConditionsInspector(transition.Conditions);
-            }
-        }
-
-        private void DrawTransitionConditionsInspector(List<BaseStateTransitionCondition> conditions)
-        {
-            for (int i = 0; i < conditions.Count; i++)
-            {
-                var item = conditions[i];
-                if (item == null)
+                if (_selectedTransition != null)
                 {
-                    conditions.RemoveAt(i);
-                    --i;
-                    continue;
+                    StateTransition transition = _stateGraph[_selectedTransition.NodeIndex, _selectedTransition.TransitionIndex];
+                    _transitionConditionsInspector.DrawInspector(transition.Conditions);
                 }
 
-                DrawInspectorArea(item);
+                _stateInspecotr.DrawInspector(_selectedNode);
             }
-
-            EditorGUILayout.Space();
-
-            if (GUILayout.Button("Add condition"))
-                _addContitionContextMenu.ShowAsContext();
-        }
-
-        private void DrawInspectorArea(MonoBehaviour item)
-        {
-            if (item == null) return;
-
-            Editor editor = Editor.CreateEditor(item);
-            EditorGUILayout.InspectorTitlebar(false, item);
-            editor.OnInspectorGUI();
+            GUILayout.EndArea();
         }
 
         private void AddState(object data)
@@ -399,12 +348,6 @@ namespace BaseGameLogic.States
             Node node = data as Node;
             Node newNode = new Node(_currentMousePossition, node);
             _stateGraph.NodeInfo.Add(newNode);
-
-            //_addStateContextMenu = GenerateAddMenu(_stateGraph.NodeInfo.ToArray(), "Add state reference/{0}", AddStateReference, GetNameFromNode, _addStateContextMenu);
-
-            //GUIContent content = new GUIContent(string.Format("Add state reference/{0}", _getName(item)));
-            //_addStateContextMenu.AddItem(content, false, AddStateReference, newNode);
-
         }
 
         private void AddCondition(object data)
@@ -418,7 +361,7 @@ namespace BaseGameLogic.States
             if (_selectedNode != null && _selectedNode.State != null)
             {
                 Undo.RecordObject(_stateGraph, "Connection added");
-                //_selectedNode.State.ExitStateConditons.Add(CreateCondition(data));
+                _selectedNode.State.ExitStateTransitions[_selectedNode.State.SelectedExitStateTransition].Conditions.Add(CreateCondition(data));
             }
         }
 

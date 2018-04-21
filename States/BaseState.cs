@@ -31,12 +31,13 @@ namespace BaseGameLogic.States
         [SerializeField] private List<StateTransition> _stateTransition = new List<StateTransition>();
         public List<StateTransition> Transitions { get { return _stateTransition; } }
 
+        public int SelectedExitStateTransition = 0; 
+
         [SerializeField] private List<ExitStateTransition> _exitStateTransitions = new List<ExitStateTransition>();
         public List<ExitStateTransition> ExitStateTransitions { get { return _exitStateTransitions; } }
 
         //[SerializeField] private List<BaseStateTransitionCondition> _exitStateConditons = new List<BaseStateTransitionCondition>();
         //public List<BaseStateTransitionCondition> ExitStateConditons { get { return _exitStateConditons; } }
-
 
         protected virtual void Awake() 
 		{

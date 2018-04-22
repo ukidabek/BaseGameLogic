@@ -381,6 +381,27 @@ namespace BaseGameLogic.States
                 index = _nodes.IndexOf(_selectedNode);
                 _nodes.RemoveAt(index);
 
+                for (int i = 0; i < _selectedNode.State.Transitions.Count; i++)
+                {
+                    for (int j = 0; j < _selectedNode.State.Transitions[i].Conditions.Count; j++)
+                    {
+                        GameObject.DestroyImmediate(_selectedNode.State.Transitions[i].Conditions[j]);
+                    }
+                    _selectedNode.State.Transitions.RemoveAt(i);
+                    i--;
+                }
+
+                for (int i = 0; i < _selectedNode.State.ExitStateTransitions.Count; i++)
+                {
+                    for (int j = 0; j < _selectedNode.State.ExitStateTransitions[i].Conditions.Count; j++)
+                    {
+                        GameObject.DestroyImmediate(_selectedNode.State.ExitStateTransitions[i].Conditions[j]);
+                    }
+
+                    _selectedNode.State.ExitStateTransitions.RemoveAt(i);
+                    i--;
+                }
+
                 if (!_selectedNode.IsReference)
                 {
                     _selectedNode.Remove();

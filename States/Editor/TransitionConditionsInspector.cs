@@ -38,7 +38,8 @@ namespace BaseGameLogic.States
 
             if (GUILayout.Button("Add condition"))
             {
-                _baseState.SelectedExitStateTransition = _selectetExitStateTransitionIndex;
+                if(_baseState != null)
+                    _baseState.SelectedExitStateTransition = _selectetExitStateTransitionIndex;
                 _addContitionContextMenu.ShowAsContext();
             }
         }

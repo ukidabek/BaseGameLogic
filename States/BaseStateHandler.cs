@@ -184,6 +184,7 @@ namespace BaseGameLogic.States
 
                 newState.ControlledObject = this;
                 newState.GetAllRequiredReferences(this.gameObject, true);
+                CurrentState.ControlledObject = this;
                 CurrentState.OnEnter();
 
                 #if UNITY_EDITOR

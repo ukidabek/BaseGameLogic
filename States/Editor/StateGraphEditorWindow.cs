@@ -54,9 +54,10 @@ namespace BaseGameLogic.States
             //_addStateContextMenu = GenerateAddMenu(_stateGraph.NodeInfo.ToArray(), "Add state reference/{0}", AddStateReference, GetNameFromNode, _addStateContextMenu);
             _addContitionContextMenu = GenerateAddMenu(AssemblyExtension.GetDerivedTypes<BaseStateTransitionCondition>(), "{0}", AddCondition, GetNameFromType);
 
+            _transitionConditionsInspector.SetData(null, null, _addContitionContextMenu);
+
             _selectedNodeContextMenu.AddItem(new GUIContent("Remove state"), false, RemoveState);
             _selectedTransitionContextMenu.AddItem(new GUIContent("Remove transition"), false, RemoveTransition);
-
 
             _stateInspecotr.SetData(_selectedNode, _stateGraph, _addContitionContextMenu);
 

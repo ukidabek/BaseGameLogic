@@ -1,7 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
+
+using System.Collections;
+using System.Collections.Generic;
 
 namespace BaseGameLogic.States
 {

@@ -315,7 +315,7 @@ namespace BaseGameLogic.States
                     _transitionConditionsInspector.DrawInspector(transition.Conditions);
                 }
 
-                _stateInspecotr.DrawInspector(_selectedNode);
+                _stateInspecotr.DrawInspector(_selectedNode, _stateGraph, _addContitionContextMenu);
             }
             GUILayout.EndArea();
         }

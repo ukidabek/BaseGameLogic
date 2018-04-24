@@ -24,15 +24,30 @@ namespace BaseGameLogic.States
                 EditorGUILayout.Space();
 
                 if (_stateGraph.Type == GraphType.Stack)
+                {
                     for (int i = 0; i < _selectedNode.State.ExitStateTransitions.Count; i++)
                     {
                         var item = _selectedNode.State.ExitStateTransitions[i];
                         GUIStyle style = new GUIStyle();
                         style.fontStyle = FontStyle.Bold;
                         EditorGUILayout.LabelField(string.Format("Exit state transition {0}", i), style);
-                        transitionConditionsInspector.SetData(item.Conditions, _selectedNode.State, addConditionGenericMenu, i);
-                        transitionConditionsInspector.DrawInspector();
+
+                        if (GUILayout.Button("Remove transition"))
+                        {
+                            foreach (var condition in _selectedNode.State.ExitStateTransitions[i].Conditions)
+                            {
+                                GameObject.DestroyImmediate(condition);
+                            }
+                            _selectedNode.State.ExitStateTransitions.RemoveAt(i--);
+                        }
+
+                        transitionConditionsInspector.DrawInspector(item.Conditions, _selectedNode.State, addConditionGenericMenu, i);
                     }
+                    if(GUILayout.Button("Add exit state transition"))
+                    {
+                        _selectedNode.State.ExitStateTransitions.Add(new ExitStateTransition());
+                    }
+                }
             }
         }
 

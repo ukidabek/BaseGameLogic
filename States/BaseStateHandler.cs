@@ -27,8 +27,7 @@ namespace BaseGameLogic.States
         #region States management variables
 
 		[Header("States management.")]
-        [SerializeField]
-        protected bool enterDefaultStateOnAwake = false;
+        [SerializeField] protected bool enterDefaultStateOnAwake = false;
 
         [SerializeField] protected BaseStateGraph _graph = null;
         [SerializeField] protected GameObject stateGraphPrefab = null;
@@ -203,8 +202,8 @@ namespace BaseGameLogic.States
         /// </summary>
         public void ExitState()
         {
-            if (_graph.Type == GraphType.Free)
-                return;
+            if (_graph.Type == GraphType.Free) return;
+
             BaseState oldState = statesStack.Pop();
             oldState.ControlledObject = null;
             oldState.OnExit();

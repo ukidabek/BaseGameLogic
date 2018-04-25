@@ -22,6 +22,8 @@ namespace BaseGameLogic.States
         private Vector2 drag;
 
         private Rect _graphAreaRect = new Rect();
+        private Rect _graphAreaWorkRect = new Rect(Vector2.zero, new Vector2(5000, 5000));
+
         private Rect _menuAreaRect = new Rect();
         private Rect _inspectorAreaRecr = new Rect();
         private float _inspectorSize = .3f;
@@ -39,11 +41,13 @@ namespace BaseGameLogic.States
 
         private StateInspecotr _stateInspecotr = new StateInspecotr();
         private TransitionConditionsInspector _transitionConditionsInspector = new TransitionConditionsInspector();
+        private Vector2 _scrollPositon;
 
         public StateGraphEditorWindow()
         {
             titleContent = new GUIContent("State Graph");
             minSize = new Vector2(800, 600);
+            _scrollPositon = new Vector2(_graphAreaWorkRect.width / 2, _graphAreaWorkRect.height / 2);
         }
 
         public void Initialize(BaseStateGraph stateGraph)
@@ -170,7 +174,7 @@ namespace BaseGameLogic.States
             _selectedNode = null;
             foreach (var item in _nodes)
             {
-                if (item.ProcessEvents(current, new Vector2(0, _menuAreaRect.height)))
+                if (item.ProcessEvents(current, new Vector2(0, _menuAreaRect.height) - _scrollPositon))
                 {
                     GUI.changed = true;
                 }
@@ -191,7 +195,7 @@ namespace BaseGameLogic.States
                     bool transitionSelected = false;
                     foreach (var item in _transitionRectList)
                     {
-                        if (item.Rect.Contains(current.mousePosition - new Vector2(0, _menuAreaRect.height)))
+                        if (item.Rect.Contains(current.mousePosition - new Vector2(0, _menuAreaRect.height) + _scrollPositon))
                         {
                             transitionSelected = true;
                             _selectedTransition = item;
@@ -200,7 +204,7 @@ namespace BaseGameLogic.States
                                 _selectedNode.IsSelected = false;
                                 _selectedNode = null;
                             }
-                            GUI.changed = true;
+                            GUI.changed = true; 
                             break;
                         }
                     }
@@ -223,6 +227,14 @@ namespace BaseGameLogic.States
                        
                     _currentMousePossition = current.mousePosition;
                     break;
+
+                case EventType.MouseDrag:
+                    if(current.button == 2)
+                    {
+                        _scrollPositon -= current.delta;
+                        Repaint();
+                    }
+                    break;
             }
         }
 
@@ -239,43 +251,49 @@ namespace BaseGameLogic.States
         {
             GUILayout.BeginArea(_graphAreaRect);
             {
-                DrawGrid(position, 10, 0.2f, Color.gray);
-                DrawGrid(position, 100, 0.4f, Color.gray);
-
-                _transitionRectList.Clear();
-
-                for (int i = 0; i < _stateGraph.FormAnyStateTransition.Count; i++)
+                Rect scrollArea = new Rect(_graphAreaRect);
+                scrollArea.y -= 16;
+                _scrollPositon = GUI.BeginScrollView(scrollArea, _scrollPositon, _graphAreaWorkRect, false, false, new GUIStyle(), new GUIStyle());
                 {
-                    if(_stateGraph.FormAnyStateTransition[i].TargetState == null)
+                    DrawGrid(_graphAreaWorkRect, 10, 0.2f, Color.gray);
+                    DrawGrid(_graphAreaWorkRect, 100, 0.4f, Color.gray);
+
+                    _transitionRectList.Clear();
+
+                    for (int i = 0; i < _stateGraph.FormAnyStateTransition.Count; i++)
                     {
-                        _stateGraph.FormAnyStateTransition.RemoveAt(i);
-                        --i;
-                        continue;
+                        if(_stateGraph.FormAnyStateTransition[i].TargetState == null)
+                        {
+                            _stateGraph.FormAnyStateTransition.RemoveAt(i);
+                            --i;
+                            continue;
+                        }
+
+                        DrawTransitionBezier(_stateGraph.FromAnyStateNode, _stateGraph.FormAnyStateTransition[i], -1, i);
                     }
 
-                    DrawTransitionBezier(_stateGraph.FromAnyStateNode, _stateGraph.FormAnyStateTransition[i], -1, i);
-                }
-
-                for (int i = 0; i < _nodes.Count; i++)
-                {
-                    var node = _nodes[i];
-                    if (node.State == null) continue;
-                    for (int j = 0; j < node.State.Transitions.Count; j++)
+                    for (int i = 0; i < _nodes.Count; i++)
                     {
-                        var transition = node.State.Transitions[j];
+                        var node = _nodes[i];
+                        if (node.State == null) continue;
+                        for (int j = 0; j < node.State.Transitions.Count; j++)
+                        {
+                            var transition = node.State.Transitions[j];
 
-                        if (transition.TargetState == null)
-                        {
-                            node.State.Transitions.RemoveAt(j--);
+                            if (transition.TargetState == null)
+                            {
+                                node.State.Transitions.RemoveAt(j--);
+                            }
+                            else
+                            {
+                                DrawTransitionBezier(node, transition, i, j);
+                            }
                         }
-                        else
-                        {
-                            DrawTransitionBezier(node, transition, i, j);
-                        }
+                        node.Draw();
                     }
-                    node.Draw();
+                    _stateGraph.FromAnyStateNode.Draw();
                 }
-                _stateGraph.FromAnyStateNode.Draw();
+                GUI.EndScrollView();
             }
             GUILayout.EndArea();
         }
@@ -451,17 +469,14 @@ namespace BaseGameLogic.States
             {
                 Handles.color = new Color(gridColor.r, gridColor.g, gridColor.b, gridOpacity);
 
-                offset += drag * 0.5f;
-                Vector3 newOffset = new Vector3(offset.x % gridSpacing, offset.y % gridSpacing, 0);
-
                 for (int i = 0; i < widthDivs; i++)
                 {
-                    Handles.DrawLine(new Vector3(gridSpacing * i, -gridSpacing, 0) + newOffset, new Vector3(gridSpacing * i, position.height, 0f) + newOffset);
+                    Handles.DrawLine(new Vector3(gridSpacing * i, -gridSpacing, 0), new Vector3(gridSpacing * i, rect.height, 0f));
                 }
 
                 for (int j = 0; j < heightDivs; j++)
                 {
-                    Handles.DrawLine(new Vector3(-gridSpacing, gridSpacing * j, 0) + newOffset, new Vector3(position.width, gridSpacing * j, 0f) + newOffset);
+                    Handles.DrawLine(new Vector3(-gridSpacing, gridSpacing * j, 0), new Vector3(rect.width, gridSpacing * j, 0f));
                 }
 
                 Handles.color = Color.white;

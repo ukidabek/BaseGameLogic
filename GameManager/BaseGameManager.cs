@@ -13,7 +13,7 @@ using UnityEngine.Events;
 
 namespace BaseGameLogic.Management
 {
-	public abstract class BaseGameManager : Singleton<BaseGameManager> 
+	public class BaseGameManager : Singleton<BaseGameManager> 
 	{
 		public InitializeObjects ObjectInitializationCallBack = new InitializeObjects();
 

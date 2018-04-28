@@ -7,14 +7,13 @@ using BaseGameLogic.Singleton;
 
 namespace BaseGameLogic.Character
 {
-	public abstract class BaseCharacterRegister : Singleton<BaseCharacterRegister>
+	public class BaseCharacterRegister : Singleton<BaseCharacterRegister>
     {
         #if UNITY_EDITOR
         /// <summary>
         /// List of characters. In editor only. 
         /// </summary>
-        [SerializeField]
-        private List<BaseCharacterController> _charactersList = new List<BaseCharacterController>();
+        [SerializeField] private List<BaseCharacterController> _charactersList = new List<BaseCharacterController>();
         #endif
         /// <summary>
         /// Characters dictionary.

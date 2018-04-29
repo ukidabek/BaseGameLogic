@@ -9,7 +9,7 @@ namespace BaseGameLogic.States
     public class StateInspecotr : BaseStateGraphInspector
     {
         private Node _selectedNode = null;
-        private BaseStateGraph _stateGraph;
+        private StateGraph _stateGraph;
         private GenericMenu addConditionGenericMenu = null;
 
         private TransitionConditionsInspector transitionConditionsInspector = new TransitionConditionsInspector();
@@ -56,8 +56,8 @@ namespace BaseGameLogic.States
             if (data.Length > 0 && data[0] != null && data[0] is Node)
                 _selectedNode = data[0] as Node;
 
-            if (data.Length > 1 && data[1] != null && data[1] is BaseStateGraph)
-                _stateGraph = data[1] as BaseStateGraph;
+            if (data.Length > 1 && data[1] != null && data[1] is StateGraph)
+                _stateGraph = data[1] as StateGraph;
 
             if (data.Length > 2 && data[2] != null && data[2] is GenericMenu)
                 addConditionGenericMenu = data[2] as GenericMenu;

@@ -70,6 +70,7 @@ namespace BaseGameLogic.Inputs
             inputCollector.transform.Reset();
             inputCollector.PlayerNumber = playerID > -1 ? playerID : _inputCollectorsDictionary.Count;
 
+            inputCollector.gameObject.name = string.Format("Player {0}", inputCollector.PlayerNumber);
             _inputCollectors.Add(inputCollector);
             _inputCollectorsDictionary.Add(inputCollector.PlayerNumber, inputCollector);
         }

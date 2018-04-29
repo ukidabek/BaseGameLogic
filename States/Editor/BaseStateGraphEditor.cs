@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace BaseGameLogic.States
 {
-    [CustomEditor(typeof(BaseStateGraph), true)]
+    [CustomEditor(typeof(StateGraph), true)]
     public class BaseStateGraphEditor : Editor
     {
         public override void OnInspectorGUI()
@@ -15,7 +15,7 @@ namespace BaseGameLogic.States
             if(GUILayout.Button("Open editor"))
             {
                 StateGraphEditorWindow window = Editor.CreateInstance<StateGraphEditorWindow>();
-                window.Initialize(target as BaseStateGraph);
+                window.Initialize(target as StateGraph);
                 window.Show();
             }
         }

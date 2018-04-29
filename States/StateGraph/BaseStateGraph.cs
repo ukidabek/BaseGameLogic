@@ -12,7 +12,7 @@ namespace BaseGameLogic.States
         Free
     }
 
-    public abstract class BaseStateGraph : MonoBehaviour
+    public class StateGraph : MonoBehaviour
     {
         [SerializeField] private GraphType _type = GraphType.Stack;
         public GraphType Type

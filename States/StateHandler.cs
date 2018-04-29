@@ -29,7 +29,7 @@ namespace BaseGameLogic.States
 		[Header("States management.")]
         [SerializeField] protected bool enterDefaultStateOnAwake = false;
 
-        [SerializeField] protected BaseStateGraph _graph = null;
+        [SerializeField] protected StateGraph _graph = null;
         [SerializeField] protected GameObject stateGraphPrefab = null;
 
 
@@ -90,7 +90,7 @@ namespace BaseGameLogic.States
         {
             if(stateGraphPrefab != null)
             {
-                _graph = Instantiate(stateGraphPrefab, this.transform, false).GetComponent<BaseStateGraph>();
+                _graph = Instantiate(stateGraphPrefab, this.transform, false).GetComponent<StateGraph>();
             }
         }
 

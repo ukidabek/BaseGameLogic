@@ -12,7 +12,7 @@ namespace BaseGameLogic.States
 
         private Action<MonoBehaviour> SetDirty = null;
 
-        private BaseStateGraph _graph = null;
+        private StateGraph _graph = null;
         private bool _formAnyStateTransition = false;
         private Node _node = null;
 
@@ -24,7 +24,7 @@ namespace BaseGameLogic.States
             SetDirty = setDirty;
         }
 
-        public Connector(Action<MonoBehaviour> setDirty, BaseStateGraph graph) : this(setDirty)
+        public Connector(Action<MonoBehaviour> setDirty, StateGraph graph) : this(setDirty)
         {
             _node = graph.FromAnyStateNode;
 

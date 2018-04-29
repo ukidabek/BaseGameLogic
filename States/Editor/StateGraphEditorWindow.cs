@@ -10,7 +10,7 @@ namespace BaseGameLogic.States
 {
     public class StateGraphEditorWindow : EditorWindow
     {
-        private BaseStateGraph _stateGraph = null;
+        private StateGraph _stateGraph = null;
         private List<Node> _nodes = new List<Node>();
         private List<TransitionInfo> _transitionRectList = new List<TransitionInfo>();
         private TransitionInfo _selectedTransition = null;
@@ -50,7 +50,7 @@ namespace BaseGameLogic.States
             _scrollPositon = new Vector2(_graphAreaWorkRect.width / 2, _graphAreaWorkRect.height / 2);
         }
 
-        public void Initialize(BaseStateGraph stateGraph)
+        public void Initialize(StateGraph stateGraph)
         {
             _stateGraph = stateGraph;
 

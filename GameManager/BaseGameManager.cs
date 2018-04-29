@@ -21,10 +21,10 @@ namespace BaseGameLogic.Management
 		private GameStatusEnum _gameStatus = GameStatusEnum.Play;
 		public GameStatusEnum GameStatus { get { return this._gameStatus; } }
 
-		[SerializeField, Manager(true, typeof(BaseInputCollectorManager))]
+		[SerializeField, Manager(true, typeof(InputCollectorManager))]
 		private GameObject inputCollectorManagerPrefab = null;
         public GameObject InputCollectorManagerPrefab { get { return inputCollectorManagerPrefab; } }
-		public BaseInputCollectorManager InputCollectorManager { get { return BaseInputCollectorManager.Instance; } }
+		public InputCollectorManager InputCollectorManager { get { return InputCollectorManager.Instance; } }
 
         [SerializeField, Manager(false, typeof(BaseCharacterRegister))]
 		private GameObject characterRegisterPrefab = null;

@@ -8,7 +8,7 @@ using System;
 
 namespace BaseGameLogic.Inputs
 {
-	public abstract class BaseInputCollectorManager : Singleton<BaseInputCollectorManager>
+	public class InputCollectorManager : Singleton<InputCollectorManager>
     {
         [SerializeField, HideInInspector]
         private List<BaseInputCollector> _inputCollectors = new List<BaseInputCollector>();

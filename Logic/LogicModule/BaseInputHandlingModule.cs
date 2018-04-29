@@ -33,9 +33,9 @@ namespace BaseGameLogic.LogicModule
 
         protected override void Start()
         {
-            if (BaseInputCollectorManager.Instance != null)
+            if (InputCollectorManager.Instance != null)
             {
-                InputCollector = BaseInputCollectorManager.Instance.GetInputCollector(_playerController.PlayerNumber);
+                InputCollector = InputCollectorManager.Instance.GetInputCollector(_playerController.PlayerNumber);
                 _currentinputSourceDefinition = ConvertToInputSourceDefinition(InputCollector.CurrentInputSourceInstance);
 
                 InputCollector.InputSourceChanged -= InputSourceChanged;

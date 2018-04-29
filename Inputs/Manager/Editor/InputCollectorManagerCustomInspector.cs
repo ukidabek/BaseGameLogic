@@ -8,21 +8,21 @@ using UnityEditorInternal;
 
 namespace BaseGameLogic.Inputs
 {
-    [CustomEditor(typeof(BaseInputCollectorManager), true)]
+    [CustomEditor(typeof(InputCollectorManager), true)]
     public class InputCollectorManagerCustomInspector : Editor
     {
         [MenuItem("BaseGameLogic/Inputs/Create InputCollectorManager")]
-        public static BaseInputCollectorManager CreateInputCollectorManager()
+        public static InputCollectorManager CreateInputCollectorManager()
         {
-            return GameObjectExtension.CreateInstanceOfAbstractType<BaseInputCollectorManager>();
+            return GameObjectExtension.CreateInstanceOfAbstractType<InputCollectorManager>();
         }
 
-        private BaseInputCollectorManager inputCollectorManager = null;
+        private InputCollectorManager inputCollectorManager = null;
         private ReorderableList list = null;
 
         private void OnEnable() 
         {
-            inputCollectorManager = target as BaseInputCollectorManager;
+            inputCollectorManager = target as InputCollectorManager;
             list = new ReorderableList(
                 serializedObject,
                 serializedObject.FindProperty("_inputCollectors"),

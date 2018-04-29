@@ -14,7 +14,7 @@ namespace BaseGameLogic.States
     /// <summary>
     /// Base game object.
     /// </summary>
-    public abstract class BaseStateHandler : MonoBehaviour
+    public class StateHandler : MonoBehaviour
     {
         #if UNITY_EDITOR
 

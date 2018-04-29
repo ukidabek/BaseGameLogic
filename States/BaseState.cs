@@ -17,8 +17,8 @@ namespace BaseGameLogic.States
     /// </summary>
     public abstract class BaseState : MonoBehaviour
     {
-        private BaseStateHandler controlledObject = null;
-		public BaseStateHandler ControlledObject
+        private StateHandler controlledObject = null;
+		public StateHandler ControlledObject
         {
     		get { return this.controlledObject; }
 			set { controlledObject = value; }
@@ -76,12 +76,12 @@ namespace BaseGameLogic.States
 		public void GetAllRequiredReferences(GameObject parent = null, bool overrideReference = false)
 		{
 			parent = parent == null ? this.transform.GetRootTransform().gameObject : parent;
-			BaseLogicModulesHandler handler = parent.GetComponentDeep<BaseLogicModulesHandler>();
+			LogicModulesHandler handler = parent.GetComponentDeep<LogicModulesHandler>();
 
             GetAllRequiredReferences(handler, overrideReference);
         }
 
-        public void GetAllRequiredReferences(BaseLogicModulesHandler handler, bool overrideReference = false)
+        public void GetAllRequiredReferences(LogicModulesHandler handler, bool overrideReference = false)
         {
 			requiredFieldList = requiredFieldList == null ? GetAllRequiredFields() : requiredFieldList;
 

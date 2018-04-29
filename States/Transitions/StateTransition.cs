@@ -19,7 +19,7 @@ namespace BaseGameLogic.States
             _targetState = targetState;
         }
 
-        public override bool Validate(BaseStateHandler stateHandler)
+        public override bool Validate(StateHandler stateHandler)
         {
             for (int i = 0; i < Conditions.Capacity; i++)
             {

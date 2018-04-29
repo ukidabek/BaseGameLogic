@@ -4,7 +4,7 @@ using System;
 
 namespace BaseGameLogic.LogicModule
 {
-    public abstract class BaseLogicModulesHandler : MonoBehaviour
+    public class LogicModulesHandler : MonoBehaviour
     {
         [SerializeField, HideInInspector]
         protected LogicModulesContainer logicModulesContainer = new LogicModulesContainer();

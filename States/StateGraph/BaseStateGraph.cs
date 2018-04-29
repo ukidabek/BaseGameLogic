@@ -51,7 +51,7 @@ namespace BaseGameLogic.States
             }
         }
 
-        public void HandleTransitions(BaseStateHandler handler) 
+        public void HandleTransitions(StateHandler handler) 
 		{
             _transitionDone = false;
 
@@ -70,7 +70,7 @@ namespace BaseGameLogic.States
             }
 		}
 
-        private void HandleTransitionLoop(BaseStateHandler handler, List<StateTransition> transitions)
+        private void HandleTransitionLoop(StateHandler handler, List<StateTransition> transitions)
         {
             foreach (var item in transitions)
             {

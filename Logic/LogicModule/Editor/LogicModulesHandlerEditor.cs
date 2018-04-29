@@ -8,10 +8,10 @@ using System.Collections.Generic;
 
 namespace BaseGameLogic.LogicModule
 {
-    [CustomEditor(typeof(BaseLogicModulesHandler), true)]
+    [CustomEditor(typeof(LogicModulesHandler), true)]
     public class LogicModulesHandlerEditor: Editor
     {
-        private BaseLogicModulesHandler _logicModulesHandler = null;
+        private LogicModulesHandler _logicModulesHandler = null;
         private ReorderableList list = null;
 
         private Type[] _logicModulesTypes = null;
@@ -20,7 +20,7 @@ namespace BaseGameLogic.LogicModule
 
         protected virtual void OnEnable()
         {
-            _logicModulesHandler = target as BaseLogicModulesHandler;
+            _logicModulesHandler = target as LogicModulesHandler;
             _logicModulesTypes = AssemblyExtension.GetDerivedTypes<BaseLogicModule>();
 
             List<GameObject> _gameObjectList = new List<GameObject>();

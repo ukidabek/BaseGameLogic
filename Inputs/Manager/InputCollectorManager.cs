@@ -10,11 +10,9 @@ namespace BaseGameLogic.Inputs
 {
 	public class InputCollectorManager : Singleton<InputCollectorManager>
     {
-        [SerializeField, HideInInspector]
-        private List<BaseInputCollector> _inputCollectors = new List<BaseInputCollector>();
+        [SerializeField, HideInInspector] private List<BaseInputCollector> _inputCollectors = new List<BaseInputCollector>();
         public BaseInputCollector this [int index] { get { return _inputCollectors[index]; } }
         public int Count { get { return _inputCollectors.Count; } }
-
 
         /// <summary>
         /// 
@@ -27,9 +25,7 @@ namespace BaseGameLogic.Inputs
 
             // Creating dictionary from collected InputCollectors.
             for (int i = 0; i < _inputCollectors.Count; i++) 
-			{
 				_inputCollectorsDictionary.Add(_inputCollectors [i].PlayerNumber, _inputCollectors [i]);
-			}
 		}
 
         /// <summary>
@@ -43,13 +39,9 @@ namespace BaseGameLogic.Inputs
 			BaseInputCollector _inputCollector = null;
 
             if(_inputCollectorsDictionary.Count == 1)
-            {
                 _inputCollectorsDictionary.TryGetValue(0, out _inputCollector);
-            }
             else
-            {
                 _inputCollectorsDictionary.TryGetValue (playerNumber, out _inputCollector);
-            }
 
 			return _inputCollector;
 		}

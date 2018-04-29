@@ -9,7 +9,7 @@ using BaseGameLogic.LogicModule;
 
 namespace BaseGameLogic.States
 {
-    [CustomEditor(typeof(BaseStateHandler), true)]
+    [CustomEditor(typeof(StateHandler), true)]
     public class BaseStateHandlerEditor : Editor
     {
         //private BaseStateHandler _baseStateObject = null;

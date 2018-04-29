@@ -64,6 +64,16 @@ namespace BaseGameLogic.Inputs
             }
         }
 
+        public void AddInputCollector(GameObject inputCollectorPrefab, int playerID = -1)
+        {
+            BaseInputCollector inputCollector = Instantiate(inputCollectorPrefab, this.transform, false).GetComponent<BaseInputCollector>();
+            inputCollector.transform.Reset();
+            inputCollector.PlayerNumber = playerID > -1 ? playerID : _inputCollectorsDictionary.Count;
+
+            _inputCollectors.Add(inputCollector);
+            _inputCollectorsDictionary.Add(inputCollector.PlayerNumber, inputCollector);
+        }
+
         public void RemoveAt(int index)
         {
             DestroyImmediate(_inputCollectors[index].gameObject);

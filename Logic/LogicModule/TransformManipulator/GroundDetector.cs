@@ -8,28 +8,24 @@ using System.Collections.Generic;
 namespace BaseGameLogic.LogicModule
 {
     [Serializable]
-    public class GroundDetector : TransformManipulator
+    public class GroundDetector
     {
-        [SerializeField]
-        private LayerMask _groundMask;
+        [SerializeField] protected Transform _transform;
 
-        [SerializeField]
-        protected Vector3 _groundedCheckOffset = new Vector3(0, -0.1f, 0);
+        [SerializeField] private LayerMask _groundMask;
 
-        [SerializeField]
-        protected float _groundedCheckDistance = 0.1f;
+        [SerializeField] protected Vector3 _groundedCheckOffset = new Vector3(0, -0.1f, 0);
 
-        [SerializeField]
-        private bool _isGrounded = false;
+        [SerializeField] protected float _groundedCheckDistance = 0.1f;
+
+        [SerializeField] private bool _isGrounded = false;
         public bool IsGrounded { get { return _isGrounded; } }
 
         public GroundDetector() : base() {}
 
-        public GroundDetector(
-            Transform transform, 
-            Vector3 groundedCheckOffset, 
-            float groundedCheckDistance) : base(transform)
+        public GroundDetector(Transform transform, Vector3 groundedCheckOffset, float groundedCheckDistance)
         {
+            _transform = transform;
             _groundedCheckOffset = groundedCheckOffset;
             _groundedCheckDistance = groundedCheckDistance;
         }

@@ -4,7 +4,7 @@ using BaseGameLogic.States;
 
 namespace BaseGameLogic.LogicModule
 {
-    public abstract class PhysicsFPPMovementModule : BaseLogicModule
+    public class PhysicsFPPMovementModule : BaseLogicModule
     {
         [Header("Require components")]
         [SerializeField]

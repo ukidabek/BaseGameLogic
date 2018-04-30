@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 using BaseGameLogic.Management;
+using UnityEngine.Events;
 
 namespace BaseGameLogic.Inputs
 {
@@ -27,7 +28,7 @@ namespace BaseGameLogic.Inputs
 		}
 
         [Header("Debug display & options.")]
-        public Action InputSourceInstanceChanged = null;
+        public UnityEvent InputSourceInstanceChanged = null;
 
 		private BaseInputSource _currentInputSourceInstance = null;
         /// <summary>
@@ -41,10 +42,7 @@ namespace BaseGameLogic.Inputs
 				if (_currentInputSourceInstance != value) 
 				{
 					_currentInputSourceInstance = value;
-					if (InputSourceInstanceChanged != null) 
-					{
-						InputSourceInstanceChanged ();
-					}
+					InputSourceInstanceChanged.Invoke();
 				}
 			}
 		}

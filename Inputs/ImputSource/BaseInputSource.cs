@@ -12,11 +12,6 @@ namespace BaseGameLogic.Inputs
     /// </summary>
 	public abstract class BaseInputSource : MonoBehaviour
 	{
-		public virtual string InputSourceType 
-		{
-			get { throw new NotImplementedException (); }
-		}
-
 		[SerializeField]
         [Tooltip("The reference to input collector that collect input from this source.")]
 		private BaseInputCollector _owner = null;
@@ -36,10 +31,7 @@ namespace BaseGameLogic.Inputs
         /// <summary>
         /// List of all PhysicalInputs  (buttons, analog values, ect.) that will be checked when this InputSource is collecting it’s inputs.
         /// </summary>
-        public List<PhysicalInput> PhysicalInputs 
-		{
-			get { return physicalInputs; }
-		}
+        public List<PhysicalInput> PhysicalInputs { get { return physicalInputs; } }
 
         /// <summary>
         /// Return true if only one PhysicalInput is positive. For example button is pleased or analog value is greater then 0 or less.
@@ -61,18 +53,12 @@ namespace BaseGameLogic.Inputs
         /// <summary>
         /// Vector used for controlling player motion (WASD, left analog on game pad).
         /// </summary>
-		public virtual Vector3 MovementVector 
-		{
-			get { return Vector3.zero; }
-		}
+		public virtual Vector3 MovementVector { get { return Vector3.zero; } }
 
         /// <summary>
         /// Vector containing a analog valeuse (greater then 0 or less) reader from game pad triggers.
         /// </summary>
-		public virtual Vector3 TriggersVector
-		{
-			get { return Vector3.zero; }
-		}
+		public virtual Vector3 TriggersVector { get { return Vector3.zero; } }
 
 		[Header("Look axis sensitivity settings")]
 		[SerializeField]
@@ -85,10 +71,7 @@ namespace BaseGameLogic.Inputs
         /// <summary>
         /// Vector used for controlling camera motion (mouse, right analog on game pad).
         /// </summary>
-        public virtual Vector3 LookVector 
-		{
-			get { return Vector3.zero; }
-		}
+        public virtual Vector3 LookVector { get { return Vector3.zero; } }
 
         [SerializeField]
         private ButtonInput _pauseButton = new ButtonInput();
@@ -117,16 +100,7 @@ namespace BaseGameLogic.Inputs
             }
 		}
 
-		protected virtual void Start()
-		{
-			// if (!Owner.InputSources.Contains (this)) 
-			// {
-			// 	if (this != null) 
-			// 	{
-			// 		Owner.InputSources.Add (this);
-			// 	} 
-			// }
-		}
+		protected virtual void Start() {}
 
         /// <summary>
         /// Rad all PhysicalInputs in InputSource.

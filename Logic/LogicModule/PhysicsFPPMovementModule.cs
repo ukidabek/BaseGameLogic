@@ -16,10 +16,18 @@ namespace BaseGameLogic.LogicModule
         [Header("Settings")]
         [SerializeField] protected Movement movement = new Movement();
         [SerializeField] protected SingleAxisRotation bodyRotation = new SingleAxisRotation();
-        public float CurrentBodyRotation { get { return bodyRotation.CurrentRotation; } }
+        public float CurrentBodyRotation
+        {
+            get { return bodyRotation.CurrentRotation; }
+            set { bodyRotation.CurrentRotation = value; }
+        }
 
         [SerializeField] protected SingleAxisRotation eyesRotation = new SingleAxisRotation();
-        public float CurrentEyesRotation { get { return eyesRotation.CurrentRotation; } }
+        public float CurrentEyesRotation
+        {
+            get { return eyesRotation.CurrentRotation; }
+            set { eyesRotation.CurrentRotation = value; }
+        }
 
         [SerializeField] protected GroundDetector groundDetector = new GroundDetector();
 

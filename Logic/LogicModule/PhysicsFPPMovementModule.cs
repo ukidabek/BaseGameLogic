@@ -7,29 +7,23 @@ namespace BaseGameLogic.LogicModule
     public class PhysicsFPPMovementModule : BaseLogicModule
     {
         [Header("Require components")]
-        [SerializeField]
-        protected Rigidbody _playerRigidbody = null;
+        [SerializeField] protected Rigidbody _playerRigidbody = null;
 
         [Header("Inputs")]
         public Vector3 MovementVector = Vector3.zero;
         public Vector3 LookVector = Vector3.zero;
 
         [Header("Settings")]
-        [SerializeField]
-        protected Movement movement = new Movement();
-        [SerializeField]
-        protected SingleAxisRotation bodyRotation = new SingleAxisRotation();
+        [SerializeField] protected Movement movement = new Movement();
+        [SerializeField] protected SingleAxisRotation bodyRotation = new SingleAxisRotation();
         public float CurrentBodyRotation { get { return bodyRotation.CurrentRotation; } }
 
-        [SerializeField]
-        protected SingleAxisRotation eyesRotation = new SingleAxisRotation();
+        [SerializeField] protected SingleAxisRotation eyesRotation = new SingleAxisRotation();
         public float CurrentEyesRotation { get { return eyesRotation.CurrentRotation; } }
 
-        [SerializeField]
-        protected GroundDetector groundDetector = new GroundDetector();
+        [SerializeField] protected GroundDetector groundDetector = new GroundDetector();
 
-        [SerializeField]
-        protected float _jumpVelocity = 5;
+        [SerializeField] protected float _jumpVelocity = 5;
 
         protected override void Reset()
         {
@@ -42,25 +36,25 @@ namespace BaseGameLogic.LogicModule
             eyesRotation.Initialize();
         }
 
-        protected override void Update()
+        public void Calculate(float deltaTime)
         {
-            HandleMovement();
-            HandleRotation();
+            HandleMovement(deltaTime);
+            HandleRotation(deltaTime);
             GroundCheack();
         }
 
-        public virtual void HandleMovement()
+        public virtual void HandleMovement(float deltaTime)
         {
-            Vector3 move = movement.CalculatMove(MovementVector, Time.deltaTime);
+            Vector3 move = movement.CalculatMove(MovementVector, deltaTime);
             _playerRigidbody.MovePosition(transform.position + move);
         }
 
-        public virtual void HandleRotation()
+        public virtual void HandleRotation(float deltaTime)
         {
-            bodyRotation.CalculateRotation(LookVector.x, Time.deltaTime);
+            bodyRotation.CalculateRotation(LookVector.x, deltaTime);
             _playerRigidbody.MoveRotation(Quaternion.Euler(bodyRotation.Rotation));
 
-            eyesRotation.Rotate(LookVector.y, Time.deltaTime);
+            eyesRotation.Rotate(LookVector.y, deltaTime);
         }
 
         public virtual void HandleJump()

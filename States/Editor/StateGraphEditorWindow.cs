@@ -345,7 +345,7 @@ namespace BaseGameLogic.States
 
             Undo.RecordObject(_stateGraph, "State added");
 
-            Node newNode = new Node(_currentMousePossition, state);
+            Node newNode = new Node(_currentMousePossition + _scrollPositon, state);
             List<Node> nodeList = new List<Node>();
             nodeList.Add(newNode);
             _statesDictionary.Add(state, nodeList);

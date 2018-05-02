@@ -29,7 +29,13 @@ namespace BaseGameLogic.Animation
 			animator.SetFloat(NameHash, value);
 		}
 
-		public void Set(Animator animator, bool value)
+        public void Set(Animator animator, float value, float dampTime)
+        {
+            animator.SetFloat(NameHash, value, dampTime, Time.deltaTime);
+        }
+
+
+        public void Set(Animator animator, bool value)
 		{
 			animator.SetBool(NameHash, value);
 		}

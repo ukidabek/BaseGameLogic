@@ -31,6 +31,8 @@ namespace BaseGameLogic.LogicModule
 
         [SerializeField] protected GroundDetector groundDetector = new GroundDetector();
 
+        public bool IsGrounded {  get { return groundDetector.IsGrounded; } }
+
         [SerializeField] protected float _jumpVelocity = 5;
 
         protected override void Reset()

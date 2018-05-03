@@ -18,6 +18,7 @@ namespace BaseGameLogic.Animation
         [SerializeField] private int _nameHash = 0;
         public int NameHash { get { return _nameHash; } }
 
+        private bool _oldBoolValue = false;
 
         public void Set(Animator animator)
 		{
@@ -37,7 +38,11 @@ namespace BaseGameLogic.Animation
 
         public void Set(Animator animator, bool value)
 		{
-			animator.SetBool(NameHash, value);
+            if(_oldBoolValue != value)
+            {
+			    animator.SetBool(NameHash, value);
+                _oldBoolValue = value;
+            }
 		}
 	}
 }

@@ -14,7 +14,6 @@ namespace BaseGameLogic.States
 
         private StateGraph _graph = null;
         private bool _formAnyStateTransition = false;
-        private Node _node = null;
 
         private bool _inNodeSelected = false;
         private bool _outNodeSelected = false;
@@ -26,8 +25,6 @@ namespace BaseGameLogic.States
 
         public Connector(Action<MonoBehaviour> setDirty, StateGraph graph) : this(setDirty)
         {
-            _node = graph.FromAnyStateNode;
-
             SetDirty = setDirty;
             _graph = graph;
         }

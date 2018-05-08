@@ -10,12 +10,12 @@ using BaseGameLogic.States;
 namespace BaseGameLogic.Character
 {
     [CustomEditor(typeof(BaseCharacterController), true)]
-    public class BaseCharacterControllerCustomInspector : BaseStateHandlerEditor 
+    public class BaseCharacterControllerCustomInspector : Editor 
     {
-        protected override void OnEnable()
-        {
-            base.OnEnable();
-        }
+        //protected override void OnEnable()
+        //{
+        //    base.OnEnable();
+        //}
 
         public override void OnInspectorGUI()
         {

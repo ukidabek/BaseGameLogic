@@ -9,8 +9,7 @@ namespace BaseGameLogic.Singleton
     {
         public static T Instance { get; protected set; }
 
-        [SerializeField]
-        private bool _dontDestroyOnLoad = false;
+        [SerializeField] private bool _dontDestroyOnLoad = false;
 
         protected virtual void CreateInstance()
         {

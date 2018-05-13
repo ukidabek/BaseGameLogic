@@ -8,9 +8,9 @@ namespace BaseGameLogic.LogicModule
 {
     public class LogicModuleOnListException : Exception
     {
-        public BaseLogicModule AdditionalModule { get; private set; }
+        public MonoBehaviour AdditionalModule { get; private set; }
 
-        public LogicModuleOnListException(BaseLogicModule additionalModule)
+        public LogicModuleOnListException(MonoBehaviour additionalModule)
         {
             AdditionalModule = additionalModule;
         }

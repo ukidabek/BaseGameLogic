@@ -8,7 +8,7 @@ using BaseGameLogic.Character;
 
 namespace BaseGameLogic.LogicModule
 {
-    public abstract class BaseInputHandlingModule<T> : BaseLogicModule where T : BaseInputSource
+    public abstract class BaseInputHandlingModule<T> : MonoBehaviour where T : BaseInputSource
     {
         [SerializeField]
         protected BasePlayerCharacterController _playerController = null;
@@ -31,7 +31,7 @@ namespace BaseGameLogic.LogicModule
             return null;
         }
 
-        protected override void Start()
+        protected void Start()
         {
             if (InputCollectorManager.Instance != null)
             {

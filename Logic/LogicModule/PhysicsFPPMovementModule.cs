@@ -4,7 +4,7 @@ using BaseGameLogic.States;
 
 namespace BaseGameLogic.LogicModule
 {
-    public class PhysicsFPPMovementModule : BaseLogicModule
+    public class PhysicsFPPMovementModule : MonoBehaviour
     {
         [Header("Require components")]
         [SerializeField] protected Rigidbody _playerRigidbody = null;
@@ -35,12 +35,12 @@ namespace BaseGameLogic.LogicModule
 
         [SerializeField] protected float _jumpVelocity = 5;
 
-        protected override void Reset()
+        protected void Reset()
         {
             _playerRigidbody = GetComponent<Rigidbody>();
         }
 
-        protected override void Awake()
+        protected void Awake()
         {
             bodyRotation.Initialize();
             eyesRotation.Initialize();

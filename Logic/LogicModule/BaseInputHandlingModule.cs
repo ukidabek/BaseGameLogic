@@ -11,7 +11,7 @@ namespace BaseGameLogic.LogicModule
     public abstract class BaseInputHandlingModule<T> : MonoBehaviour where T : BaseInputSource
     {
         [SerializeField]
-        protected BasePlayerCharacterController _playerController = null;
+        protected PlayerCharacterController _playerController = null;
 
         [SerializeField]
         protected T _currentinputSourceDefinition = null;

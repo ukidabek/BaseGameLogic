@@ -8,7 +8,7 @@ using BaseGameLogic.Inputs;
 
 namespace BaseGameLogic.Character
 {
-	public abstract class BasePlayerCharacterController : BaseCharacterController, IComparable 
+	public class PlayerCharacterController : BaseCharacterController, IComparable 
 	{
 		public override bool IsPlayer { get { return true; } }
 
@@ -22,7 +22,7 @@ namespace BaseGameLogic.Character
 
 		public int CompareTo (object obj)
 		{
-			BasePlayerCharacterController otherPlayer = obj as BasePlayerCharacterController;
+			PlayerCharacterController otherPlayer = obj as PlayerCharacterController;
 
 			if (PlayerNumber < otherPlayer.PlayerNumber)
 				return 1;

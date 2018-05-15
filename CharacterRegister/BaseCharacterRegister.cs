@@ -25,12 +25,12 @@ namespace BaseGameLogic.Character
         /// List of players. In editor only. 
         /// </summary>
         [SerializeField]
-		private List<BasePlayerCharacterController> _playersList = new List<BasePlayerCharacterController>();
+		private List<PlayerCharacterController> _playersList = new List<PlayerCharacterController>();
         #endif
         /// <summary>
         /// Players dictionary.
         /// </summary>
-        private Dictionary<int, BasePlayerCharacterController> _playerDictionary = new Dictionary<int, BasePlayerCharacterController>();
+        private Dictionary<int, PlayerCharacterController> _playerDictionary = new Dictionary<int, PlayerCharacterController>();
 
         /// <summary>
         /// Register character
@@ -64,7 +64,7 @@ namespace BaseGameLogic.Character
         {
             if (character.IsPlayer)
             {
-                BasePlayerCharacterController player = character as BasePlayerCharacterController;
+                PlayerCharacterController player = character as PlayerCharacterController;
                 bool containsValue = _playerDictionary.ContainsValue(player);
                 if (containsValue)
                 {
@@ -107,7 +107,7 @@ namespace BaseGameLogic.Character
         {
             if (character.IsPlayer)
             {
-                BasePlayerCharacterController player = character as BasePlayerCharacterController;
+                PlayerCharacterController player = character as PlayerCharacterController;
                 int playerNumber = player.PlayerNumber;
                 bool valueRemoved = _playerDictionary.Remove(playerNumber);
                 if(valueRemoved)
@@ -142,9 +142,9 @@ namespace BaseGameLogic.Character
         /// </summary>
         /// <param name="index"></param>
         /// <returns>BasePlayerCharacterController instance.</returns>
-		public BasePlayerCharacterController GetPlayerCharacterInstance(int index)
+		public PlayerCharacterController GetPlayerCharacterInstance(int index)
 		{
-            BasePlayerCharacterController player = null;
+            PlayerCharacterController player = null;
             if(_playerDictionary.TryGetValue(index, out player))
             {
                 return player;

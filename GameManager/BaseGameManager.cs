@@ -26,16 +26,10 @@ namespace BaseGameLogic.Management
         public GameObject InputCollectorManagerPrefab { get { return inputCollectorManagerPrefab; } }
 		public InputCollectorManager InputCollectorManager { get { return InputCollectorManager.Instance; } }
 
-        [SerializeField, Manager(false, typeof(BaseCharacterRegister))]
-		private GameObject characterRegisterPrefab = null;
-        public GameObject CharacterRegisterPrefab { get { return characterRegisterPrefab; } }
-		public BaseCharacterRegister CharacterRegisterInstance { get { return BaseCharacterRegister.Instance; } }
-
         [SerializeField, Manager(true, typeof(BaseTimeManager))]
 		private GameObject timeManagerPrefab = null;
         public GameObject TimeManagerPrefab { get { return timeManagerPrefab; } }
 		public BaseTimeManager TimeManagerInstance { get { return BaseTimeManager.Instance; } }
-
 
         protected virtual void CreateManagersInstance()
 		{

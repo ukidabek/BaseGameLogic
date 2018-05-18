@@ -14,7 +14,7 @@ namespace BaseGameLogic.Character
     /// </summary>
     public abstract class BaseCharacterController : MonoBehaviour
     {
-		public virtual bool IsPlayer { get { return false; } }
+        public virtual bool IsPlayer { get { return false; } }
 
         protected virtual void Start() {}
                                                 

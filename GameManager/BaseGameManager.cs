@@ -39,14 +39,19 @@ namespace BaseGameLogic.Management
 				object managerObject = managerPrefabField.GetValue(this);
 				GameObject gameObject = managerObject as GameObject;
 				if(gameObject != null)
-					gameObject.CreateInstance(transform);
+                {
+					var instance = gameObject.CreateInstance(transform);
+                    IInitialize initialize = instance.GetComponentInChildren<IInitialize>();
+                    if(initialize != null) ObjectInitializationCallBack.AddListener(initialize.Initialize);
+                }
 			}
 		}
 
 		protected virtual void InitializeOtherObjects()
 		{
 			ObjectInitializationCallBack.Invoke (this);
-		}
+            ObjectInitializationCallBack.RemoveAllListeners();
+        }
 
 		protected override void Awake()
 		{
@@ -62,9 +67,9 @@ namespace BaseGameLogic.Management
 
 		protected virtual void Update()
 		{
-			this.enabled = false;
             if(_gameStatus != GameStatusEnum.Loading)
             {
+			    this.enabled = false;
 			    InitializeOtherObjects ();
             }
 		}
@@ -78,6 +83,11 @@ namespace BaseGameLogic.Management
             }
 
             Cursor.visible = true;
+        }
+
+        public void LoadGame()
+        {
+            _gameStatus = GameStatusEnum.Loading;
         }
 
         public void ResumeGame()

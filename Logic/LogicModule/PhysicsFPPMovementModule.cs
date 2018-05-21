@@ -9,6 +9,12 @@ namespace BaseGameLogic.LogicModule
         [Header("Require components")]
         [SerializeField] protected Rigidbody _playerRigidbody = null;
 
+        public Vector3 Position
+        {
+            get { return _playerRigidbody.position; }
+            set { _playerRigidbody.MovePosition(value); }
+        }
+
         [Header("Inputs")]
         public Vector3 MovementVector = Vector3.zero;
         public Vector3 LookVector = Vector3.zero;

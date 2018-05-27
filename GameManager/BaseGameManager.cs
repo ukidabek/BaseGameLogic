@@ -1,15 +1,14 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 
 using System;
+using System.Reflection;
 using System.Collections;
+using System.Collections.Generic;
 
 using BaseGameLogic.Singleton;
 using BaseGameLogic.Inputs;
 using BaseGameLogic.TimeManagement;
-using BaseGameLogic.Character;
-using System.Reflection;
-using System.Collections.Generic;
-using UnityEngine.Events;
 
 namespace BaseGameLogic.Management
 {
@@ -20,16 +19,6 @@ namespace BaseGameLogic.Management
 		[SerializeField]
 		private GameStatusEnum _gameStatus = GameStatusEnum.Play;
 		public GameStatusEnum GameStatus { get { return this._gameStatus; } }
-
-		[SerializeField, Manager(true, typeof(InputCollectorManager))]
-		private GameObject inputCollectorManagerPrefab = null;
-        public GameObject InputCollectorManagerPrefab { get { return inputCollectorManagerPrefab; } }
-		public InputCollectorManager InputCollectorManager { get { return InputCollectorManager.Instance; } }
-
-        [SerializeField, Manager(true, typeof(BaseTimeManager))]
-		private GameObject timeManagerPrefab = null;
-        public GameObject TimeManagerPrefab { get { return timeManagerPrefab; } }
-		public BaseTimeManager TimeManagerInstance { get { return BaseTimeManager.Instance; } }
 
         protected virtual void CreateManagersInstance()
 		{
@@ -74,15 +63,9 @@ namespace BaseGameLogic.Management
             }
 		}
 
-		public void PauseGame()
+		public virtual void PauseGame()
 		{
 			_gameStatus = GameStatusEnum.Pause;
-            if(TimeManagerInstance != null)
-            {
-			    TimeManagerInstance.Factor = 0f;
-            }
-
-            Cursor.visible = true;
         }
 
         public void LoadGame()
@@ -90,15 +73,9 @@ namespace BaseGameLogic.Management
             _gameStatus = GameStatusEnum.Loading;
         }
 
-        public void ResumeGame()
+        public virtual void ResumeGame()
 		{
 			_gameStatus = GameStatusEnum.Play;
-            if (TimeManagerInstance != null)
-            {
-                TimeManagerInstance.Factor = 1f;
-            }
-
-            Cursor.visible = false;
         }
     }
 

@@ -9,8 +9,38 @@ namespace BaseGameLogic.Animation
 	[Serializable]
 	public class AnimatorParametrHandler
 	{
-		[SerializeField] private RuntimeAnimatorController _animator = null;
-        public RuntimeAnimatorController Animator { get { return _animator; } }
+        /// <summary>
+        /// This take animation controller form animator and sets its.
+        /// </summary>
+        public Animator Animator
+        {
+            set
+            {
+                if (value != null)
+                {
+                    if (value.runtimeAnimatorController is AnimatorOverrideController)
+                    {
+                        var controller = value.runtimeAnimatorController as AnimatorOverrideController;
+                        _animator = controller.runtimeAnimatorController;
+                    }
+                    else
+                    {
+                        _animator = value.runtimeAnimatorController;
+                    }
+                }
+                else
+                {
+                    _animator = null;
+                }
+            }
+        }
+
+        [SerializeField] private RuntimeAnimatorController _animator = null;
+        public RuntimeAnimatorController AnimatorController
+        {
+            get { return _animator; }
+            set { _animator = value; }
+        }
 
         [SerializeField] private string _name = string.Empty;
         public string Name { get { return _name; } }
